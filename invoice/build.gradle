@@ -1,0 +1,19 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'dz.fahis.fawatir'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'dz.fahis.fawatir'
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+    buildTypes { release { minifyEnabled false } }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
+dependencies {
+    // On-device text recognition (Latin script), works offline.
+    implementation 'com.google.mlkit:text-recognition:16.0.1'
+    implementation 'androidx.core:core:1.13.1'
+}

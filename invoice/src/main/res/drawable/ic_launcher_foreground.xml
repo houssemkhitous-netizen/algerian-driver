@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Invoice sheet with text lines and a magnifier, white on blue. 108dp canvas, art inside the 66dp safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M34,26 L62,26 L72,36 L72,80 L34,80 Z"/>
+    <path android:fillColor="#C9D6F2"
+        android:pathData="M62,26 L62,36 L72,36 Z"/>
+    <path android:fillColor="#1F4AA8"
+        android:pathData="M40,42 L60,42 L60,45 L40,45 Z M40,50 L64,50 L64,53 L40,53 Z M40,58 L54,58 L54,61 L40,61 Z"/>
+    <path android:fillColor="#FFB020"
+        android:pathData="M66,60 A10,10 0 1,0 66.01,60 Z M66,64 A6,6 0 1,1 65.99,64 Z"/>
+    <path android:fillColor="#FFB020"
+        android:pathData="M71.5,76.5 L74.5,73.5 L82,81 L79,84 Z"/>
+</vector>

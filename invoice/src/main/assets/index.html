@@ -1,0 +1,1198 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>[hidden]{display:none!important}body{margin:0}</style></head><body><title>فاحص الفواتير</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Reem+Kufi:wght@600&display=swap">
+<style>
+/* Layout: one column. Scan card, form sections, live findings, roadblock penalties, sticky status bar. */
+:root {
+  --bg: #f1f4f8;
+  --surface: #ffffff;
+  --ink: #15213a;
+  --muted: #5a6479;
+  --line: #d3d9e4;
+  --accent: #1f4aa8;
+  --accent-soft: #e4ebf8;
+  --bad: #b3261e;
+  --bad-soft: #fbe9e7;
+  --warn: #8a5a00;
+  --warn-soft: #fdf1d8;
+  --ok: #17703f;
+  --ok-soft: #e1f3e8;
+  --info: #3d5a80;
+  --info-soft: #e8eef6;
+  --f-display: "Reem Kufi", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans Arabic", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e141f; --surface: #161e2c; --ink: #e5e9f1; --muted: #9aa5ba; --line: #2b3548;
+    --accent: #7aa2f0; --accent-soft: #1d2a45;
+    --bad: #ff9b92; --bad-soft: #3a1c1a; --warn: #f0c36a; --warn-soft: #382a0d;
+    --ok: #7fd6a2; --ok-soft: #12301f; --info: #9db8dc; --info-soft: #1b2639;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e141f; --surface: #161e2c; --ink: #e5e9f1; --muted: #9aa5ba; --line: #2b3548;
+  --accent: #7aa2f0; --accent-soft: #1d2a45;
+  --bad: #ff9b92; --bad-soft: #3a1c1a; --warn: #f0c36a; --warn-soft: #382a0d;
+  --ok: #7fd6a2; --ok-soft: #12301f; --info: #9db8dc; --info-soft: #1b2639;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.6; }
+.app {
+  max-width: 760px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 96px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+h1 { font-family: var(--f-display); font-size: 1.7rem; line-height: 1.3; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--f-display); font-size: 1.1rem; margin: 0 0 12px; text-wrap: balance; }
+h2.sec { margin: 8px 0 0; font-size: 1.3rem; }
+.sub { color: var(--muted); margin: 4px 0 0; }
+.banner { background: var(--info-soft); color: var(--info); border-radius: 8px; padding: 10px 12px; font-size: 0.88rem; display: flex; gap: 8px 12px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.banner p { margin: 0; flex: 1 1 220px; min-width: 0; }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+button, .btn { font: inherit; font-size: 0.92rem; cursor: pointer; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 7px 12px; min-height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; }
+button.primary, .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; }
+button:disabled { opacity: 0.55; cursor: default; }
+button:focus-visible, .btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.span { grid-column: 1 / -1; }
+label { display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; color: var(--muted); min-width: 0; }
+input[type="text"], input[type="date"], select, textarea {
+  font: inherit; font-size: 0.95rem; color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-height: 42px; width: 100%; min-width: 0;
+}
+input.ltr { direction: ltr; text-align: right; font-family: var(--f-data); font-size: 0.88rem; }
+.check { flex-direction: row; align-items: center; gap: 8px; color: var(--ink); font-size: 0.92rem; }
+.check input { width: 20px; height: 20px; accent-color: var(--accent); flex: none; }
+.line { border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.line .full { grid-column: 1 / -1; }
+.line-foot { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.lines { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.num { font-family: var(--f-data); font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+.words { background: var(--accent-soft); border-radius: 8px; padding: 8px 10px; font-size: 0.85rem; }
+.words .num { font-family: var(--f-body); direction: ltr; text-align: left; display: block; }
+
+/* scan */
+.scan { border: 1.5px dashed var(--accent); background: var(--accent-soft); }
+.scan-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.thumb { width: 72px; height: 72px; border-radius: 8px; object-fit: cover; border: 1px solid var(--line); background: var(--surface); flex: none; }
+.filebtn { position: relative; overflow: hidden; }
+.filebtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.status { font-size: 0.88rem; margin: 10px 0 0; color: var(--muted); }
+.status.err { color: var(--bad); }
+.status.ok { color: var(--ok); }
+
+/* verify box */
+.verify { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+.vrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.vrow .lbl { font-size: 0.82rem; color: var(--muted); min-width: 92px; }
+.chip { font-size: 0.78rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+.chip.bad { background: var(--bad-soft); color: var(--bad); }
+.chip.warn { background: var(--warn-soft); color: var(--warn); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.info { background: var(--info-soft); color: var(--info); }
+.btn.small, button.small { min-height: 34px; padding: 4px 10px; font-size: 0.82rem; }
+
+/* results */
+.verdict { border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+.verdict.bad { background: var(--bad-soft); color: var(--bad); }
+.verdict.warn { background: var(--warn-soft); color: var(--warn); }
+.verdict.ok { background: var(--ok-soft); color: var(--ok); }
+.verdict strong { font-family: var(--f-display); font-size: 1.25rem; font-weight: 600; }
+.verdict span { font-size: 0.9rem; }
+.finding { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.finding h3 { margin: 0; font-size: 1rem; line-height: 1.5; }
+.finding p { margin: 0; overflow-wrap: anywhere; }
+.tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.pill { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em; padding: 2px 10px; border-radius: 999px; }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.info { background: var(--info-soft); color: var(--info); }
+.pill.law { background: var(--accent-soft); color: var(--accent); }
+.effect { background: var(--bg); border-radius: 8px; padding: 8px 10px; font-size: 0.88rem; color: var(--muted); }
+.effect b { color: var(--ink); }
+.oklist { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.oklist li { display: flex; gap: 8px; color: var(--ok); font-size: 0.92rem; }
+.oklist li span { color: var(--ink); }
+.oklist li::before { content: "✓"; font-weight: 600; }
+.list { display: flex; flex-direction: column; gap: 10px; }
+.foot { font-size: 0.8rem; color: var(--muted); }
+textarea.fallback { height: 160px; margin-top: 8px; }
+
+/* roadblock */
+.rb-sum { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.rb-sum div { background: var(--bg); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+.rb-sum small { display: block; font-size: 0.78rem; color: var(--muted); }
+.rb-sum b { font-size: 1.05rem; }
+.tbl-wrap { overflow-x: auto; margin-top: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 540px; }
+th, td { text-align: right; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+td.amt { white-space: nowrap; }
+.who { font-size: 0.78rem; color: var(--muted); }
+.pv { white-space: pre-wrap; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px; font-size: 0.88rem; line-height: 1.9; overflow-wrap: anywhere; max-height: 520px; overflow-y: auto; }
+.notes { margin: 12px 0 0; padding-inline-start: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 0.88rem; }
+
+/* sticky status bar */
+.bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+  background: var(--surface); border-top: 1px solid var(--line);
+  padding-top: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.bar-in { max-width: 760px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.counts { display: flex; gap: 6px 12px; flex-wrap: wrap; font-size: 0.9rem; font-weight: 500; }
+.c-bad { color: var(--bad); } .c-warn { color: var(--warn); } .c-ok { color: var(--ok); }
+@media (max-width: 440px) { .line { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+
+<div class="app" dir="rtl" lang="ar">
+  <header>
+    <h1>فاحص الفواتير</h1>
+    <p class="sub">صوّر الفاتورة أو أدخل بياناتها، فتظهر الأخطاء وتكييفها القانوني والجزاء المقرر لكل منها، وإجراءات المراقبة عند الحاجز وصيغة المحضر.</p>
+  </header>
+
+  <section class="card scan" aria-labelledby="scanTitle">
+    <h2 id="scanTitle">مسح الفاتورة من صورة</h2>
+    <div class="scan-row">
+      <img class="thumb" id="thumb" alt="صورة الفاتورة المختارة" hidden>
+      <div class="btns">
+        <label class="btn" for="camIn" style="flex-direction:row;color:var(--ink);font-size:0.92rem">التقاط صورة</label>
+        <input type="file" id="camIn" accept="image/*" capture="environment" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" tabindex="-1">
+        <label class="btn" for="fileIn" style="flex-direction:row;color:var(--ink);font-size:0.92rem">اختيار من المعرض</label>
+        <input type="file" id="fileIn" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" tabindex="-1">
+        <button type="button" class="primary" id="scanBtn" disabled>استخراج البيانات</button>
+        <button type="button" id="stopBtn" hidden>إيقاف</button>
+      </div>
+    </div>
+    <p class="status" id="scanStatus">اختر صورة واضحة للفاتورة كاملة، ولو كانت مقلوبة. يقرؤها الهاتف ويملأ الحقول، ثم تراجعها أنت.</p>
+    <div id="pasteBox" hidden contenteditable="true" role="textbox" aria-label="خانة لصق الصورة" style="margin-top:10px;min-height:56px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:10px;color:var(--muted);font-size:0.88rem">إن لم تعمل الأزرار: انسخ صورة الفاتورة من تطبيق الصور، ثم اضغط هنا ضغطاً مطولاً واختر «لصق».</div>
+  </section>
+
+  <div class="banner">
+    <p>المعروض مثال من صورة الفاتورة 001/2026، وقد تكون فيه أخطاء قراءة. صحّحه حسب الأصل.</p>
+    <div class="btns">
+      <button type="button" id="btnExample">حمّل المثال</button>
+      <button type="button" id="btnClear">فاتورة فارغة</button>
+    </div>
+  </div>
+
+  <section class="card">
+    <h2>الفاتورة</h2>
+    <div class="grid">
+      <label>رقم الفاتورة<input type="text" id="invNo" class="ltr" autocomplete="off"></label>
+      <label>التاريخ<input type="date" id="invDate"></label>
+      <label>طريقة الدفع
+        <select id="pay">
+          <option value="cheque">شيك</option>
+          <option value="virement">تحويل بنكي</option>
+          <option value="especes">نقداً</option>
+          <option value="autre">أخرى</option>
+          <option value="none">غير مذكورة</option>
+        </select>
+      </label>
+      <label>رقم الشيك أو مرجع التحويل<input type="text" id="payRef" class="ltr" autocomplete="off"></label>
+      <label class="span">مرجع وصل التسليم أو الطلبية<input type="text" id="deliv" class="ltr" autocomplete="off"></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>البائع</h2>
+    <div class="grid">
+      <label class="span">الاسم أو التسمية<input type="text" id="sName" dir="auto" autocomplete="off"></label>
+      <label class="span">النشاط في السجل التجاري<input type="text" id="sAct" dir="auto" autocomplete="off"></label>
+      <label class="span">العنوان<input type="text" id="sAddr" dir="auto" autocomplete="off"></label>
+      <label>السجل التجاري RC<input type="text" id="sRc" class="ltr" autocomplete="off"></label>
+      <label>الرقم الجبائي NIF<input type="text" id="sNif" class="ltr" inputmode="numeric" autocomplete="off"></label>
+      <label>رقم التعريف الإحصائي NIS<input type="text" id="sNis" class="ltr" inputmode="numeric" autocomplete="off"></label>
+      <label>رقم مادة الضريبة AI<input type="text" id="sAi" class="ltr" inputmode="numeric" autocomplete="off"></label>
+      <label class="span">النظام الجبائي
+        <select id="sRegime">
+          <option value="ifu">الضريبة الجزافية الوحيدة IFU (غير خاضع للـTVA)</option>
+          <option value="reel">النظام الحقيقي (خاضع للـTVA)</option>
+        </select>
+      </label>
+      <div class="verify" data-party="s"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>المشتري</h2>
+    <div class="grid">
+      <label class="check span"><input type="checkbox" id="bBiz" checked>المشتري تاجر أو شركة</label>
+      <label class="span">الاسم أو التسمية<input type="text" id="bName" dir="auto" autocomplete="off"></label>
+      <label class="span">العنوان<input type="text" id="bAddr" dir="auto" autocomplete="off"></label>
+      <label>السجل التجاري RC<input type="text" id="bRc" class="ltr" autocomplete="off"></label>
+      <label>الرقم الجبائي NIF<input type="text" id="bNif" class="ltr" inputmode="numeric" autocomplete="off"></label>
+      <label>رقم التعريف الإحصائي NIS<input type="text" id="bNis" class="ltr" inputmode="numeric" autocomplete="off"></label>
+      <label>رقم مادة الضريبة AI<input type="text" id="bAi" class="ltr" inputmode="numeric" autocomplete="off"></label>
+      <div class="verify" data-party="b"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>السلع والمبالغ</h2>
+    <div class="lines" id="lines"></div>
+    <div class="btns"><button type="button" id="addLine">إضافة سطر</button></div>
+    <div class="grid" style="margin-top:16px">
+      <label>نسبة الـTVA المطبقة
+        <select id="rate">
+          <option value="0">0% (غير خاضع)</option>
+          <option value="9">9%</option>
+          <option value="19">19%</option>
+        </select>
+      </label>
+      <label class="check" style="align-self:end"><input type="checkbox" id="mention">عبارة «غير خاضع للـTVA» مكتوبة</label>
+      <label>المجموع خارج الرسم HT كما هو مكتوب<input type="text" id="stHT" class="ltr" inputmode="decimal" autocomplete="off"></label>
+      <label>مبلغ الـTVA كما هو مكتوب<input type="text" id="stTVA" class="ltr" inputmode="decimal" autocomplete="off"></label>
+      <label>المجموع TTC كما هو مكتوب<input type="text" id="stTTC" class="ltr" inputmode="decimal" autocomplete="off"></label>
+      <label class="check" style="align-self:end"><input type="checkbox" id="stamp">ختم وإمضاء البائع موجودان</label>
+      <label class="span">المبلغ بالحروف كما هو مكتوب<input type="text" id="stWords" dir="ltr" style="text-align:left" autocomplete="off"></label>
+      <div class="span words" id="wordsHint"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>النقل والحاجز</h2>
+    <div class="grid">
+      <label class="check span"><input type="checkbox" id="inTransit" checked>البضاعة منقولة على الطريق الآن</label>
+      <label class="span">الوثيقة المرافقة للبضاعة
+        <select id="doc">
+          <option value="facture">هذه الفاتورة</option>
+          <option value="bl">وصل تسليم فقط</option>
+          <option value="transfert">سند تحويل (بضاعة لا تخص عملية بيع)</option>
+          <option value="none">لا توجد أي وثيقة</option>
+        </select>
+      </label>
+      <label class="check span"><input type="checkbox" id="rcCopy">نسخة من السجل التجاري للبائع أو المشتري مرافقة</label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>بيانات التوقيف (اختيارية، لملء صيغة المحضر)</h2>
+    <div class="grid">
+      <label>الجهة المعاينة
+        <select id="stCorps">
+          <option value="sn">الأمن الوطني</option>
+          <option value="gn">الدرك الوطني</option>
+          <option value="dc">مديرية التجارة</option>
+        </select>
+      </label>
+      <label>اسم العون ورتبته<input type="text" id="stAgent" dir="auto" autocomplete="off"></label>
+      <label>مكان الحاجز<input type="text" id="stPlace" dir="auto" autocomplete="off"></label>
+      <label>التاريخ<input type="date" id="stDate"></label>
+      <label>الساعة<input type="text" id="stTime" class="ltr" placeholder="14:30" autocomplete="off"></label>
+      <label>رقم المركبة<input type="text" id="stPlate" class="ltr" autocomplete="off"></label>
+      <label>اسم السائق<input type="text" id="stDriver" dir="auto" autocomplete="off"></label>
+      <label>الحارس على المحجوزات<input type="text" id="stKeeper" dir="auto" autocomplete="off"></label>
+    </div>
+  </section>
+
+  <h2 class="sec" id="results">نتيجة الفحص</h2>
+  <div id="verdict"></div>
+  <div class="list" id="findings"></div>
+  <section class="card" id="oksec">
+    <h2>ما تم التحقق منه</h2>
+    <ul class="oklist" id="oks"></ul>
+  </section>
+
+  <h2 class="sec" id="rbTitle">عند التوقيف في حاجز أمني</h2>
+  <section class="card" id="rb"></section>
+
+  <h2 class="sec">إجراءات رجل الأمن خطوة بخطوة</h2>
+  <section class="card">
+    <ol class="notes" id="steps" style="margin:0"></ol>
+  </section>
+
+  <h2 class="sec">صيغة المحضر</h2>
+  <section class="card">
+    <p class="foot" style="margin:0 0 10px">نموذج استرشادي يبيّن ما يتضمنه محضر المعاينة حسب المادتين 56 و57، مبني على بيانات هذه الفاتورة. ليس وثيقة رسمية، فالمحاضر الرسمية تحرر على نماذج الإدارة وبتوقيع الأعوان المؤهلين.</p>
+    <div class="pv" id="pv"></div>
+    <div class="btns" style="margin-top:10px"><button type="button" id="copyPv">نسخ صيغة المحضر</button></div>
+  </section>
+
+  <div class="btns">
+    <button type="button" id="copy">نسخ التقرير</button>
+  </div>
+  <textarea class="fallback" id="fallback" hidden readonly aria-label="نص التقرير"></textarea>
+  <p class="foot">هذه الأداة للمراجعة الأولية وليست استشارة قانونية. المواد مأخوذة من القانون 04-02 المعدل والمتمم (نسخة وزارة التجارة) والقانون 04-08 والمرسوم التنفيذي 05-468. الغرامات تقديرية لأن القاضي أو الإدارة يحددان المبلغ داخل الحدين، وسقفا IFU والدفع نقداً مكتوبان من الذاكرة. تحقق من النصوص السارية أو لدى محاسب أو محامٍ.</p>
+</div>
+
+<div class="bar" role="status" aria-live="polite">
+  <div class="bar-in">
+    <div class="counts" id="counts"></div>
+    <button type="button" class="primary" id="goResults">عرض النتيجة</button>
+  </div>
+</div>
+
+<script>
+// <logic>
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+function num(s){
+  s = String(s == null ? '' : s).replace(/[٠-٩]/g, function(c){ return c.charCodeAt(0) - 0x660; }).replace(/[\s  ]/g, '');
+  if (!s) return NaN;
+  var c = s.indexOf(',') >= 0, d = s.indexOf('.') >= 0;
+  if (c && d) {
+    if (s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\./g, '').replace(',', '.');
+    else s = s.replace(/,/g, '');
+  } else if (c) {
+    s = /,\d{1,2}$/.test(s) ? s.replace(',', '.') : s.replace(/,/g, '');
+  } else if (d) {
+    if (!/\.\d{1,2}$/.test(s)) s = s.replace(/\./g, '');
+  }
+  return /^-?\d+(\.\d+)?$/.test(s) ? parseFloat(s) : NaN;
+}
+
+function fmt(n){
+  if (!isFinite(n)) return '—';
+  return new Intl.NumberFormat('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(n);
+}
+function fmt0(n){ return isFinite(n) ? new Intl.NumberFormat('fr-FR', {maximumFractionDigits: 0}).format(n) : '—'; }
+
+var U = ['zéro','un','deux','trois','quatre','cinq','six','sept','huit','neuf','dix','onze','douze','treize','quatorze','quinze','seize','dix-sept','dix-huit','dix-neuf'];
+var T = ['','','vingt','trente','quarante','cinquante','soixante'];
+function below100(n, final){
+  if (n < 20) return U[n];
+  var t = Math.floor(n / 10), u = n % 10;
+  if (t <= 6) { if (u === 0) return T[t]; if (u === 1) return T[t] + ' et un'; return T[t] + '-' + U[u]; }
+  if (t === 7) { if (u === 1) return 'soixante et onze'; return 'soixante-' + U[10 + u]; }
+  if (t === 8) { if (u === 0) return final ? 'quatre-vingts' : 'quatre-vingt'; return 'quatre-vingt-' + U[u]; }
+  return 'quatre-vingt-' + U[10 + u];
+}
+function below1000(n, final){
+  var h = Math.floor(n / 100), r = n % 100, s = '';
+  if (h > 0) { s = h === 1 ? 'cent' : U[h] + ' cent'; if (r === 0 && h > 1 && final) s += 's'; }
+  if (r > 0) s += (s ? ' ' : '') + below100(r, final);
+  return s;
+}
+function words(n){
+  n = Math.floor(n);
+  if (n === 0) return 'zéro';
+  var parts = [], mil = Math.floor(n / 1e6), th = Math.floor((n % 1e6) / 1000), r = n % 1000;
+  if (mil > 0) parts.push(below1000(mil, true) + ' million' + (mil > 1 ? 's' : ''));
+  if (th > 0) parts.push(th === 1 ? 'mille' : below1000(th, false) + ' mille');
+  if (r > 0) parts.push(below1000(r, true));
+  return parts.join(' ');
+}
+function amountWords(v){
+  if (!isFinite(v) || v < 0 || v >= 1e9) return '';
+  var i = Math.floor(v + 1e-9), c = Math.round((v - i) * 100), s = words(i) + ' dinars';
+  if (c > 0) s += ' et ' + words(c) + ' centimes';
+  return s;
+}
+function norm(s){
+  var skip = {et:1, dinar:1, dinars:1, algerien:1, algeriens:1, da:1, dzd:1, centime:1, centimes:1};
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .split(/[^a-z]+/).filter(function(w){ return w && !skip[w]; })
+    .map(function(w){ return w.replace(/[sx]$/, ''); }).join(' ');
+}
+function digits(s){ return String(s || '').replace(/[٠-٩]/g, function(c){ return c.charCodeAt(0) - 0x660; }).replace(/\D/g, ''); }
+
+// NIF: 15 digits (20 for a secondary establishment, whose first 15 are the main NIF). No public check key.
+function checkNif(v){
+  var d = digits(v);
+  if (!d) return {state: 'none', label: 'غير مذكور'};
+  if (d.length === 15) return {state: 'ok', label: 'الصيغة سليمة (15 رقماً)'};
+  if (d.length === 20) return {state: 'ok', label: 'صيغة فرع (20 رقماً)'};
+  return {state: 'bad', label: 'الصيغة خاطئة: ' + d.length + ' رقماً بدل 15'};
+}
+function checkNis(v){
+  var d = digits(v);
+  if (!d) return {state: 'none', label: 'غير مذكور'};
+  if (d.length === 15) return {state: 'ok', label: 'الصيغة سليمة (15 رقماً)'};
+  return {state: 'warn', label: 'طول غير معتاد: ' + d.length + ' رقماً'};
+}
+// RC: e.g. "18 A 1670868-01/43" or "07 B 0123456-00/16". Letter A = natural person, B = company.
+function parseRc(v){
+  var s = String(v || '').toUpperCase().replace(/\s+/g, ' ').trim();
+  if (!s) return {state: 'none', label: 'غير مذكور'};
+  var m = s.match(/^(\d{2})\s*([AB])\s*(\d{5,8})\s*[-–]?\s*(\d{2})\s*\/\s*(\d{2})$/);
+  if (!m) {
+    var loose = s.match(/^(\d{2})\s*([AB])\s*\d{4,}/);
+    if (loose) return {state: 'warn', label: 'الصيغة غير مكتملة', letter: loose[2]};
+    return {state: 'bad', label: 'الصيغة لا تشبه رقم سجل جزائري'};
+  }
+  return {state: 'ok', label: 'الصيغة سليمة', year: m[1], letter: m[2], seq: m[3], tail: m[4] + '/' + m[5]};
+}
+var COMPANY = /\b(SARL|EURL|SPA|SNC|SCS|SPAS|SPASU|ETS)\b|شركة|ذات المسؤولية/i;
+
+// Penalty catalogue (Law 04-02 as amended, Law 04-08).
+var LAW = {
+  a33: {ref: 'المادة 33 من القانون 04-02', name: 'عدم الفوترة', kind: 'pct', pct: 0.8,
+    qual: 'مخالفة عدم الفوترة، المنصوص عليها في المادتين 10 و34 (الفقرة الأخيرة) والمعاقب عليها بالمادة 33 من القانون 04-02 المعدل والمتمم',
+    who: 'البائع ملزم بتسليم الفاتورة والمشتري ملزم بطلبها (المادة 10)', seize: true},
+  a34: {ref: 'المادة 34 من القانون 04-02', name: 'فاتورة غير مطابقة', kind: 'range', min: 10000, max: 50000,
+    qual: 'مخالفة تحرير فاتورة غير مطابقة، المنصوص عليها في المادة 12 والمعاقب عليها بالمادة 34 من القانون 04-02 المعدل والمتمم، والمرسوم التنفيذي 05-468',
+    who: 'محرر الفاتورة (البائع)', seize: false},
+  a37: {ref: 'المادتان 24 و37 من القانون 04-02', name: 'فاتورة وهمية أو مزورة', kind: 'range', min: 300000, max: 10000000,
+    qual: 'مخالفة الممارسات التجارية التدليسية (تحرير أو استعمال فاتورة وهمية أو مزيفة)، المنصوص عليها في المادة 24 والمعاقب عليها بالمادة 37 من القانون 04-02 المعدل والمتمم',
+    who: 'محرر الفاتورة ومن استعملها عن علم', seize: true},
+  l41: {ref: 'المادة 41 من القانون 04-08', name: 'نشاط خارج موضوع السجل التجاري', kind: 'range', min: 20000, max: 200000,
+    qual: 'مخالفة ممارسة نشاط تجاري خارج موضوع مستخرج السجل التجاري، المعاقب عليها بالمادة 41 من القانون 04-08 المتعلق بشروط ممارسة الأنشطة التجارية',
+    who: 'البائع، مع غلق إداري مؤقت لشهر والشطب إن لم تُسوَّ الوضعية', seize: false},
+  l31b: {ref: 'المادة 31 مكرر من القانون 04-08', name: 'نشاط بمستخرج سجل منتهي الصلاحية', kind: 'range', min: 10000, max: 500000,
+    qual: 'مخالفة ممارسة نشاط تجاري بمستخرج سجل تجاري منتهي الصلاحية، المعاقب عليها بالمادة 31 مكرر من القانون 04-08 المعدل بالقانون 13-06',
+    who: 'البائع، مع غلق إداري يأمر به الوالي', seize: false},
+  a53: {ref: 'المادتان 53 و54 من القانون 04-02', name: 'معارضة المراقبة', kind: 'range', min: 100000, max: 1000000,
+    qual: 'جنحة معارضة المراقبة، المنصوص عليها في المادة 54 والمعاقب عليها بالمادة 53 من القانون 04-02',
+    who: 'من يرفض تقديم الوثائق أو يعرقل المراقبة، مع حبس من 6 أشهر إلى سنتين', seize: false}
+};
+var LEGAL = {
+  a33: 'تُكيَّف عدم فوترة: الفاتورة الناقصة لهذا البيان تُعامل كأنها غير موجودة (المادة 34، الفقرة الأخيرة). الجزاء غرامة تساوي 80% من المبلغ الواجب فوترته (المادة 33)، مع جواز حجز البضاعة (المادة 39) ومصادرتها بحكم قضائي (المادة 44)، وجواز الغلق الإداري حتى 60 يوماً (المادة 46).',
+  a34: 'تُكيَّف فاتورة غير مطابقة (المادة 34). الجزاء غرامة من 10.000 إلى 50.000 دج. لا تبرر وحدها حجز البضاعة.',
+  a37: 'قد تُكيَّف ممارسة تجارية تدليسية لتحرير أو استعمال فاتورة وهمية أو مزيفة (المادة 24). الجزاء غرامة من 300.000 إلى 10.000.000 دج (المادة 37)، مع جواز الحجز والمصادرة.',
+  l41: 'ممارسة نشاط تجاري خارج موضوع مستخرج السجل التجاري. الجزاء غلق إداري مؤقت لمدة شهر وغرامة من 20.000 إلى 200.000 دج، والشطب من السجل بحكم قضائي إن لم تُسوَّ الوضعية خلال شهرين (المادة 41 من القانون 04-08).',
+  l31b: 'ممارسة نشاط بمستخرج سجل منتهي الصلاحية: غرامة من 10.000 إلى 500.000 دج وغلق إداري، والشطب إن لم تُسوَّ الوضعية خلال ثلاثة أشهر (المادة 31 مكرر من القانون 04-08).'
+};
+
+function analyze(d, today){
+  var F = [], OK = [];
+  function add(sev, title, detail, effect, law){ F.push({sev: sev, title: title, detail: detail, effect: effect || (law ? LEGAL[law] : ''), law: law || null}); }
+  function ok(t){ OK.push(t); }
+  var has = function(v){ return String(v || '').trim().length > 0; };
+  var s = d.seller;
+  var NONE = 'لا يشكل مخالفة في القانون 04-02 ولا في المرسوم 05-468، ولا يترتب عليه جزاء.';
+
+  // seller identity. Art. 34: name, NIF, address missing = non-invoicing (art. 33).
+  var crit = [], soft = [];
+  if (!has(s.name)) crit.push('الاسم'); if (!has(s.addr)) crit.push('العنوان'); if (!has(s.nif)) crit.push('الرقم الجبائي NIF');
+  if (!has(s.rc)) soft.push('رقم السجل التجاري'); if (!has(s.nis)) soft.push('رقم التعريف الإحصائي NIS');
+  if (crit.length) add('bad', 'بيانات جوهرية للبائع ناقصة', 'غير مذكور: ' + crit.join('، ') + '.', null, 'a33');
+  if (soft.length) add('bad', 'بيانات إلزامية للبائع ناقصة', 'غير مذكور: ' + soft.join('، ') + '. المرسوم التنفيذي 05-468 يوجب ' + (soft.length > 1 ? 'ذكرهما.' : 'ذكره.'), null, 'a34');
+  if (!crit.length && !soft.length) ok('بيانات البائع الإلزامية كاملة.');
+  if (!has(s.ai)) add('info', 'رقم مادة الضريبة AI للبائع غير مذكور', 'ليس من البيانات التي يعددها المرسوم 05-468.', NONE);
+
+  var nifS = checkNif(s.nif);
+  if (nifS.state === 'bad') add('bad', 'الرقم الجبائي للبائع بصيغة خاطئة', nifS.label + '. تأكد من الأصل أو من القراءة.',
+    'رقم جبائي خاطئ يعادل غيابه، فيُكيَّف عدم فوترة (المادة 34، الفقرة الأخيرة): غرامة 80% من المبلغ (المادة 33) مع جواز الحجز. وإن ثبت أن الرقم لشخص آخر فقد يُكيَّف تدليساً (المادتان 24 و37).', 'a33');
+  if (has(s.nif) && nifS.state === 'ok') {
+    if (d.verify.sNif === 'yes') ok('الرقم الجبائي للبائع مؤكَّد في موقع المديرية العامة للضرائب.');
+    else if (d.verify.sNif === 'no') add('bad', 'الرقم الجبائي للبائع لا يطابق موقع الضرائب', 'موقع المديرية العامة للضرائب لا يعرض اسم البائع لهذا الرقم.', null, 'a37');
+    else add('info', 'الرقم الجبائي للبائع لم يُتحقق منه بعد', 'افتح موقع المديرية العامة للضرائب من قسم البائع وقارن الاسم.', 'لا مخالفة في ذاته. للمحققين التحقق منه لدى إدارة الضرائب (المادتان 49 و50).');
+  }
+  var nisS = checkNis(s.nis);
+  if (nisS.state === 'warn') add('warn', 'رقم NIS للبائع بطول غير معتاد', nisS.label + '.', 'إن ثبت خطؤه فالفاتورة غير مطابقة (المادة 34): غرامة من 10.000 إلى 50.000 دج.');
+  var rcS = parseRc(s.rc);
+  if (rcS.state === 'bad' || rcS.state === 'warn') add('warn', 'رقم السجل التجاري للبائع غير واضح', rcS.label + ': ' + s.rc, null, 'a34');
+  if (rcS.letter === 'A' && COMPANY.test(s.name)) add('warn', 'نوع السجل لا يطابق شكل البائع', 'الحرف A يخص الشخص الطبيعي، والاسم يدل على شركة.', 'إن ثبت أن السجل لا يخص البائع فقد يُكيَّف تدليساً (المادتان 24 و37).');
+  if (has(s.rc) && rcS.state === 'ok') {
+    if (d.verify.sRc === 'yes') ok('سجل البائع مؤكَّد ونشاطه مطابق.');
+    else if (d.verify.sRc === 'no') add('bad', 'سجل البائع منتهٍ أو لا يطابق', 'السجل منتهي الصلاحية أو مشطوب أو لا يخص البائع.', null, 'l31b');
+  }
+
+  // buyer
+  if (d.buyerBiz) {
+    var b = d.buyer, bc = [], bs = [];
+    if (!has(b.name)) bc.push('الاسم'); if (!has(b.addr)) bc.push('العنوان'); if (!has(b.nif)) bc.push('الرقم الجبائي NIF');
+    if (!has(b.rc)) bs.push('رقم السجل التجاري'); if (!has(b.nis)) bs.push('NIS');
+    if (bc.length) add('bad', 'بيانات جوهرية للمشتري ناقصة', 'غير مذكور: ' + bc.join('، ') + '.', null, 'a33');
+    if (bs.length) add('bad', 'بيانات إلزامية للمشتري ناقصة', 'غير مذكور: ' + bs.join('، ') + '.', null, 'a34');
+    if (!bc.length && !bs.length) ok('بيانات المشتري الإلزامية كاملة.');
+    var nifB = checkNif(b.nif);
+    if (nifB.state === 'bad') add('bad', 'الرقم الجبائي للمشتري بصيغة خاطئة', nifB.label + '.', null, 'a33');
+    var rcB = parseRc(b.rc);
+    if (rcB.state === 'bad' || rcB.state === 'warn') add('warn', 'رقم السجل التجاري للمشتري غير واضح', rcB.label + ': ' + b.rc, null, 'a34');
+    if (rcB.letter === 'A' && COMPANY.test(b.name)) add('warn', 'نوع سجل المشتري لا يطابق شكله', 'الحرف A يخص الشخص الطبيعي، والاسم يدل على شركة.', 'إن ثبت خطؤه فالفاتورة غير مطابقة (المادة 34).');
+  }
+
+  // number & date
+  if (!has(d.no)) add('bad', 'رقم الفاتورة غير مذكور', 'الفاتورة تُستخرج من دفتر بترقيم تسلسلي متصل (المرسوم 05-468).', null, 'a34');
+  else ok('رقم الفاتورة موجود.');
+  var dt = d.date ? new Date(d.date + 'T00:00:00') : null;
+  if (!dt || isNaN(dt)) add('bad', 'تاريخ الفاتورة غير مذكور', '', null, 'a34');
+  else {
+    if (dt > today) add('bad', 'تاريخ الفاتورة لاحق لليوم', 'التاريخ ' + d.date + '.', 'فاتورة بتاريخ لم يحل بعد قد تُكيَّف فاتورة صورية (المادتان 24 و37).', 'a37');
+    else ok('تاريخ الفاتورة سابق أو يساوي اليوم.');
+    if (/^0*1(\D|$)/.test(String(d.no || '').trim()) && dt.getMonth() >= 5)
+      add('info', 'الفاتورة رقم 1 لهذه السنة', 'التاريخ في الشهر ' + (dt.getMonth() + 1) + ' والرقم يعني أنها الأولى للبائع.', 'لا مخالفة في ذاته. للمحققين طلب دفتر الفواتير للتأكد من التسلسل (المادة 50).');
+  }
+
+  // lines & arithmetic. Missing designation, quantity or unit price = non-invoicing (art. 34).
+  var ht = 0, okLines = true;
+  if (!d.lines.length) { add('bad', 'لا توجد سلع في الفاتورة', '', null, 'a33'); okLines = false; }
+  d.lines.forEach(function(l, i){
+    var q = num(l.qty), p = num(l.price), tag = 'السطر ' + (i + 1);
+    if (!has(l.des)) { add('bad', tag + ': التسمية غير مكتوبة', '', null, 'a33'); okLines = false; }
+    if (!(q > 0)) { add('bad', tag + ': الكمية غير صحيحة', '', null, 'a33'); okLines = false; }
+    if (!(p >= 0)) { add('bad', tag + ': سعر الوحدة غير صحيح', '', null, 'a33'); okLines = false; }
+    if (q > 0 && p >= 0) ht += q * p;
+  });
+  if (d.lines.length && okLines) ok('كل سطر فيه تسمية وكمية وسعر.');
+  ht = Math.round(ht * 100) / 100;
+  var rate = parseFloat(d.rate) || 0;
+  var tva = Math.round(ht * rate) / 100, ttc = Math.round((ht + tva) * 100) / 100;
+  var sHT = num(d.stHT), sTVA = num(d.stTVA), sTTC = num(d.stTTC);
+  function cmp(label, stated, calc){
+    if (!isFinite(stated)) { add('warn', label + ' غير مكتوب', 'المحسوب من الأسطر: ' + fmt(calc) + ' دج.', null, 'a34'); return; }
+    if (Math.abs(stated - calc) > 0.009) add('bad', label + ' لا يطابق الحساب', 'المكتوب ' + fmt(stated) + ' دج والمحسوب ' + fmt(calc) + ' دج.', null, 'a34');
+    else ok(label + ' مطابق للحساب (' + fmt(calc) + ' دج).');
+  }
+  if (d.lines.length && okLines) { cmp('المجموع HT', sHT, ht); cmp('مبلغ الـTVA', isFinite(sTVA) ? sTVA : (rate === 0 ? 0 : NaN), tva); cmp('المجموع TTC', sTTC, ttc); }
+
+  // TVA (tax law, handled by the tax administration, not at the roadblock)
+  var TAX = ' هذه مخالفة جبائية تعاينها إدارة الضرائب وفق قانون الإجراءات الجبائية، ولا تدخل في غرامات الحاجز.';
+  var htRef = isFinite(sHT) ? sHT : ht;
+  if (s.regime === 'ifu') {
+    if (rate > 0 || (isFinite(sTVA) && sTVA > 0)) add('bad', 'بائع بنظام IFU يحصّل TVA', 'الخاضع للضريبة الجزافية الوحيدة لا يحصّل الـTVA.', 'تحصيل رسم بغير صفة يُلزم البائع بدفعه للخزينة مع الغرامات الجبائية.' + TAX);
+    else ok('لا TVA على فاتورة بائع بنظام IFU، وهو متسق.');
+    if (!d.mention) add('warn', 'عبارة «غير خاضع للـTVA» غير موجودة', '', 'المرسوم 05-468 يوجب بيان طبيعة الرسوم ونسبها، وغياب هذه العبارة قد يُعد نقصاً في الفاتورة (المادة 34).');
+    else ok('عبارة عدم الخضوع للـTVA مكتوبة.');
+    if (htRef > 8000000) add('warn', 'مبلغ الفاتورة يفوق سقف IFU', 'المبلغ ' + fmt(htRef) + ' دج، وسقف رقم الأعمال السنوي لنظام IFU هو 8.000.000 دج حسب علمي.', 'تجاوز السقف يخرج البائع إلى النظام الحقيقي ويُلزمه بالـTVA بأثر رجعي.' + TAX);
+  } else {
+    if (rate === 0 && !d.mention) add('bad', 'بائع خاضع للـTVA بلا TVA', 'النظام الحقيقي يوجب 19% أو 9% إلا في حالة إعفاء مبرر.', 'غياب نسبة الرسم بيان ناقص في الفاتورة (المادة 34)، ويُلزم البائع بدفع الرسم مع الغرامات الجبائية.', 'a34');
+    else if (rate > 0) ok('الـTVA مطبق بنسبة ' + rate + '%.');
+  }
+
+  // amount in words (decree 05-468: TTC in figures and letters)
+  var base = isFinite(sTTC) ? sTTC : ttc;
+  if (!has(d.stWords)) add('warn', 'المبلغ بالحروف غير مكتوب', 'المطلوب: ' + amountWords(base) + '. المرسوم 05-468 يوجب كتابة المبلغ الإجمالي بالأرقام والحروف.', null, 'a34');
+  else if (norm(d.stWords) !== norm(amountWords(base))) add('bad', 'المبلغ بالحروف لا يطابق المبلغ بالأرقام', 'المكتوب: ' + d.stWords + '. المتوقع: ' + amountWords(base) + '.', null, 'a34');
+  else ok('المبلغ بالحروف مطابق للمبلغ بالأرقام.');
+
+  // payment
+  var pm = d.pay;
+  if (pm === 'none') add('bad', 'طريقة الدفع غير مذكورة', 'المرسوم 05-468 يوجب ذكر طريقة الدفع وتاريخه.', null, 'a34');
+  else if (pm === 'especes') {
+    if (base > 1000000) add('bad', 'دفع نقدي فوق السقف', 'المبلغ ' + fmt(base) + ' دج والسقف المعتاد للدفع النقدي بين التجار 1.000.000 دج حسب علمي.', 'مخالفة إلزامية الدفع بوسائل الدفع الكتابية.' + TAX);
+    else add('info', 'دفع نقدي', 'يخضع الدفع النقدي لحق الطابع.', 'لا مخالفة تجارية. عدم دفع حق الطابع شأن جبائي.');
+  } else if (pm === 'cheque' || pm === 'virement') {
+    ok('طريقة الدفع مذكورة (وسيلة بنكية).');
+    if (!has(d.payRef)) add('info', 'رقم الشيك أو التحويل غير مذكور', '', NONE);
+  }
+
+  if (!has(d.deliv)) add('info', 'لا مرجع لوصل تسليم أو طلبية', '', NONE + ' لكن للمحققين طلب ما يثبت مصدر البضاعة (المادة 50).');
+  else ok('مرجع التسليم مكتوب.');
+  if (!d.stamp) add('bad', 'ختم وإمضاء البائع غير موجودين', 'المرسوم 05-468 يوجب الختم الندي والإمضاء على الفاتورة الورقية.', null, 'a34');
+  else ok('الختم والإمضاء موجودان.');
+
+  // activity vs goods
+  var goods = d.lines.map(function(l){ return l.des; }).join(' ').toLowerCase();
+  var act = String(s.act || '').toLowerCase();
+  var meltGoods = /lingot|ingot|سبيكة|سبائك|billette|brame/.test(goods);
+  var meltAct = /fonderie|m[ée]tallurgie|fusion|مسبك|صهر|سبك/.test(act);
+  var recAct = /r[ée]cup[ée]ration|collecte|استرجاع|جمع/.test(act);
+  if (has(s.act) && meltGoods && !meltAct) add('bad', 'نشاط البائع لا يطابق السلعة', 'النشاط المسجل: ' + s.act + '. والسلعة سبائك ناتجة عن الصهر.' + (recAct ? ' الاسترجاع لا يشمل الصهر.' : ''), null, 'l41');
+  else if (has(s.act) && meltGoods) ok('نشاط البائع يغطي الصهر.');
+  if (!has(s.act)) add('info', 'نشاط البائع لم يُدخل', '', 'أدخل النشاط من مستخرج السجل التجاري لمقارنته بالسلعة.');
+
+  var order = {bad: 0, warn: 1, info: 2};
+  F.sort(function(a, b){ return order[a.sev] - order[b.sev]; });
+  return {findings: F, oks: OK, totals: {ht: ht, tva: tva, ttc: ttc}, base: base};
+}
+
+// What happens at a roadblock, given the findings and how the goods travel.
+function roadblock(d, r){
+  var base = r.base, rows = [], notes = [];
+  var laws = {};
+  r.findings.forEach(function(f){ if (f.law) (laws[f.law] = laws[f.law] || []).push(f.title); });
+  if (d.inTransit && d.doc === 'none') laws.a33 = ['البضاعة منقولة بلا فاتورة ولا وثيقة تقوم مقامها (المادتان 10 و13)'].concat(laws.a33 || []);
+  if (d.inTransit && d.doc === 'bl') (laws.a34 = laws.a34 || []).push('وصل التسليم لا يقوم مقام الفاتورة إلا في البيوع المتكررة لنفس الزبون، مع فاتورة إجمالية شهرية (المادة 11)');
+  if (d.inTransit && d.doc === 'transfert') notes.push('سند التحويل يغطي فقط البضاعة التي لا تكون محل معاملة تجارية (المادة 11). إن كانت البضاعة مبيعة فالمطلوب فاتورة، وإلا كُيّفت عدم فوترة.');
+
+  var min = 0, max = 0, seizure = false;
+  ['a33', 'a37', 'l41', 'l31b', 'a34'].forEach(function(k){
+    if (!laws[k]) return;
+    if (k === 'a34' && laws.a33) return; // absorbed: the invoice already counts as missing
+    var L = LAW[k], lo, hi;
+    if (L.kind === 'pct') { lo = hi = Math.round(base * L.pct); } else { lo = L.min; hi = L.max; }
+    if (L.seize) seizure = true;
+    min += lo; max += hi;
+    rows.push({key: k, ref: L.ref, name: L.name, qual: L.qual, why: laws[k], lo: lo, hi: hi, who: L.who, pct: L.kind === 'pct'});
+  });
+  var level = rows.length === 0 ? 'ok' : (laws.a33 || laws.a37 ? 'bad' : 'warn');
+  var settle = !rows.length ? '' : (max <= 1000000 ? 'director' : (max < 3000000 ? 'minister' : 'prosecutor'));
+  return {rows: rows, min: min, max: max, seizure: seizure, level: level, notes: notes, settle: settle, a34absorbed: !!(laws.a33 && laws.a34)};
+}
+
+// Illustrative wording of an inspection report, built from Law 04-02 arts. 49, 52, 55-57 and 39-41.
+function buildPv(d, r, rb, stop){
+  var dots = '............';
+  var v = function(x){ x = String(x || '').trim(); return x || dots; };
+  var corps = stop.corps === 'gn' ? 'الدرك الوطني' : (stop.corps === 'dc' ? 'مديرية التجارة' : 'الأمن الوطني');
+  var agent = stop.corps === 'dc' ? 'أعوان قمع الغش والممارسات التجارية المؤهلين بموجب المادة 49 من القانون 04-02، الحاملين للتفويض بالعمل' : 'ضابط الشرطة القضائية، من ' + corps + '، المؤهل بموجب المادة 49 من القانون 04-02';
+  var goods = d.lines.map(function(l){ return (l.des || dots) + ' بكمية ' + (l.qty || dots) + ' ' + (l.unit || ''); }).join('، ');
+  var L = [];
+  L.push('نموذج استرشادي لصيغة محضر معاينة' + (rb.seizure ? ' وحجز' : '') + ' (ليس وثيقة رسمية)');
+  L.push('');
+  L.push('محضر معاينة مخالفة' + (rb.seizure ? ' وحجز' : '') + ' رقم: ' + dots);
+  L.push('');
+  L.push('في يوم ' + v(stop.date) + ' على الساعة ' + v(stop.time) + '، نحن ' + v(stop.agent) + '، ' + agent + '،');
+  L.push('وأثناء قيامنا بمهمة مراقبة على مستوى ' + v(stop.place) + '، وطبقاً للمواد 13 و49 و52 من القانون 04-02 المؤرخ في 23 جوان 2004 المحدد للقواعد المطبقة على الممارسات التجارية، المعدل والمتمم،');
+  L.push('قمنا بتوقيف المركبة رقم ' + v(stop.plate) + ' التي يقودها السيد ' + v(stop.driver) + '، والمحملة بـ: ' + goods + '.');
+  L.push('');
+  if (d.inTransit && d.doc === 'none') {
+    L.push('وبعد مطالبة الناقل بتقديم الفاتورة أو الوثيقة التي تقوم مقامها، صرّح بعدم حيازته لأي وثيقة تبرر حيازة البضاعة ونقلها.');
+  } else {
+    L.push('وبعد مطالبة الناقل بتقديم الوثائق المبررة للبضاعة، قدّم لنا الفاتورة رقم ' + v(d.no) + ' المؤرخة في ' + v(d.date) + '، الصادرة عن ' + v(d.seller.name) + '، سجل تجاري رقم ' + v(d.seller.rc) + '، لفائدة ' + v(d.buyer.name) + '، بمبلغ إجمالي قدره ' + fmt(r.base) + ' دج.');
+    L.push('وبعد فحص الفاتورة ومقارنتها بالبضاعة، عاينّا ما يلي:');
+    r.findings.filter(function(f){ return f.law; }).forEach(function(f, i){ L.push('  ' + (i + 1) + '. ' + f.title + '.'); });
+  }
+  L.push('');
+  if (rb.rows.length) {
+    L.push('وحيث إن هذه الأفعال تشكل:');
+    rb.rows.forEach(function(x){ L.push('  - ' + x.qual + '.'); });
+    if (rb.a34absorbed) L.push('  (وتُعتبر البيانات الناقصة الأخرى مستغرقة في مخالفة عدم الفوترة طبقاً للمادة 34، الفقرة الأخيرة.)');
+    L.push('');
+    if (rb.seizure) {
+      L.push('فقد قمنا بحجز البضاعة المذكورة حجزاً عينياً طبقاً للمادتين 39 و40 من القانون 04-02، وحررنا محضر جرد ملحقاً بهذا المحضر، ووضعنا الأختام عليها، وعُيّن ' + v(stop.keeper) + ' حارساً عليها طبقاً للمادة 41، على أن تكون مصاريف الحجز على عاتق المخالف.');
+      L.push('');
+    }
+    L.push('القيمة المقترحة لغرامة المصالحة: ' + (rb.min === rb.max ? fmt0(rb.min) : 'بين ' + fmt0(rb.min) + ' و' + fmt0(rb.max)) + ' دج (تُحدد من طرف الجهة المختصة طبقاً للمادة 60).');
+  } else {
+    L.push('ولم نعاين أي مخالفة لأحكام القانون 04-02.');
+  }
+  L.push('');
+  L.push('تصريح المعني: ' + dots);
+  L.push('');
+  L.push('أُعلم المعني بتاريخ ومكان تحرير هذا المحضر ودُعي لحضوره (المادة 57). وبعد تلاوته عليه: وقّع معنا / رفض التوقيع / اعترض على الغرامة المقترحة (يُشطب ما لا يصلح).');
+  L.push('ويُرسل هذا المحضر إلى السيد المدير الولائي للتجارة طبقاً للمادة 55' + (stop.corps === 'dc' ? '' : '، مع إخطار السيد وكيل الجمهورية المختص') + '.');
+  L.push('');
+  L.push('حُرر بتاريخ ' + v(stop.date) + '.     توقيع الأعوان المعاينين: ' + dots + '     توقيع المعني: ' + dots);
+  return L.join('\n');
+}
+
+var STEPS = [
+  ['التوقيف وطلب الوثائق', 'يطلب العون الفاتورة أو الوثيقة التي تقوم مقامها، ويجب تقديمها عند أول طلب (المادة 13). الشرطة والدرك مؤهلون بصفتهم ضباطاً وأعواناً للشرطة القضائية (المادة 49).'],
+  ['معاينة البضاعة', 'يمكنه فتح الطرود والأمتعة أثناء النقل بحضور المرسل أو المرسل إليه أو الناقل (المادة 52)، ومقارنة التسمية والكمية بالفاتورة.'],
+  ['حجز الوثائق', 'يمكنه حجز الفاتورة وأي وثيقة تجارية أو محاسبية لها صلة بالمخالفة، وتُرفق بمحضر الحجز (المادة 50).'],
+  ['حجز البضاعة عند الاقتضاء', 'إذا كُيّفت المخالفة عدم فوترة أو تدليساً يمكنه حجز البضاعة أينما وُجدت، وكذلك العتاد المستعمل في المخالفة، مع حفظ حقوق الغير حسن النية (المادة 39). الحجز عيني أو اعتباري (المادة 40).'],
+  ['الجرد والأختام والحراسة', 'يحرر محضر جرد للمحجوزات (المادة 39) ويضع الأختام. الحارس هو صاحب البضاعة إن كان له مخزن، وإلا إدارة أملاك الدولة، والمصاريف على المخالف (المادة 41). البضاعة سريعة التلف يقرر الوالي بيعها فوراً أو التنازل عنها أو إتلافها (المادة 43).'],
+  ['تحرير المحضر', 'خلال 8 أيام من انتهاء التحقيق، موقعاً من الأعوان تحت طائلة البطلان. يتضمن التاريخ والمكان والمعاينات وهوية الأعوان والمخالف والتكييف القانوني والغرامة المقترحة والحجز وجرده (المادتان 56 و57). يوقعه المخالف، وإن غاب أو رفض أو اعترض يُذكر ذلك فيه. وله حجية إلى أن يُطعن فيه بالتزوير (المادة 58).'],
+  ['إحالة المحضر', 'يُرسل إلى المدير الولائي للتجارة (المادة 55). ويُخطر ضابط الشرطة القضائية وكيل الجمهورية وفق قانون الإجراءات الجزائية.'],
+  ['المصالحة أو المتابعة', 'إذا كانت الغرامة ≤ 1.000.000 دج يقترح المدير الولائي للتجارة المصالحة، وبين 1 و3 ملايين يقترحها الوزير، وفوق 3 ملايين يُرسل المحضر تلقائياً إلى وكيل الجمهورية (المادة 60). للمخالف الاعتراض على المبلغ خلال 8 أيام (المادة 61). دفع غرامة المصالحة في أجلها ينهي المتابعة، وعدم دفعها يحيل الملف إلى القضاء (المادة 62).'],
+  ['الحكم', 'يحكم القاضي بالغرامة ويمكنه مصادرة المحجوزات (المادة 44)، أو برفع اليد وإرجاعها مع تعويض صاحبها (المادة 45). ويمكن للوالي غلق المحل حتى 60 يوماً (المادة 46)، والعود خلال سنتين يضاعف العقوبة (المادة 47).']
+];
+// </logic>
+
+var SEV = {bad: 'خطأ', warn: 'نقص', info: 'تنبيه'};
+var $ = function(id){ return document.getElementById(id); };
+var linesEl = $('lines');
+var verify = {sNif: '', sRc: '', bNif: '', bRc: ''};
+
+function lineRow(l){
+  var div = document.createElement('div');
+  div.className = 'line';
+  div.innerHTML =
+    '<label class="full">التسمية<input type="text" data-k="des" dir="auto" autocomplete="off"></label>' +
+    '<label>الوحدة<input type="text" data-k="unit" dir="auto" autocomplete="off"></label>' +
+    '<label>الكمية<input type="text" data-k="qty" class="ltr" inputmode="decimal" autocomplete="off"></label>' +
+    '<label>سعر الوحدة HT<input type="text" data-k="price" class="ltr" inputmode="decimal" autocomplete="off"></label>' +
+    '<div class="line-foot"><span>المجموع: <span class="num" data-total>—</span> دج</span><button type="button" class="small" data-del>حذف السطر</button></div>';
+  ['des', 'unit', 'qty', 'price'].forEach(function(k){ div.querySelector('[data-k="' + k + '"]').value = l[k] == null ? '' : l[k]; });
+  linesEl.appendChild(div);
+}
+function setLines(arr){ linesEl.innerHTML = ''; (arr && arr.length ? arr : [{unit: 'Kg'}]).forEach(lineRow); }
+
+function readForm(){
+  var lines = Array.prototype.map.call(linesEl.children, function(row){
+    var o = {};
+    row.querySelectorAll('[data-k]').forEach(function(i){ o[i.getAttribute('data-k')] = i.value; });
+    return o;
+  });
+  return {
+    no: $('invNo').value, date: $('invDate').value, pay: $('pay').value, payRef: $('payRef').value, deliv: $('deliv').value,
+    seller: {name: $('sName').value, act: $('sAct').value, addr: $('sAddr').value, rc: $('sRc').value, nif: $('sNif').value, nis: $('sNis').value, ai: $('sAi').value, regime: $('sRegime').value},
+    buyerBiz: $('bBiz').checked,
+    buyer: {name: $('bName').value, addr: $('bAddr').value, rc: $('bRc').value, nif: $('bNif').value, nis: $('bNis').value, ai: $('bAi').value},
+    lines: lines, rate: $('rate').value, mention: $('mention').checked, stamp: $('stamp').checked,
+    stHT: $('stHT').value, stTVA: $('stTVA').value, stTTC: $('stTTC').value, stWords: $('stWords').value,
+    inTransit: $('inTransit').checked, doc: $('doc').value, rcCopy: $('rcCopy').checked,
+    verify: verify
+  };
+}
+
+// verification boxes (format check + official sites + user confirmation)
+var NIF_URL = 'https://nifenligne.mf.gov.dz/nif.asp';
+var RC_URL = 'https://sidjilcom.cnrc.dz';
+function chip(st){ var c = st.state === 'none' ? 'info' : st.state; return '<span class="chip ' + c + '">' + esc(st.label) + '</span>'; }
+function confirmBtns(key, yes, no){
+  var v = verify[key];
+  return '<span class="vrow" role="group">' +
+    '<button type="button" class="small" data-vkey="' + key + '" data-v="yes" aria-pressed="' + (v === 'yes') + '"' + (v === 'yes' ? ' style="border-color:var(--ok);color:var(--ok)"' : '') + '>' + yes + '</button>' +
+    '<button type="button" class="small" data-vkey="' + key + '" data-v="no" aria-pressed="' + (v === 'no') + '"' + (v === 'no' ? ' style="border-color:var(--bad);color:var(--bad)"' : '') + '>' + no + '</button></span>';
+}
+function renderVerify(d){
+  document.querySelectorAll('.verify').forEach(function(box){
+    var p = box.getAttribute('data-party'), party = p === 's' ? d.seller : d.buyer;
+    if (p === 'b' && !d.buyerBiz) { box.hidden = true; return; }
+    box.hidden = false;
+    var nif = checkNif(party.nif), nis = checkNis(party.nis), rc = parseRc(party.rc);
+    var rcInfo = rc.letter ? (rc.letter === 'A' ? ' · شخص طبيعي' : ' · شخص معنوي') : '';
+    box.innerHTML =
+      '<div class="vrow"><span class="lbl">NIF</span>' + chip(nif) +
+        (digits(party.nif) ? '<button type="button" class="small" data-copy="' + esc(digits(party.nif)) + '">نسخ الرقم</button>' +
+        '<a class="btn small" href="' + NIF_URL + '" target="_blank" rel="noopener">التحقق في موقع الضرائب</a>' : '') + '</div>' +
+      (digits(party.nif) && nif.state === 'ok' ? '<div class="vrow"><span class="lbl">النتيجة</span>' + confirmBtns(p + 'Nif', 'الاسم مطابق', 'غير مطابق أو غير موجود') + '</div>' : '') +
+      '<div class="vrow"><span class="lbl">NIS</span>' + chip(nis) + '</div>' +
+      '<div class="vrow"><span class="lbl">السجل</span>' + chip(rc) + (rcInfo ? '<span class="chip info">' + rcInfo.slice(3) + '</span>' : '') +
+        (String(party.rc || '').trim() ? '<button type="button" class="small" data-copy="' + esc(party.rc) + '">نسخ الرقم</button>' +
+        '<a class="btn small" href="' + RC_URL + '" target="_blank" rel="noopener">سجلكم (CNRC)</a>' : '') + '</div>' +
+      (String(party.rc || '').trim() && rc.state === 'ok' ? '<div class="vrow"><span class="lbl">النتيجة</span>' + confirmBtns(p + 'Rc', 'السجل ساري والنشاط مطابق', 'منتهٍ أو لا يطابق') + '</div>' : '');
+  });
+}
+
+var lastReport = '', lastPv = '';
+function render(){
+  var d = readForm(), r = analyze(d, new Date()), rb = roadblock(d, r);
+  Array.prototype.forEach.call(linesEl.children, function(row, i){
+    var l = d.lines[i], q = num(l.qty), p = num(l.price);
+    row.querySelector('[data-total]').textContent = (q > 0 && p >= 0) ? fmt(q * p) : '—';
+  });
+  renderVerify(d);
+  var base = r.base;
+  $('wordsHint').innerHTML = 'المبلغ بالحروف المتوقع (TTC ' + esc(fmt(base)) + ' دج):<span class="num">' + esc(amountWords(base) || '—') + '</span>';
+
+  var nb = r.findings.filter(function(f){ return f.sev === 'bad'; }).length;
+  var nw = r.findings.filter(function(f){ return f.sev === 'warn'; }).length;
+  var ni = r.findings.length - nb - nw;
+  var cls = nb ? 'bad' : (nw ? 'warn' : 'ok');
+  var head = nb ? 'الفاتورة غير مطابقة' : (nw ? 'مقبولة مع نقائص' : 'تبدو مطابقة');
+  var sub = nb ? 'فيها ' + nb + ' من الأخطاء الجوهرية، ويستحسن عدم اعتمادها قبل تصحيحها.' : (nw ? 'لا أخطاء جوهرية، لكن توجد نقائص يستحسن تصحيحها.' : 'لم تظهر مخالفات في البنود المفحوصة.');
+  $('verdict').innerHTML = '<div class="verdict ' + cls + '"><strong>' + head + '</strong><span>' + sub + '</span></div>';
+
+  $('findings').innerHTML = r.findings.map(function(f){
+    return '<article class="finding"><div class="tags"><span class="pill ' + f.sev + '">' + SEV[f.sev] + '</span>' +
+      (f.law ? '<span class="pill law">' + esc(LAW[f.law].ref) + '</span>' : '') + '</div><h3>' + esc(f.title) + '</h3>' +
+      (f.detail ? '<p>' + esc(f.detail) + '</p>' : '') +
+      (f.effect ? '<div class="effect"><b>الأثر القانوني:</b> ' + esc(f.effect) + '</div>' : '') + '</article>';
+  }).join('');
+  $('oks').innerHTML = r.oks.map(function(t){ return '<li><span>' + esc(t) + '</span></li>'; }).join('');
+  $('oksec').hidden = !r.oks.length;
+  $('counts').innerHTML = '<span class="c-bad">' + nb + ' أخطاء</span><span class="c-warn">' + nw + ' نقائص</span>' + (ni ? '<span>' + ni + ' تنبيه</span>' : '') + '<span class="c-ok">' + r.oks.length + ' سليم</span>';
+
+  // roadblock section
+  var rbHead = rb.level === 'ok' ? 'لا مخالفة تجارية ظاهرة في الوثائق' : (rb.level === 'bad' ? 'عدم فوترة: غرامة كبيرة وحجز وارد' : 'فاتورة غير مطابقة: غرامة محتملة');
+  var rangeTxt = rb.rows.length ? (rb.min === rb.max ? fmt0(rb.min) : fmt0(rb.min) + ' إلى ' + fmt0(rb.max)) + ' دج' : '0 دج';
+  var settleTxt = {director: 'المدير الولائي للتجارة (≤ 1.000.000 دج)', minister: 'وزير التجارة (بين 1 و3 ملايين دج)', prosecutor: 'لا مصالحة: إحالة إلى وكيل الجمهورية (> 3.000.000 دج)'}[rb.settle] || 'لا محل لها';
+  var html = '<div class="verdict ' + rb.level + '" style="margin-bottom:12px"><strong>' + rbHead + '</strong><span>' +
+    (d.inTransit ? 'البضاعة على الطريق، والوثيقة المرافقة: ' + esc($('doc').selectedOptions[0].textContent) + '.' : 'البضاعة ليست في النقل، والتقدير يخص مراقبة الوثائق عموماً.') + '</span></div>';
+  html += '<div class="rb-sum">' +
+    '<div><small>الغرامة التقديرية</small><b class="num">' + rangeTxt + '</b></div>' +
+    '<div><small>حجز البضاعة</small><b>' + (rb.seizure ? 'جائز (المادتان 39 و40)' : 'غير مبرر بهذه المخالفات') + '</b></div>' +
+    '<div><small>المصالحة (المادة 60)</small><b style="font-size:0.9rem">' + settleTxt + '</b></div></div>';
+  if (rb.rows.length) {
+    html += '<div class="tbl-wrap"><table><thead><tr><th>التكييف القانوني</th><th>الوقائع في هذه الفاتورة</th><th>الجزاء</th></tr></thead><tbody>' +
+      rb.rows.map(function(x){
+        return '<tr><td><b>' + esc(x.name) + '</b><div class="who">' + esc(x.qual) + '</div><div class="who">المسؤول: ' + esc(x.who) + '</div></td><td>' + x.why.map(esc).join('<br>') + '</td><td class="amt num">' +
+          (x.pct ? '80% = ' + fmt0(x.lo) : fmt0(x.lo) + ' – ' + fmt0(x.hi)) + ' دج</td></tr>';
+      }).join('') + '</tbody></table></div>';
+  }
+  var notes = rb.notes.slice();
+  if (rb.a34absorbed) notes.push('مخالفات المادة 34 الأخرى لا تُجمع مع المادة 33، لأن الفاتورة تُعامل أصلاً كأنها غير موجودة.');
+  notes.push('رفض تقديم الوثائق أو عرقلة المراقبة يُكيَّف جنحة معارضة المراقبة (المادة 54): حبس من 6 أشهر إلى سنتين وغرامة من 100.000 إلى 1.000.000 دج أو إحداهما (المادة 53).');
+  notes.push('هذه الغرامات تجارية، ولا تمنع العقوبات الجبائية التي تطبقها إدارة الضرائب (المادة 33).');
+  html += '<ul class="notes">' + notes.map(function(n){ return '<li>' + esc(n) + '</li>'; }).join('') + '</ul>';
+  $('rb').innerHTML = html;
+
+  $('steps').innerHTML = STEPS.map(function(s, i){
+    return '<li><b>' + esc(s[0]) + '.</b> ' + esc(s[1]) + '</li>';
+  }).join('');
+
+  var stop = {corps: $('stCorps').value, agent: $('stAgent').value, place: $('stPlace').value, date: $('stDate').value, time: $('stTime').value, plate: $('stPlate').value, driver: $('stDriver').value, keeper: $('stKeeper').value};
+  lastPv = buildPv(d, r, rb, stop);
+  $('pv').textContent = lastPv;
+
+  lastReport = 'تقرير فحص الفاتورة ' + (d.no || '') + ' — ' + head + '\n\n' +
+    r.findings.map(function(f){ return '[' + SEV[f.sev] + '] ' + f.title + (f.law ? ' (' + LAW[f.law].ref + ')' : '') + (f.detail ? '\n' + f.detail : '') + '\nالأثر القانوني: ' + f.effect; }).join('\n\n') +
+    '\n\nعند الحاجز: ' + rbHead + '. الغرامة التقديرية: ' + rangeTxt + (rb.seizure ? '. الحجز جائز.' : '.') +
+    '\n' + rb.rows.map(function(x){ return '- ' + x.qual + ': ' + (x.pct ? fmt0(x.lo) : fmt0(x.lo) + ' – ' + fmt0(x.hi)) + ' دج'; }).join('\n') +
+    '\n\nمراجعة أولية وليست استشارة قانونية.';
+}
+
+var EXAMPLE = {
+  invNo: '001/2026', invDate: '2026-10-11', pay: 'cheque', payRef: '', deliv: '',
+  sName: 'LEKAIM AMAR', sAct: 'RECUPERATION DES DECHETS FERREUX ET NON FERREUX', sAddr: 'CITE EL OULED SMAIL TELEGHMA MILA',
+  sRc: '18 A 1670868-01/43', sNif: '19125011582149', sNis: '', sAi: '4306066451', sRegime: 'ifu',
+  bBiz: true, bName: 'DQM OTSMANE FAYCAL PLAST', bAddr: 'ZONE INDUSTRIELLE BENBOULAID N 13 B.P N 72 B MOUKADEM BLIDA',
+  bRc: '07 A 4047335-09/00', bNif: '172260101462130', bNis: '197226010146242', bAi: '09059546196',
+  lines: [{des: "LINGOT D'ALUMINIUM", unit: 'Kg', qty: '10000', price: '175.00'}],
+  rate: '0', mention: true, stamp: true, stHT: '1750000.00', stTVA: '', stTTC: '1750000.00',
+  stWords: 'UN MILLION SEPT CENT CINQUANTE MILLE DINARS',
+  inTransit: true, doc: 'facture', rcCopy: false
+};
+var EMPTY = {
+  invNo: '', invDate: '', pay: 'cheque', payRef: '', deliv: '',
+  sName: '', sAct: '', sAddr: '', sRc: '', sNif: '', sNis: '', sAi: '', sRegime: 'ifu',
+  bBiz: true, bName: '', bAddr: '', bRc: '', bNif: '', bNis: '', bAi: '',
+  lines: [{des: '', unit: 'Kg', qty: '', price: ''}],
+  rate: '0', mention: false, stamp: false, stHT: '', stTVA: '', stTTC: '', stWords: '',
+  inTransit: true, doc: 'facture', rcCopy: false
+};
+var TEXT_IDS = ['invNo','invDate','payRef','deliv','sName','sAct','sAddr','sRc','sNif','sNis','sAi','bName','bAddr','bRc','bNif','bNis','bAi','stHT','stTVA','stTTC','stWords'];
+function load(o){
+  TEXT_IDS.forEach(function(id){ $(id).value = o[id] == null ? '' : String(o[id]); });
+  $('pay').value = o.pay || 'cheque'; $('sRegime').value = o.sRegime || 'ifu'; $('rate').value = String(o.rate || '0');
+  $('bBiz').checked = o.bBiz !== false; $('mention').checked = !!o.mention; $('stamp').checked = !!o.stamp;
+  $('inTransit').checked = o.inTransit !== false; $('doc').value = o.doc || 'facture'; $('rcCopy').checked = !!o.rcCopy;
+  verify = {sNif: '', sRc: '', bNif: '', bRc: ''};
+  setLines(o.lines);
+  render();
+}
+
+document.addEventListener('input', function(e){
+  var id = e.target.id;
+  if (id === 'sNif') verify.sNif = ''; if (id === 'sRc') verify.sRc = '';
+  if (id === 'bNif') verify.bNif = ''; if (id === 'bRc') verify.bRc = '';
+  if (e.target.type !== 'file') render();
+});
+document.addEventListener('change', function(e){ if (e.target.type !== 'file') render(); });
+document.addEventListener('click', function(e){
+  var v = e.target.closest('[data-vkey]');
+  if (v) { var k = v.getAttribute('data-vkey'); verify[k] = verify[k] === v.getAttribute('data-v') ? '' : v.getAttribute('data-v'); render(); return; }
+  var c = e.target.closest('[data-copy]');
+  if (c) {
+    var txt = c.getAttribute('data-copy');
+    try { navigator.clipboard.writeText(txt).then(function(){ c.textContent = 'تم النسخ'; setTimeout(render, 1400); }, function(){ c.textContent = txt; }); }
+    catch (err) { c.textContent = txt; }
+  }
+});
+linesEl.addEventListener('click', function(e){
+  var b = e.target.closest('[data-del]');
+  if (b) { b.closest('.line').remove(); render(); }
+});
+$('addLine').addEventListener('click', function(){ lineRow({unit: 'Kg'}); render(); });
+$('btnExample').addEventListener('click', function(){ load(EXAMPLE); });
+$('btnClear').addEventListener('click', function(){ load(EMPTY); });
+$('goResults').addEventListener('click', function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $('results').scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'start'});
+});
+$('copyPv').addEventListener('click', function(){
+  var fb = $('fallback'), btn = $('copyPv');
+  function manual(){ fb.hidden = false; fb.value = lastPv; fb.focus(); fb.select(); }
+  try {
+    navigator.clipboard.writeText(lastPv).then(function(){ btn.textContent = 'تم النسخ'; setTimeout(function(){ btn.textContent = 'نسخ صيغة المحضر'; }, 1600); }, manual);
+  } catch (e) { manual(); }
+});
+$('copy').addEventListener('click', function(){
+  var fb = $('fallback');
+  function manual(){ fb.hidden = false; fb.value = lastReport; fb.focus(); fb.select(); }
+  try {
+    navigator.clipboard.writeText(lastReport).then(function(){ $('copy').textContent = 'تم النسخ'; setTimeout(function(){ $('copy').textContent = 'نسخ التقرير'; }, 1600); }, manual);
+  } catch (e) { manual(); }
+});
+
+// ---- scan with Claude ----
+var sample = null, picked = null, ctl = null;
+var scanStatus = $('scanStatus');
+function setStatus(t, cls){ scanStatus.textContent = t; scanStatus.className = 'status' + (cls ? ' ' + cls : ''); }
+// Re-encode any image the browser can decode (HEIC on iPhone, large photos) as a JPEG under ~2000px.
+function toJpeg(f){
+  return new Promise(function(resolve){
+    var url; try { url = URL.createObjectURL(f); } catch (e) { resolve(f); return; }
+    var img = new Image();
+    img.onload = function(){
+      try {
+        var k = Math.min(1, 3000 / Math.max(img.naturalWidth, img.naturalHeight));
+        var c = document.createElement('canvas');
+        c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        c.toBlob(function(b){ resolve(b || f); }, 'image/jpeg', 0.9);
+      } catch (e) { resolve(f); }
+    };
+    img.onerror = function(){ resolve(f); };
+    img.src = url;
+  });
+}
+function usePicked(f){
+  if (!f || !/^image\//.test(f.type || 'image/')) { setStatus('هذا الملف ليس صورة. اختر صورة الفاتورة.', 'err'); return; }
+  setStatus('جارٍ تجهيز الصورة…', '');
+  toJpeg(f).then(function(j){ pickFile(j); });
+}
+function pick(e){
+  var f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (f) usePicked(f);
+}
+document.addEventListener('paste', function(e){
+  var cd = e.clipboardData, list = [];
+  if (cd && cd.files) for (var i = 0; i < cd.files.length; i++) list.push(cd.files[i]);
+  if (!list.length && cd && cd.items) for (var j = 0; j < cd.items.length; j++) if (cd.items[j].kind === 'file') { var f = cd.items[j].getAsFile(); if (f) list.push(f); }
+  for (var k = 0; k < list.length; k++) if (/^image\//.test(list[k].type)) { e.preventDefault(); usePicked(list[k]); return; }
+});
+// Some phone keyboards insert the pasted image as an <img> instead of a paste file.
+$('pasteBox').addEventListener('input', function(){
+  var box = this, img = box.querySelector('img');
+  if (img && img.src) {
+    var im = new Image();
+    im.onload = function(){
+      try {
+        var c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight;
+        c.getContext('2d').drawImage(im, 0, 0);
+        c.toBlob(function(b){ if (b) usePicked(b); else setStatus('لم أستطع قراءة الصورة الملصوقة.', 'err'); }, 'image/jpeg', 0.9);
+      } catch (e) { setStatus('لم أستطع قراءة الصورة الملصوقة.', 'err'); }
+    };
+    im.onerror = function(){ setStatus('لم أستطع قراءة الصورة الملصوقة.', 'err'); };
+    im.src = img.src;
+  }
+  box.textContent = 'تم استلام اللصق.';
+});
+document.addEventListener('dragover', function(e){ e.preventDefault(); });
+document.addEventListener('drop', function(e){
+  var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if (f) { e.preventDefault(); usePicked(f); }
+});
+function pickFile(f){
+  picked = f;
+  try { $('thumb').src = URL.createObjectURL(f); $('thumb').hidden = false; } catch (err) {}
+  $('scanBtn').disabled = false;
+  setStatus(sample ? 'الصورة جاهزة. اضغط «استخراج البيانات».' : 'الصورة جاهزة. ' + (scanWhy || NO_CLAUDE), sample ? '' : 'err');
+}
+$('camIn').addEventListener('change', pick);
+$('fileIn').addEventListener('change', pick);
+
+var PROMPT = [
+  'This photo shows an Algerian commercial invoice (facture), possibly rotated or upside down. Read it carefully and extract the fields.',
+  'Reply with ONLY one JSON object with exactly these keys (strings unless stated). Use "" when a field is absent or unreadable. Copy numbers and names exactly as printed, do not invent or correct anything.',
+  '{"invNo":"invoice number","invDate":"YYYY-MM-DD","pay":"cheque|virement|especes|autre|none","payRef":"cheque or transfer reference","deliv":"delivery note or order reference",',
+  '"sName":"seller name","sAct":"seller activity as printed","sAddr":"seller address","sRc":"seller RC (registre du commerce) number","sNif":"seller NIF (may be printed as NIF or M.F or matricule fiscal)","sNis":"seller NIS","sAi":"seller article d\'imposition (AI or ART)","sRegime":"ifu if the invoice says non assujetti a la TVA or shows no TVA, else reel",',
+  '"bBiz":true,"bName":"buyer name","bAddr":"buyer address","bRc":"","bNif":"","bNis":"","bAi":"",',
+  '"lines":[{"des":"designation","unit":"unit","qty":"quantity digits only","price":"unit price HT digits with . decimal"}],',
+  '"rate":"0|9|19","mention":true if the invoice states non assujetti a la TVA,"stamp":true if a stamp and signature are visible,',
+  '"stHT":"total HT digits with . decimal","stTVA":"TVA amount or empty","stTTC":"total TTC digits with . decimal","stWords":"amount in words exactly as written"}'
+].join('\n');
+
+var scanWhy = 'جارٍ التحقق من توفر القراءة الآلية…';
+var NO_CLAUDE = 'القراءة الآلية لا تعمل هنا لأن الصفحة مفتوحة خارج Claude (مثلاً الملف المنزَّل). افتحها من بطاقة «فاحص الفواتير» في محادثة Claude، أو أرسل صورة الفاتورة في المحادثة وسأملأ البيانات لك.';
+if (window.AndroidOcr) { sample = 'native'; scanWhy = ''; setStatus('القراءة الآلية جاهزة وتعمل دون إنترنت. التقط صورة الفاتورة أو اخترها.', 'ok'); }
+else (window.claude && typeof window.claude.use === 'function' ? window.claude.use('sample') : Promise.resolve(null)).then(function(s){
+  if (!s) { scanWhy = NO_CLAUDE; setStatus(NO_CLAUDE, 'err'); return; }
+  return s.limits().then(function(l){
+    if (!l || !l.images) { scanWhy = 'هذا التطبيق لا يسمح للصفحة بإرسال الصور إلى Claude. جرّب فتحها من claude.ai في المتصفح، أو أرسل الصورة في المحادثة.'; setStatus(scanWhy, 'err'); return; }
+    sample = s; scanWhy = '';
+    if (!picked) setStatus('القراءة الآلية جاهزة. اختر صورة الفاتورة أو التقطها.', 'ok');
+  }, function(){ scanWhy = 'تعذر التحقق من دعم الصور. أرسل الصورة في المحادثة وسأملأ البيانات لك.'; setStatus(scanWhy, 'err'); });
+}).catch(function(){ scanWhy = NO_CLAUDE; setStatus(NO_CLAUDE, 'err'); });
+
+$('stopBtn').addEventListener('click', function(){ if (ctl) ctl.abort(); });
+$('scanBtn').addEventListener('click', function(){
+  if (window.AndroidOcr) { nativeScan(); return; }
+  if (!picked) { setStatus('اختر صورة أولاً.', 'err'); return; }
+  if (!sample) { setStatus(scanWhy || NO_CLAUDE, 'err'); return; }
+  ctl = new AbortController();
+  $('scanBtn').disabled = true; $('stopBtn').hidden = false;
+  setStatus('Claude يقرأ الفاتورة… قد يستغرق ذلك دقيقة.', '');
+  sample.json(PROMPT, {images: [picked], signal: ctl.signal}).then(function(o){
+    if (!o || typeof o !== 'object' || Array.isArray(o)) throw {code: 'invalid_json'};
+    var data = {};
+    TEXT_IDS.forEach(function(id){ data[id] = o[id] == null ? '' : String(o[id]); });
+    if (data.invDate && !/^\d{4}-\d{2}-\d{2}$/.test(data.invDate)) data.invDate = '';
+    data.pay = ['cheque','virement','especes','autre','none'].indexOf(o.pay) >= 0 ? o.pay : 'none';
+    data.sRegime = o.sRegime === 'reel' ? 'reel' : 'ifu';
+    data.rate = ['0','9','19'].indexOf(String(o.rate)) >= 0 ? String(o.rate) : '0';
+    data.bBiz = o.bBiz !== false; data.mention = o.mention === true; data.stamp = o.stamp === true;
+    data.lines = Array.isArray(o.lines) ? o.lines.slice(0, 30).map(function(l){ l = l || {}; return {des: String(l.des || ''), unit: String(l.unit || ''), qty: String(l.qty || ''), price: String(l.price || '')}; }) : [];
+    data.inTransit = $('inTransit').checked; data.doc = $('doc').value; data.rcCopy = $('rcCopy').checked;
+    load(data);
+    setStatus('تم ملء الحقول من الصورة. راجع كل رقم مع الأصل قبل الاعتماد على النتيجة.', 'ok');
+  }).catch(function(e){
+    var code = e && e.code;
+    var msg = {
+      cancelled: 'أُوقفت القراءة.',
+      not_granted: 'لم يُسمح للصفحة باستعمال Claude. أدخل البيانات يدوياً.',
+      sampling_disabled: 'Claude غير متاح لهذا الحساب.',
+      rate_limited: 'طلبات كثيرة. انتظر قليلاً ثم أعد المحاولة.',
+      image_rejected: 'الصورة غير مقبولة. جرّب صورة JPG أو PNG أوضح وأصغر من 20 ميغابايت.',
+      images_unavailable: 'هذا العرض لا يدعم إرسال الصور.',
+      invalid_json: 'لم أستطع فهم الرد. أعد المحاولة بصورة أوضح.',
+      refused: 'تعذرت قراءة هذه الصورة.',
+      session_expired: 'انتهت الجلسة. سجّل الدخول من جديد.'
+    }[code] || 'تعذر الاتصال. أعد المحاولة.';
+    setStatus(msg, code === 'cancelled' ? '' : 'err');
+    if (code === 'not_granted' || code === 'sampling_disabled' || code === 'images_unavailable') sample = null;
+  }).then(function(){
+    $('stopBtn').hidden = true; $('scanBtn').disabled = !picked; ctl = null;
+  });
+});
+
+load(EXAMPLE);
+// Turns raw OCR text of an Algerian invoice (mostly French/Latin) into form fields.
+function parseInvoiceText(raw){
+  var t = String(raw || '').replace(/\r/g, '').replace(/[ \t]+/g, ' ');
+  var lines = t.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+  var o = {};
+  function num(s){
+    if (!s) return '';
+    s = String(s).replace(/[^\d.,]/g, '');
+    if (!s) return '';
+    var m = s.match(/^(.*)[.,](\d{1,2})$/);
+    var ip = m ? m[1] : s, dp = m ? m[2] : '';
+    ip = ip.replace(/[.,]/g, '');
+    if (!ip) return '';
+    return dp ? ip + '.' + (dp.length === 1 ? dp + '0' : dp) : ip;
+  }
+  function digits(s){ return String(s || '').replace(/\D/g, ''); }
+
+  // Split seller part from buyer part.
+  var splitRe = /(a\s*l['’`]?\s*intention\s*d[eu]|doit\s*:|client\s*:|destinataire|factur[ée]e?\s*[àa]\s*:|acheteur)/i;
+  var idx = -1;
+  for (var i = 0; i < lines.length; i++) if (splitRe.test(lines[i])) { idx = i; break; }
+  var sellerL = idx >= 0 ? lines.slice(0, idx) : lines;
+  var buyerL = idx >= 0 ? lines.slice(idx) : [];
+  var sellerT = sellerL.join('\n'), buyerT = buyerL.join('\n');
+
+  function ids(T, p){
+    var m;
+    m = T.match(/(?:N\s?\.?\s?I\s?\.?\s?F|M\s?\.?\s?F|I\s?\.?\s?F|matricule\s*fiscal|identifiant\s*fiscal)[^\d\n]{0,14}((?:\d[\s.]?){15,20})/i);
+    if (m) o[p + 'Nif'] = digits(m[1]).slice(0, 20);
+    m = T.match(/N\s?\.?\s?I\s?\.?\s?S[^\d\n]{0,12}((?:\d[\s.]?){12,18})/i);
+    if (m) o[p + 'Nis'] = digits(m[1]).slice(0, 15);
+    m = T.match(/(?:\bA\s?\.?\s?[IT1l]\b|\bART\b|article\s*d['’]?\s*imposition|\bAI\b)[^\d\n]{0,12}((?:\d[\s.]?){9,13})/i);
+    if (m) o[p + 'Ai'] = digits(m[1]);
+    m = T.match(/(?:\bR\s?\.?\s?[CEG]\s?\.?\s?N?\b|registre\s*(?:du|de)\s*commerce)[^\dA-Z\n]{0,10}(\d{2}[\s\/]*(?:\d{2})?[\s\-\/]*[A-Z]?[\s\-]*\d{5,8}[\s]*[A-Z]?[\s\-\/]*(?:\d{2}[\s\/]*\d{2})?)/i);
+    if (m) o[p + 'Rc'] = m[1].replace(/\s+/g, ' ').replace(/[\s\-\/]+$/, '').trim();
+  }
+  ids(sellerT, 's');
+  ids(buyerT, 'b');
+  // If no split marker: second occurrences belong to the buyer.
+  if (idx < 0) {
+    var nifs = t.match(/(?:N\s?\.?\s?I\s?\.?\s?F|M\s?\.?\s?F)[^\d\n]{0,14}((?:\d[\s.]?){15,20})/gi);
+    if (nifs && nifs.length > 1) o.bNif = digits(nifs[1].replace(/^[^\d]*/, '')).slice(0, 20);
+  }
+
+  var label = /^(-?\s*)?(R\s?\.?\s?C|N\s?\.?\s?I\s?\.?\s?[FS]|M\s?\.?\s?F|A\s?\.?\s?[IT]|ART|B\s?\.?\s?P|TEL|T[ée]l|FAX|E-?mail|R[EG]N|a\s*l['’]?\s*intention|doit|client|date|facture)\b/i;
+  var actRe = /(r[ée]cup[ée]ration|commerce|vente|fabrication|import|export|transformation|production|services?|travaux|distribution|gros|d[ée]tail|n[ée]goce|transport|entreprise|b[aâ]timent|alimentation)/i;
+  var addrRe = /(cit[ée]|rue|zone|lot|route|bd|boulevard|avenue|cooperative|coop|lotissement|n[°o]\s*\d|wilaya|commune|\bz\.?i\b|\bbp\b)/i;
+  function pickName(L, skipFirst){
+    for (var i = skipFirst ? 1 : 0; i < L.length; i++) {
+      var s = L[i];
+      if (label.test(s) || actRe.test(s) || addrRe.test(s) || /\d{4,}/.test(s) || s.length < 3) continue;
+      if ((s.match(/[A-Za-zÀ-ÿ]/g) || []).length < 3) continue;
+      return s.replace(/^[^A-Za-zÀ-ÿ]+/, '');
+    }
+    return '';
+  }
+  o.sName = pickName(sellerL, false);
+  // Join a short second name line (e.g. "LEKAIM" / "AMAR").
+  var sIdx = sellerL.indexOf(o.sName);
+  if (o.sName && o.sName.split(' ').length === 1 && sellerL[sIdx + 1] && /^[A-Z][A-Z' -]{1,20}$/.test(sellerL[sIdx + 1].replace(/[^A-Z' -]/g, '').trim()) && !label.test(sellerL[sIdx + 1]) && !actRe.test(sellerL[sIdx + 1]) && !addrRe.test(sellerL[sIdx + 1]))
+    o.sName += ' ' + sellerL[sIdx + 1].replace(/[^A-Za-zÀ-ÿ' -]/g, '').trim();
+  o.bName = pickName(buyerL, true);
+  function first(L, re){ for (var i = 0; i < L.length; i++) if (re.test(L[i]) && !/(N\s?\.?I\s?\.?[FS]|R\s?\.?C\s?N|M\s?\.?F)\s*N?[°o]?\s*\d/i.test(L[i])) return L[i].replace(/^[-–•\s]+/, ''); return ''; }
+  o.sAct = first(sellerL, actRe);
+  o.sAddr = first(sellerL, addrRe);
+  o.bAddr = first(buyerL, addrRe);
+
+  var m;
+  m = t.match(/factur[eé]\s*(?:n|no|num[ée]ro)?\s*[°º*o]?\s*[:.]?\s*([A-Z]{0,3}\s?\d{1,6}\s?\/\s?\d{2,4})/i)
+    || t.match(/(?:^|\s)(\d{1,6}\s?\/\s?20\d{2})(?:\s|$)/m);
+  if (m) o.invNo = m[1].replace(/\s+/g, '');
+  m = t.match(/\b(\d{1,2})\s?[\/\-.]\s?(\d{1,2})\s?[\/\-.]\s?(20\d{2})\b/);
+  if (m) {
+    var dd = +m[1], mm = +m[2];
+    if (dd >= 1 && dd <= 31 && mm >= 1 && mm <= 12) o.invDate = m[3] + '-' + (mm < 10 ? '0' : '') + mm + '-' + (dd < 10 ? '0' : '') + dd;
+  }
+  o.pay = /ch[eèé]que/i.test(t) ? 'cheque' : /virement/i.test(t) ? 'virement' : /esp[eè]ce/i.test(t) ? 'especes' : 'none';
+  m = t.match(/ch[eèé]que\s*(?:n|no)?\s*[°º]?\s*[:.]?\s*(\d{5,})/i) || t.match(/virement\s*(?:n|no|r[ée]f)?\s*[°º.]?\s*[:.]?\s*([A-Z0-9]{5,})/i);
+  if (m) o.payRef = m[1];
+  m = t.match(/(?:bon\s*de\s*(?:livraison|commande)|\bBL\b|\bBC\b)\s*(?:n|no)?\s*[°º]?\s*[:.]?\s*([A-Z0-9\/\-]{2,})/i);
+  if (m) o.deliv = m[1];
+
+  o.mention = /non\s*assujett/i.test(t);
+  var AMT = '(\\d{1,3}(?:[\\s.,]?\\d{3})*(?:[.,]\\d{1,2})?)';
+  function after(re){
+    for (var i = 0; i < lines.length; i++) {
+      if (!re.test(lines[i])) continue;
+      var rest = lines[i].replace(re, ' ');
+      var runs = rest.match(/\d[\d\s.,]*\d/g) || [];
+      runs.sort(function(a, b){ return digits(b).length - digits(a).length; });
+      if (runs[0] && digits(runs[0]).length >= 3) return num(runs[0]);
+      var mm;
+      for (var j = i + 1; j < Math.min(lines.length, i + 4); j++) {
+        mm = lines[j].match(new RegExp('^\\s*' + AMT + '\\s*(?:DA|DZD)?\\s*$', 'i'));
+        if (mm && digits(mm[1]).length >= 3) return num(mm[1]);
+      }
+    }
+    return '';
+  }
+  o.stHT = after(/(total|montant)\s*(g[ée]n[ée]ral\s*)?h\s?\.?\s?t\.?/i);
+  o.stTTC = after(/(total|montant)\s*t\s?\.?\s?t\s?\.?\s?c\.?|net\s*[àa]\s*payer/i);
+  if (!o.mention) o.stTVA = after(/(?:montant\s*)?t\s?\.?\s?v\s?\.?\s?a(?!\s*\d{1,2}\s*%\s*$)/i);
+  // Fall back to the largest amount when labels and values come out in separate columns.
+  var all = (t.match(/\d{1,3}(?:[ .,]\d{3})+(?:[.,]\d{2})|\d{4,}[.,]\d{2}/g) || []).map(function(s){ return parseFloat(num(s)); }).filter(function(x){ return x > 0; });
+  var max = all.length ? Math.max.apply(null, all) : 0;
+  if (!o.stTTC && max) o.stTTC = String(max.toFixed(2));
+  if (!o.stHT && o.mention && o.stTTC) o.stHT = o.stTTC;
+  m = t.match(/\b(19|9)\s?%/);
+  o.rate = o.mention ? '0' : (m ? m[1] : (o.stTVA ? '19' : '0'));
+  o.sRegime = o.mention || o.rate === '0' ? 'ifu' : 'reel';
+
+  for (i = 0; i < lines.length; i++) {
+    if (/somme\s*d[eu]/i.test(lines[i])) {
+      var w = lines[i].replace(/^.*somme\s*d[eu]\s*:?/i, '').trim();
+      var k = i + 1;
+      while (k < lines.length && k <= i + 3 && /^[A-ZÀ-Ÿ' ,\-]+$/.test(lines[k]) && lines[k].length > 3) { w += ' ' + lines[k]; k++; }
+      o.stWords = w.trim();
+      break;
+    }
+  }
+  o.stamp = /cachet|signature/i.test(t);
+
+  o.lines = [];
+  var unitRe = '(kg|k\\.g|k,g|kgs|u|unit[ée]|pcs?|pi[eè]ces?|l|litres?|m2|m3|ml|m|t|tonnes?|qx|sacs?|cartons?|ff|forfait)';
+  var lr = new RegExp('^(.*?)\\s+' + unitRe + '\\s+([\\d\\s.,]+?)\\s+(\\d[\\d\\s.,]*[.,]\\d{2})\\s+(\\d[\\d\\s.,]*[.,]\\d{2})\\s*$', 'i');
+  for (i = 0; i < lines.length; i++) {
+    m = lines[i].match(lr);
+    if (!m) continue;
+    var des = m[1].replace(/[^A-Za-zÀ-ÿ0-9' \-]/g, '').trim();
+    var nx = lines[i + 1] || '';
+    if (/^[A-Z'À-Ÿ ]{3,}$/.test(nx) && !/total/i.test(nx)) des = (des + ' ' + nx).trim();
+    o.lines.push({des: des, unit: m[2], qty: num(m[3]).replace(/\.00$/, ''), price: num(m[4])});
+  }
+  return o;
+}
+
+
+// Android app only: on-device scanning through the AndroidOcr bridge.
+function nativeScan(){
+  if (!picked) { setStatus('اختر صورة أولاً.', 'err'); return; }
+  $('scanBtn').disabled = true;
+  setStatus('الهاتف يقرأ الفاتورة… بضع ثوانٍ.', '');
+  var fr = new FileReader();
+  fr.onerror = function(){ setStatus('لم أستطع فتح الصورة.', 'err'); $('scanBtn').disabled = false; };
+  fr.onload = function(){
+    var b64 = String(fr.result).split(',')[1] || '';
+    var id = 'r' + Date.now();
+    window.__ocrDone = function(rid, text, err){
+      if (rid !== id) return;
+      $('scanBtn').disabled = false;
+      if (err || !text || text.replace(/\s/g, '').length < 20) {
+        setStatus('لم أستطع قراءة نص واضح. صوّر الفاتورة كاملة ومستوية، في إضاءة جيدة ودون ظل.', 'err');
+        return;
+      }
+      var o = parseInvoiceText(text);
+      var data = {};
+      TEXT_IDS.forEach(function(k){ data[k] = o[k] == null ? '' : String(o[k]); });
+      data.pay = o.pay || 'none';
+      data.sRegime = o.sRegime === 'reel' ? 'reel' : 'ifu';
+      data.rate = o.rate || '0';
+      data.bBiz = !!(o.bNif || o.bRc || o.bNis || o.bAi || o.bName);
+      data.mention = !!o.mention;
+      data.stamp = !!o.stamp;
+      data.lines = (o.lines || []).slice(0, 30);
+      data.inTransit = $('inTransit').checked; data.doc = $('doc').value; data.rcCopy = $('rcCopy').checked;
+      load(data);
+      var filled = TEXT_IDS.filter(function(k){ return data[k]; }).length;
+      var missing = [];
+      if (!data.sNif) missing.push('NIF البائع');
+      if (!data.sRc) missing.push('سجل البائع');
+      if (!data.lines.length) missing.push('أسطر السلع');
+      if (!data.stTTC) missing.push('المجموع');
+      setStatus('ملأتُ ' + filled + ' خانة من الصورة.' + (missing.length ? ' لم أجد: ' + missing.join('، ') + '.' : '') + ' راجع كل رقم مع الأصل.', missing.length ? '' : 'ok');
+    };
+    try { window.AndroidOcr.recognize(b64, id); }
+    catch (e) { $('scanBtn').disabled = false; setStatus('تعذرت القراءة. أعد المحاولة.', 'err'); }
+  };
+  fr.readAsDataURL(picked);
+}
+
+</script>
+</body></html>
