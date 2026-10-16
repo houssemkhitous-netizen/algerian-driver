@@ -1164,16 +1164,16 @@ function keyUi(){
   box.innerHTML = '<summary style="cursor:pointer;font-weight:600;color:var(--accent)">القراءة القوية: مفتاح Gemini</summary>' +
     '<ol style="margin:8px 0;padding-inline-start:20px;font-size:0.88rem;color:var(--muted);line-height:1.7">' +
     '<li>افتح <a href="https://aistudio.google.com/apikey" style="color:var(--accent)">aistudio.google.com/apikey</a> وسجّل بحساب Gmail.</li>' +
-    '<li>اضغط <b>Create API key</b> وانسخ المفتاح (يبدأ بـ AIza).</li>' +
+    '<li>اضغط <b>Create API key</b> وانسخ المفتاح (يبدأ بـ AQ. أو AIza).</li>' +
     '<li>الصقه هنا واضغط «حفظ». يبقى في هاتفك فقط.</li></ol>' +
-    '<div style="display:flex;gap:8px;flex-wrap:wrap"><input id="gemIn" type="password" dir="ltr" placeholder="AIza…" autocomplete="off" style="flex:1;min-width:180px">' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap"><input id="gemIn" type="password" dir="ltr" placeholder="AQ.… أو AIza…" autocomplete="off" style="flex:1;min-width:180px">' +
     '<button type="button" id="gemSave" class="primary">حفظ</button><button type="button" id="gemDel">حذف</button></div>';
   $('scanStatus').insertAdjacentElement('afterend', box);
   $('gemIn').value = gemKey();
   if (!gemKey()) box.open = true;
   $('gemSave').addEventListener('click', function(){
     var k = $('gemIn').value.trim();
-    if (!/^AIza[\w-]{20,}$/.test(k)) { setStatus('المفتاح غير صحيح. يبدأ بـ AIza وطوله نحو 39 حرفاً.', 'err'); return; }
+    if (!/^(AIza[\w-]{20,}|AQ\.[\w.-]{20,})$/.test(k)) { setStatus('المفتاح غير صحيح. يبدأ بـ AIza أو AQ.', 'err'); return; }
     try { localStorage.setItem(GKEY, k); } catch (e) {}
     box.open = false;
     setStatus(readyMsg(), 'ok');
@@ -1245,7 +1245,7 @@ function nativeScan(){
       if (rid !== id) return;
       if (err) {
         var why = /^net /.test(err) ? 'لا يوجد اتصال بالإنترنت.'
-          : /^(400|401|403)/.test(err) ? 'مفتاح Gemini مرفوض. تحقق منه في الأسفل.'
+          : /^(400|401|403)/.test(err) ? 'Google رفضت المفتاح (' + err.slice(0, 80) + ').'
           : /^429/.test(err) ? 'انتهت حصة Gemini المجانية مؤقتاً.'
           : 'تعذرت القراءة عبر Gemini (' + err.slice(0, 60) + ').';
         localScan(b64, why);

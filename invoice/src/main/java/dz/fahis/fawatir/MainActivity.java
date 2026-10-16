@@ -265,8 +265,20 @@ public class MainActivity extends Activity {
     // Online reading with Google Gemini, using the user's own free API key.
     private static final String API = "https://generativelanguage.googleapis.com/v1beta/";
 
-    private static String http(String method, String url, String body, int[] code) throws Exception {
+    // Send the key in the x-goog-api-key header (works for both AIza and the newer AQ. keys); if refused, retry with ?key=.
+    private static String call(String method, String path, String key, String body, int[] code) throws Exception {
+        String r = http(method, API + path, key, body, code);
+        if (code[0] == 401 || code[0] == 403 || (code[0] == 400 && r.toLowerCase(Locale.ROOT).contains("api key"))) {
+            int[] c2 = new int[1];
+            String r2 = http(method, API + path + (path.contains("?") ? "&" : "?") + "key=" + java.net.URLEncoder.encode(key, "UTF-8"), null, body, c2);
+            if (c2[0] < 400 || code[0] != 401) { code[0] = c2[0]; return r2; }
+        }
+        return r;
+    }
+
+    private static String http(String method, String url, String key, String body, int[] code) throws Exception {
         HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+        if (key != null) c.setRequestProperty("x-goog-api-key", key);
         c.setRequestMethod(method);
         c.setConnectTimeout(20000);
         c.setReadTimeout(120000);
@@ -291,7 +303,7 @@ public class MainActivity extends Activity {
         List<String> out = new ArrayList<>();
         try {
             int[] code = new int[1];
-            String r = http("GET", API + "models?pageSize=200&key=" + key, null, code);
+            String r = call("GET", "models?pageSize=200", key, null, code);
             if (code[0] == 200) {
                 JSONArray a = new JSONObject(r).optJSONArray("models");
                 Pattern p = Pattern.compile("^models/(gemini-(\\d+(?:\\.\\d+)?)-flash)$");
@@ -332,7 +344,7 @@ public class MainActivity extends Activity {
                     String last = "no_model";
                     for (String m : models(key)) {
                         int[] code = new int[1];
-                        String r = http("POST", API + "models/" + m + ":generateContent?key=" + key, body.toString(), code);
+                        String r = call("POST", "models/" + m + ":generateContent", key, body.toString(), code);
                         if (code[0] == 200) {
                             JSONObject o = new JSONObject(r);
                             JSONArray cands = o.optJSONArray("candidates");
