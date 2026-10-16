@@ -28,7 +28,17 @@ import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -54,6 +64,7 @@ public class MainActivity extends Activity {
         s.setAllowFileAccess(true);
         s.setTextZoom(100);
         web.addJavascriptInterface(new Ocr(), "AndroidOcr");
+        web.addJavascriptInterface(new Gemini(), "AndroidGemini");
         web.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest r) {
@@ -246,6 +257,104 @@ public class MainActivity extends Activity {
                     reply(id, null, String.valueOf(e));
                 } finally {
                     if (rec != null) rec.close();
+                }
+            }).start();
+        }
+    }
+
+    // Online reading with Google Gemini, using the user's own free API key.
+    private static final String API = "https://generativelanguage.googleapis.com/v1beta/";
+
+    private static String http(String method, String url, String body, int[] code) throws Exception {
+        HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+        c.setRequestMethod(method);
+        c.setConnectTimeout(20000);
+        c.setReadTimeout(120000);
+        if (body != null) {
+            c.setDoOutput(true);
+            c.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+            try (OutputStream o = c.getOutputStream()) { o.write(body.getBytes(StandardCharsets.UTF_8)); }
+        }
+        code[0] = c.getResponseCode();
+        InputStream in = code[0] >= 400 ? c.getErrorStream() : c.getInputStream();
+        if (in == null) return "";
+        ByteArrayOutputStream b = new ByteArrayOutputStream();
+        byte[] buf = new byte[8192];
+        int n;
+        while ((n = in.read(buf)) > 0) b.write(buf, 0, n);
+        in.close();
+        return b.toString("UTF-8");
+    }
+
+    // Newest "gemini-X-flash" models first, then known fallbacks.
+    private static List<String> models(String key) {
+        List<String> out = new ArrayList<>();
+        try {
+            int[] code = new int[1];
+            String r = http("GET", API + "models?pageSize=200&key=" + key, null, code);
+            if (code[0] == 200) {
+                JSONArray a = new JSONObject(r).optJSONArray("models");
+                Pattern p = Pattern.compile("^models/(gemini-(\\d+(?:\\.\\d+)?)-flash)$");
+                List<double[]> vs = new ArrayList<>();
+                List<String> names = new ArrayList<>();
+                for (int i = 0; a != null && i < a.length(); i++) {
+                    JSONObject m = a.getJSONObject(i);
+                    String nm = m.optString("name");
+                    Matcher mt = p.matcher(nm);
+                    if (!mt.matches()) continue;
+                    if (!m.optString("supportedGenerationMethods").contains("generateContent")) continue;
+                    names.add(mt.group(1));
+                    vs.add(new double[]{Double.parseDouble(mt.group(2)), names.size() - 1});
+                }
+                vs.sort((x, y) -> Double.compare(y[0], x[0]));
+                for (double[] v : vs) out.add(names.get((int) v[1]));
+            }
+        } catch (Exception ignored) {}
+        for (String f : new String[]{"gemini-flash-latest", "gemini-2.5-flash"}) if (!out.contains(f)) out.add(f);
+        return out;
+    }
+
+    private void geminiReply(String id, String text, String err) {
+        final String js = "window.__geminiDone && window.__geminiDone(" + JSONObject.quote(id) + "," + JSONObject.quote(text == null ? "" : text) + "," + JSONObject.quote(err == null ? "" : err) + ")";
+        runOnUiThread(() -> web.evaluateJavascript(js, null));
+    }
+
+    private class Gemini {
+        @JavascriptInterface
+        public void ask(final String key, final String b64, final String prompt, final String id) {
+            new Thread(() -> {
+                try {
+                    JSONObject img = new JSONObject().put("inline_data", new JSONObject().put("mime_type", "image/jpeg").put("data", b64));
+                    JSONObject txt = new JSONObject().put("text", prompt);
+                    JSONObject body = new JSONObject()
+                        .put("contents", new JSONArray().put(new JSONObject().put("role", "user").put("parts", new JSONArray().put(img).put(txt))))
+                        .put("generationConfig", new JSONObject().put("temperature", 0).put("responseMimeType", "application/json"));
+                    String last = "no_model";
+                    for (String m : models(key)) {
+                        int[] code = new int[1];
+                        String r = http("POST", API + "models/" + m + ":generateContent?key=" + key, body.toString(), code);
+                        if (code[0] == 200) {
+                            JSONObject o = new JSONObject(r);
+                            JSONArray cands = o.optJSONArray("candidates");
+                            StringBuilder sb = new StringBuilder();
+                            if (cands != null && cands.length() > 0) {
+                                JSONArray parts = cands.getJSONObject(0).optJSONObject("content") == null ? null : cands.getJSONObject(0).getJSONObject("content").optJSONArray("parts");
+                                for (int i = 0; parts != null && i < parts.length(); i++) sb.append(parts.getJSONObject(i).optString("text"));
+                            }
+                            if (sb.length() > 0) { geminiReply(id, sb.toString(), null); return; }
+                            last = "empty";
+                            continue;
+                        }
+                        String msg = "";
+                        try { msg = new JSONObject(r).getJSONObject("error").optString("message"); } catch (Exception ignored) {}
+                        last = code[0] + " " + msg;
+                        if (code[0] == 400 && msg.toLowerCase(Locale.ROOT).contains("api key")) break;
+                        if (code[0] == 401 || code[0] == 403) break;
+                        // 404 (model gone) or 429 (quota of this model): try the next model.
+                    }
+                    geminiReply(id, null, last);
+                } catch (Throwable e) {
+                    geminiReply(id, null, "net " + e);
                 }
             }).start();
         }

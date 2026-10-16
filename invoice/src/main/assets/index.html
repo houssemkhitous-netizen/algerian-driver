@@ -172,7 +172,7 @@ td.amt { white-space: nowrap; }
         <button type="button" id="stopBtn" hidden>إيقاف</button>
       </div>
     </div>
-    <p class="status" id="scanStatus">اختر صورة واضحة للفاتورة كاملة، ولو كانت مقلوبة. يقرؤها الهاتف ويملأ الحقول، ثم تراجعها أنت.</p>
+    <p class="status" id="scanStatus">اختر صورة واضحة للفاتورة كاملة، ولو كانت مقلوبة. يقرؤها التطبيق ويملأ الحقول، ثم تراجعها أنت.</p>
     <div id="pasteBox" hidden contenteditable="true" role="textbox" aria-label="خانة لصق الصورة" style="margin-top:10px;min-height:56px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:10px;color:var(--muted);font-size:0.88rem">إن لم تعمل الأزرار: انسخ صورة الفاتورة من تطبيق الصور، ثم اضغط هنا ضغطاً مطولاً واختر «لصق».</div>
   </section>
 
@@ -962,7 +962,7 @@ var PROMPT = [
 
 var scanWhy = 'جارٍ التحقق من توفر القراءة الآلية…';
 var NO_CLAUDE = 'القراءة الآلية لا تعمل هنا لأن الصفحة مفتوحة خارج Claude (مثلاً الملف المنزَّل). افتحها من بطاقة «فاحص الفواتير» في محادثة Claude، أو أرسل صورة الفاتورة في المحادثة وسأملأ البيانات لك.';
-if (window.AndroidOcr) { sample = 'native'; scanWhy = ''; setStatus('القراءة الآلية جاهزة وتعمل دون إنترنت. التقط صورة الفاتورة أو اخترها.', 'ok'); }
+if (window.AndroidOcr) { sample = 'native'; scanWhy = ''; setTimeout(function(){ keyUi(); setStatus(readyMsg(), gemKey() ? 'ok' : ''); }, 0); }
 else (window.claude && typeof window.claude.use === 'function' ? window.claude.use('sample') : Promise.resolve(null)).then(function(s){
   if (!s) { scanWhy = NO_CLAUDE; setStatus(NO_CLAUDE, 'err'); return; }
   return s.limits().then(function(l){
@@ -1151,45 +1151,114 @@ function parseInvoiceText(raw){
 }
 
 
-// Android app only: on-device scanning through the AndroidOcr bridge.
+// Android app only. Strong reading with Gemini (user's free key) when online; on-device reading otherwise.
+var GKEY = 'gemKey';
+function gemKey(){ try { return localStorage.getItem(GKEY) || ''; } catch (e) { return ''; } }
+function readyMsg(){
+  return gemKey() ? 'القراءة القوية (Gemini) مفعّلة. التقط صورة الفاتورة أو اخترها.' : 'القراءة داخل الهاتف فقط، وهي محدودة. للقراءة القوية ضع مفتاح Gemini المجاني في الأسفل.';
+}
+function keyUi(){
+  var box = document.createElement('details');
+  box.id = 'gemBox';
+  box.style.cssText = 'margin-top:10px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface)';
+  box.innerHTML = '<summary style="cursor:pointer;font-weight:600;color:var(--accent)">القراءة القوية: مفتاح Gemini</summary>' +
+    '<ol style="margin:8px 0;padding-inline-start:20px;font-size:0.88rem;color:var(--muted);line-height:1.7">' +
+    '<li>افتح <a href="https://aistudio.google.com/apikey" style="color:var(--accent)">aistudio.google.com/apikey</a> وسجّل بحساب Gmail.</li>' +
+    '<li>اضغط <b>Create API key</b> وانسخ المفتاح (يبدأ بـ AIza).</li>' +
+    '<li>الصقه هنا واضغط «حفظ». يبقى في هاتفك فقط.</li></ol>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap"><input id="gemIn" type="password" dir="ltr" placeholder="AIza…" autocomplete="off" style="flex:1;min-width:180px">' +
+    '<button type="button" id="gemSave" class="primary">حفظ</button><button type="button" id="gemDel">حذف</button></div>';
+  $('scanStatus').insertAdjacentElement('afterend', box);
+  $('gemIn').value = gemKey();
+  if (!gemKey()) box.open = true;
+  $('gemSave').addEventListener('click', function(){
+    var k = $('gemIn').value.trim();
+    if (!/^AIza[\w-]{20,}$/.test(k)) { setStatus('المفتاح غير صحيح. يبدأ بـ AIza وطوله نحو 39 حرفاً.', 'err'); return; }
+    try { localStorage.setItem(GKEY, k); } catch (e) {}
+    box.open = false;
+    setStatus(readyMsg(), 'ok');
+  });
+  $('gemDel').addEventListener('click', function(){
+    try { localStorage.removeItem(GKEY); } catch (e) {}
+    $('gemIn').value = '';
+    setStatus(readyMsg(), '');
+  });
+}
+
+function fillFrom(o){
+  var data = {};
+  TEXT_IDS.forEach(function(k){ data[k] = o[k] == null ? '' : String(o[k]); });
+  if (data.invDate && !/^\d{4}-\d{2}-\d{2}$/.test(data.invDate)) data.invDate = '';
+  data.pay = ['cheque','virement','especes','autre','none'].indexOf(o.pay) >= 0 ? o.pay : 'none';
+  data.sRegime = o.sRegime === 'reel' ? 'reel' : 'ifu';
+  data.rate = ['0','9','19'].indexOf(String(o.rate)) >= 0 ? String(o.rate) : '0';
+  data.bBiz = o.bBiz === undefined ? !!(o.bNif || o.bRc || o.bNis || o.bAi) : o.bBiz !== false;
+  data.mention = o.mention === true;
+  data.stamp = o.stamp === true;
+  data.lines = Array.isArray(o.lines) ? o.lines.slice(0, 30).map(function(l){ l = l || {}; return {des: String(l.des || ''), unit: String(l.unit || ''), qty: String(l.qty || ''), price: String(l.price || '')}; }) : [];
+  data.inTransit = $('inTransit').checked; data.doc = $('doc').value; data.rcCopy = $('rcCopy').checked;
+  load(data);
+  return data;
+}
+function report(data, how){
+  var filled = TEXT_IDS.filter(function(k){ return data[k]; }).length;
+  var missing = [];
+  if (!data.sNif) missing.push('NIF البائع');
+  if (!data.sRc) missing.push('سجل البائع');
+  if (!data.lines.length) missing.push('أسطر السلع');
+  if (!data.stTTC) missing.push('المجموع');
+  setStatus(how + ': ملأتُ ' + filled + ' خانة.' + (missing.length ? ' لم أجد: ' + missing.join('، ') + '.' : '') + ' راجع الأرقام مع الأصل.', missing.length ? '' : 'ok');
+}
+
+function localScan(b64, note){
+  var id = 'r' + Date.now();
+  setStatus((note ? note + ' ' : '') + 'الهاتف يقرأ الفاتورة… بضع ثوانٍ.', '');
+  window.__ocrDone = function(rid, text, err){
+    if (rid !== id) return;
+    $('scanBtn').disabled = false;
+    if (err || !text || text.replace(/\s/g, '').length < 20) {
+      setStatus('لم أستطع قراءة نص واضح. صوّر الفاتورة كاملة ومستوية، في إضاءة جيدة ودون ظل.', 'err');
+      return;
+    }
+    var o = parseInvoiceText(text);
+    o.bBiz = undefined;
+    report(fillFrom(o), (note ? note + ' ' : '') + 'قراءة داخل الهاتف');
+  };
+  try { window.AndroidOcr.recognize(b64, id); }
+  catch (e) { $('scanBtn').disabled = false; setStatus('تعذرت القراءة. أعد المحاولة.', 'err'); }
+}
+
+var GEM_PROMPT = PROMPT + '\nThe invoice may be in French or Arabic; copy Arabic text as printed. Read every row of the items table. Use digits only for numbers, with "." as the decimal separator and no thousands separators.';
+
 function nativeScan(){
   if (!picked) { setStatus('اختر صورة أولاً.', 'err'); return; }
   $('scanBtn').disabled = true;
-  setStatus('الهاتف يقرأ الفاتورة… بضع ثوانٍ.', '');
   var fr = new FileReader();
   fr.onerror = function(){ setStatus('لم أستطع فتح الصورة.', 'err'); $('scanBtn').disabled = false; };
   fr.onload = function(){
     var b64 = String(fr.result).split(',')[1] || '';
-    var id = 'r' + Date.now();
-    window.__ocrDone = function(rid, text, err){
+    var key = gemKey();
+    if (!key || !window.AndroidGemini) { localScan(b64, ''); return; }
+    var id = 'g' + Date.now();
+    setStatus('Gemini يقرأ الفاتورة… من 5 إلى 20 ثانية.', '');
+    window.__geminiDone = function(rid, text, err){
       if (rid !== id) return;
-      $('scanBtn').disabled = false;
-      if (err || !text || text.replace(/\s/g, '').length < 20) {
-        setStatus('لم أستطع قراءة نص واضح. صوّر الفاتورة كاملة ومستوية، في إضاءة جيدة ودون ظل.', 'err');
+      if (err) {
+        var why = /^net /.test(err) ? 'لا يوجد اتصال بالإنترنت.'
+          : /^(400|401|403)/.test(err) ? 'مفتاح Gemini مرفوض. تحقق منه في الأسفل.'
+          : /^429/.test(err) ? 'انتهت حصة Gemini المجانية مؤقتاً.'
+          : 'تعذرت القراءة عبر Gemini (' + err.slice(0, 60) + ').';
+        localScan(b64, why);
         return;
       }
-      var o = parseInvoiceText(text);
-      var data = {};
-      TEXT_IDS.forEach(function(k){ data[k] = o[k] == null ? '' : String(o[k]); });
-      data.pay = o.pay || 'none';
-      data.sRegime = o.sRegime === 'reel' ? 'reel' : 'ifu';
-      data.rate = o.rate || '0';
-      data.bBiz = !!(o.bNif || o.bRc || o.bNis || o.bAi || o.bName);
-      data.mention = !!o.mention;
-      data.stamp = !!o.stamp;
-      data.lines = (o.lines || []).slice(0, 30);
-      data.inTransit = $('inTransit').checked; data.doc = $('doc').value; data.rcCopy = $('rcCopy').checked;
-      load(data);
-      var filled = TEXT_IDS.filter(function(k){ return data[k]; }).length;
-      var missing = [];
-      if (!data.sNif) missing.push('NIF البائع');
-      if (!data.sRc) missing.push('سجل البائع');
-      if (!data.lines.length) missing.push('أسطر السلع');
-      if (!data.stTTC) missing.push('المجموع');
-      setStatus('ملأتُ ' + filled + ' خانة من الصورة.' + (missing.length ? ' لم أجد: ' + missing.join('، ') + '.' : '') + ' راجع كل رقم مع الأصل.', missing.length ? '' : 'ok');
+      var o = null;
+      try { var a = text.indexOf('{'), z = text.lastIndexOf('}'); o = JSON.parse(text.slice(a, z + 1)); } catch (e) {}
+      if (!o || typeof o !== 'object' || Array.isArray(o)) { localScan(b64, 'لم أفهم رد Gemini.'); return; }
+      $('scanBtn').disabled = false;
+      report(fillFrom(o), 'قراءة Gemini');
     };
-    try { window.AndroidOcr.recognize(b64, id); }
-    catch (e) { $('scanBtn').disabled = false; setStatus('تعذرت القراءة. أعد المحاولة.', 'err'); }
+    try { window.AndroidGemini.ask(key, b64, GEM_PROMPT, id); }
+    catch (e) { localScan(b64, ''); }
   };
   fr.readAsDataURL(picked);
 }
