@@ -26,8 +26,8 @@ jobs:
         if: failure()
         shell: bash
         run: |
-          grep -v "> Task" build.log | grep -E -A8 "What went wrong|error:" | head -9 | tr "
-" " " | sed "s/^/::error::/"; echo
+          MSG=$(grep -v "> Task" build.log | grep -E -A8 "What went wrong|error:" | head -12 | tr '\n' ' ')
+          echo "::error::$MSG"
       - name: Rename APK
         run: |
           cp app/build/outputs/apk/debug/app-debug.apk algerian-driver.apk
