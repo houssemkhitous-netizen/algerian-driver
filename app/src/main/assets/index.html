@@ -1,0 +1,1162 @@
+<!doctype html><html lang="ar" dir="rtl" class="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body><title>وثائق الحاجز</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one column. Who/what form on top, then a document checklist split into three groups, then the missing-document summary. */
+:root {
+  --bg: #eef3f1;
+  --surface: #ffffff;
+  --ink: #1d2320;
+  --muted: #5e6660;
+  --line: #d9dbd4;
+  --accent: #1f6b4f;
+  --accent-soft: #e2efe8;
+  --bad: #b3261e; --bad-soft: #fbe9e7;
+  --warn: #8a5a00; --warn-soft: #fbf0d6;
+  --ok: #1f6b4f; --ok-soft: #e2efe8;
+  --info: #3f5b78; --info-soft: #e7eef5;
+  --f-display: "Noto Kufi Arabic", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans Arabic", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.65; }
+.app { max-width: 760px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 90px; display: flex; flex-direction: column; gap: 16px; }
+h1 { font-family: var(--f-display); font-size: 1.6rem; line-height: 1.35; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--f-display); font-size: 1.08rem; margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); margin: 4px 0 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.lbl { font-size: 0.82rem; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: inherit; font-size: 0.9rem; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 999px; padding: 6px 14px; min-height: 40px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); font-weight: 600; }
+input[type="text"], textarea { font: inherit; font-size: 1rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-height: 46px; width: 100%; }
+button { font: inherit; font-size: 0.92rem; cursor: pointer; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 7px 12px; min-height: 40px; }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); font-weight: 600; }
+button:disabled { opacity: .55; cursor: default; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.match { font-size: 0.88rem; color: var(--muted); }
+.match b { color: var(--accent); }
+.group-h { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.count { font-size: 0.82rem; color: var(--muted); }
+.doc-h { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+.doc select { font: inherit; font-size: 0.86rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; min-height: 40px; max-width: 100%; flex: 1 1 200px; }
+.doc.missing select { border-color: var(--bad); color: var(--bad); }
+.case { border: 1px solid var(--line); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+.case.on { border-color: var(--bad); background: var(--bad-soft); }
+.case-h { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.case .when { font-weight: 600; }
+.case .qual { font-size: 0.88rem; }
+.case .meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.case .extra { font-size: 0.84rem; color: var(--muted); }
+.type { font-size: 0.75rem; font-weight: 600; padding: 2px 10px; border-radius: 999px; }
+.type.forfait { background: var(--info-soft); color: var(--info); }
+.type.court { background: var(--bad-soft); color: var(--bad); }
+.type.admin, .type.settle { background: var(--warn-soft); color: var(--warn); }
+.type.none { background: var(--ok-soft); color: var(--ok); }
+.amt { font-weight: 600; font-size: 0.92rem; }
+.v { font-size: 0.7rem; font-weight: 600; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.v.ok { background: var(--ok-soft); color: var(--ok); }
+.v.one { background: var(--info-soft); color: var(--info); }
+.v.no { background: var(--warn-soft); color: var(--warn); }
+.arts { font-size: 0.85rem; background: var(--bg); border-radius: 6px; padding: 6px 8px; display: flex; flex-direction: column; gap: 2px; }
+.lawname { color: var(--muted); font-size: 0.8rem; }
+.pvc summary { cursor: pointer; color: var(--bad); font-weight: 600; font-size: 0.85rem; }
+.pv { white-space: pre-wrap; background: var(--surface); border: 1px dashed var(--line); border-radius: 6px; padding: 10px; font-size: 0.86rem; line-height: 1.9; margin-block: 6px; }
+button.small { min-height: 34px; padding: 4px 10px; font-size: 0.82rem; }
+.needed { display: flex; flex-direction: column; gap: 10px; }
+.needed ol { margin: 4px 0 0; padding-inline-start: 22px; display: flex; flex-direction: column; gap: 2px; font-size: 0.92rem; }
+.sel { font: inherit; font-size: 0.95rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-height: 44px; width: 100%; }
+textarea { resize: vertical; }
+.rcout { display: flex; flex-direction: column; gap: 8px; }
+.rcrow { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; font-size: 0.88rem; }
+.rcrow .code { font-family: var(--f-data); font-weight: 600; direction: ltr; unicode-bidi: isolate; }
+.verd { border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; font-size: 0.9rem; }
+.verd.ok { background: var(--ok-soft); color: var(--ok); }
+.verd.bad { background: var(--bad-soft); color: var(--bad); }
+.verd.unknown { background: var(--warn-soft); color: var(--warn); }
+.verd .pv { color: var(--ink); }
+.steps { margin: 4px 0 0; padding-inline-start: 22px; display: flex; flex-direction: column; gap: 4px; color: var(--ink); font-size: 0.88rem; }
+.pvbox { color: var(--ink); background: var(--surface); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.legend { display: flex; flex-direction: column; gap: 6px; font-size: 0.86rem; }
+.doc { border-top: 1px solid var(--line); padding-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.doc:first-of-type { border-top: 0; padding-top: 0; }
+.doc input { width: 22px; height: 22px; margin-top: 3px; accent-color: var(--accent); grid-row: span 2; }
+.doc .name { font-weight: 600; }
+.doc .fr { font-size: 0.8rem; color: var(--muted); direction: ltr; unicode-bidi: isolate; }
+.doc details { font-size: 0.88rem; }
+.doc summary { cursor: pointer; color: var(--accent); font-size: 0.85rem; padding-block: 4px; }
+.doc .body { display: flex; flex-direction: column; gap: 6px; padding-top: 6px; }
+.doc .basis { color: var(--muted); }
+.doc .pen { background: var(--bg); border-radius: 8px; padding: 8px 10px; }
+.doc.missing .name { color: var(--bad); }
+.tag { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 1px 8px; border-radius: 999px; margin-inline-start: 6px; vertical-align: middle; }
+.tag.part { background: var(--warn-soft); color: var(--warn); }
+.tag.rec { background: var(--info-soft); color: var(--info); }
+.tag.seize { background: var(--bad-soft); color: var(--bad); }
+.num { font-family: var(--f-data); font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+.sum { border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.sum.bad { background: var(--bad-soft); color: var(--bad); }
+.sum.ok { background: var(--ok-soft); color: var(--ok); }
+.sum strong { font-family: var(--f-display); font-size: 1.15rem; }
+.sum ul { margin: 0; padding-inline-start: 18px; color: var(--ink); font-size: 0.9rem; }
+.ai { white-space: pre-wrap; background: var(--bg); border-radius: 8px; padding: 12px; font-size: 0.9rem; }
+.foot { font-size: 0.8rem; color: var(--muted); }
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--surface); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+.tabs button { border: 0; border-radius: 0; background: transparent; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px 6px; min-height: 58px; font-size: 0.74rem; position: relative; }
+.tabs svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tabs button[aria-current="page"] { color: var(--accent); font-weight: 600; }
+.tabs button[aria-current="page"]::before { content: ""; position: absolute; top: 0; left: 25%; right: 25%; height: 3px; border-radius: 0 0 3px 3px; background: var(--accent); }
+.badge { position: absolute; top: 4px; left: calc(50% - 20px); min-width: 18px; height: 18px; border-radius: 9px; background: var(--bad); color: var(--surface); font-size: 0.7rem; line-height: 18px; padding: 0 4px; }
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 4; background: var(--bg); display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-block: 10px 6px; margin-block: -20px 0; }
+.top h1 { font-size: 1.15rem; }
+.toptxt { font-size: 0.85rem; }
+[data-tab]:not(.on) { display: none !important; }
+.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--surface); border-top: 1px solid var(--line); padding-top: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.bar-in { max-width: 760px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 0.9rem; }
+
+/* Type hierarchy: primary headings large and marked; secondary labels small and muted. */
+h2, .group-h h2 { font-family: var(--f-display); font-size: 1.28rem; font-weight: 700; line-height: 1.4; color: var(--ink); border-inline-start: 4px solid var(--accent); padding-inline-start: 10px; }
+.top h1 { font-size: 1.2rem; font-weight: 700; }
+.lbl { font-size: 0.74rem; font-weight: 600; letter-spacing: 0.02em; color: var(--muted); margin-top: 4px; }
+.needed .lbl { font-size: 0.8rem; color: var(--accent); font-weight: 700; border-bottom: 1px solid var(--line); padding-bottom: 2px; }
+.needed ol { font-size: 0.9rem; }
+.count { font-size: 0.72rem; }
+.doc .name { font-size: 0.98rem; font-weight: 700; }
+.doc .fr { font-size: 0.7rem; }
+.doc summary { font-size: 0.78rem; }
+.case .when { font-size: 0.88rem; font-weight: 700; }
+.case .qual { font-size: 0.82rem; }
+.arts { font-size: 0.78rem; }
+.lawname, .case .extra, .extra { font-size: 0.74rem; }
+.match { font-size: 0.8rem; }
+.foot { font-size: 0.74rem; }
+.sum strong { font-size: 1.3rem; }
+.pvbox > b { font-size: 0.95rem; }
+.verd b { font-size: 0.95rem; }
+.chip { font-size: 0.88rem; }
+
+/* Single light, colourful look. Each section heading carries its own colour (--hc). */
+:root { color-scheme: light; --hc: #1f6b4f; --hc-soft: #e2efe8; }
+.top { background: linear-gradient(90deg, #1f6b4f, #2a8a63); color: #fff; margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding-inline: max(16px, env(safe-area-inset-left, 0px)); border-radius: 0 0 14px 14px; box-shadow: 0 2px 8px rgba(20, 60, 45, .18); }
+.top h1 { color: #fff; font-size: 1.25rem; }
+.toptxt { background: #fff; border-radius: 999px; padding: 3px 10px; }
+.card { border-color: color-mix(in srgb, var(--hc) 22%, #d9dbd4); }
+h2, .group-h h2 { color: var(--hc); border-inline-start-color: var(--hc); font-size: 1.32rem; }
+.card > h2:first-child, .card > .group-h { background: var(--hc-soft); margin: -16px -16px 4px; padding: 12px 16px; border-radius: 9px 9px 0 0; }
+.card > h2:first-child { border-inline-start: 0; padding-inline-start: 16px; box-shadow: inset -5px 0 0 var(--hc); }
+.card > .group-h h2 { border-inline-start: 0; padding-inline-start: 0; }
+.card > .group-h { box-shadow: inset -5px 0 0 var(--hc); }
+.needed .lbl { color: var(--hc); }
+.chip[aria-pressed="true"] { background: var(--hc); border-color: var(--hc); }
+.tabs button[aria-current="page"] { color: #1f6b4f; }
+[data-tab="who"] { --hc: #1f6b4f; --hc-soft: #e1f1e8; }
+[data-tab="search"] { --hc: #1d5fa8; --hc-soft: #e3edf9; }
+[data-tab="docs"] { --hc: #1d5fa8; --hc-soft: #e3edf9; }
+[data-tab="list"] { --hc: #c2410c; --hc-soft: #fdeee4; }
+[data-tab="sum"] { --hc: #8f2d56; --hc-soft: #f8e7ee; }
+.hc-veh { --hc: #1d5fa8; --hc-soft: #e3edf9; }
+.hc-act { --hc: #9a6a00; --hc-soft: #fbf1d9; }
+.hc-goods { --hc: #6b3fa0; --hc-soft: #efe7f8; }
+.hc-gen { --hc: #b3261e; --hc-soft: #fbe9e7; }
+.hc-tech { --hc: #c2410c; --hc-soft: #fdeee4; }
+.hc-road { --hc: #0f766e; --hc-soft: #e0f2f0; }
+#needH { color: #0f766e; } [aria-labelledby="needH"] { --hc: #0f766e; --hc-soft: #e0f2f0; }
+[aria-labelledby="rcH"] { --hc: #9a6a00; --hc-soft: #fbf1d9; }
+
+/* Item titles prominent and coloured; status selector compact. */
+.doc .name { font-size: 1.1rem; font-weight: 800; color: var(--hc); line-height: 1.45; }
+.doc.missing .name { color: var(--bad); }
+.doc-h { align-items: center; }
+.doc select { flex: none; width: auto; max-width: 62%; font-size: 0.76rem; min-height: 30px; padding: 2px 6px; border-radius: 6px; color: var(--muted); background: var(--surface); }
+.doc.missing select { font-weight: 600; }
+.case .when { color: var(--hc); font-size: 0.92rem; }
+.case.on .when { color: var(--bad); }
+
+/* Dark mode (class on <html>), with brighter section colours. */
+html.dark { color-scheme: dark; --bg: #0f1518; --surface: #172026; --ink: #e8eef0; --muted: #9fb1b7; --line: #2a373e;
+  --accent: #4fd39a; --accent-soft: #163327; --bad: #ff8a80; --bad-soft: #3a1d1b; --warn: #f3c969; --warn-soft: #3a2e10;
+  --ok: #4fd39a; --ok-soft: #133024; --info: #9cc3f0; --info-soft: #1a2a3e; }
+html.dark body { background: var(--bg); color: var(--ink); }
+html.dark .top { background: linear-gradient(90deg, #12392b, #1b5a41); box-shadow: 0 2px 10px rgba(0,0,0,.5); }
+html.dark .toptxt { background: #0f1518; }
+html.dark .card { border-color: color-mix(in srgb, var(--hc) 35%, #2a373e); }
+html.dark [data-tab="who"] { --hc: #4fd39a; --hc-soft: #143026; }
+html.dark [data-tab="search"], html.dark [data-tab="docs"], html.dark .hc-veh { --hc: #74b3ff; --hc-soft: #15253a; }
+html.dark [data-tab="list"], html.dark .hc-tech { --hc: #ff9a5c; --hc-soft: #3a2214; }
+html.dark [data-tab="sum"] { --hc: #ff7eb0; --hc-soft: #3a1a29; }
+html.dark .hc-act, html.dark [aria-labelledby="rcH"] { --hc: #f3c969; --hc-soft: #352a10; }
+html.dark .hc-goods { --hc: #c39bff; --hc-soft: #2a1f3d; }
+html.dark .hc-gen { --hc: #ff8a80; --hc-soft: #3a1d1b; }
+html.dark .hc-road, html.dark [aria-labelledby="needH"] { --hc: #4fd8c8; --hc-soft: #12302d; }
+html.dark #needH { color: #4fd8c8; }
+html.dark .tabs { background: #141c21; }
+html.dark .tabs button[aria-current="page"] { color: #4fd39a; }
+html.dark .tabs button[aria-current="page"]::before { background: #4fd39a; }
+html.dark .chip[aria-pressed="true"] { color: #0f1518; }
+html.dark button.primary { color: #0f1518; }
+html.dark .badge { color: #fff; }
+.themebtn { background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35); color: #fff; border-radius: 999px; min-height: 30px; padding: 2px 10px; font-size: 0.78rem; }
+.top-end { display: flex; align-items: center; gap: 8px; }
+
+/* Dark: one lightness/chroma for every section hue so colours read as a family; blue and orange more vivid. */
+html.dark [data-tab="who"] { --hc: oklch(0.80 0.17 155); --hc-soft: oklch(0.29 0.07 155); }
+html.dark [data-tab="search"], html.dark [data-tab="docs"], html.dark .hc-veh { --hc: oklch(0.78 0.16 250); --hc-soft: oklch(0.31 0.10 255); }
+html.dark [data-tab="list"], html.dark .hc-tech { --hc: oklch(0.80 0.17 55); --hc-soft: oklch(0.31 0.09 50); }
+html.dark [data-tab="sum"] { --hc: oklch(0.78 0.16 355); --hc-soft: oklch(0.29 0.08 355); }
+html.dark .hc-act, html.dark [aria-labelledby="rcH"] { --hc: oklch(0.85 0.15 90); --hc-soft: oklch(0.30 0.07 90); }
+html.dark .hc-goods { --hc: oklch(0.78 0.15 300); --hc-soft: oklch(0.29 0.08 300); }
+html.dark .hc-gen { --hc: oklch(0.76 0.17 25); --hc-soft: oklch(0.29 0.08 25); }
+html.dark .hc-road, html.dark [aria-labelledby="needH"] { --hc: oklch(0.82 0.13 190); --hc-soft: oklch(0.29 0.06 190); }
+html.dark #needH { color: var(--hc); }
+html.dark .card > h2:first-child, html.dark .card > .group-h { background: linear-gradient(90deg, var(--hc-soft), color-mix(in srgb, var(--hc-soft) 55%, var(--surface))); box-shadow: inset -6px 0 0 var(--hc); }
+html.dark h2, html.dark .group-h h2 { text-shadow: 0 0 18px color-mix(in srgb, var(--hc) 35%, transparent); }
+html.dark .card { border-color: color-mix(in srgb, var(--hc) 45%, #2a373e); }
+
+/* Swap: blue -> violet, orange -> pink (goods and summary take the freed hues). */
+html.dark [data-tab="search"], html.dark [data-tab="docs"], html.dark .hc-veh { --hc: oklch(0.78 0.17 300); --hc-soft: oklch(0.31 0.11 300); }
+html.dark [data-tab="list"], html.dark .hc-tech { --hc: oklch(0.79 0.17 350); --hc-soft: oklch(0.31 0.10 350); }
+html.dark .hc-goods { --hc: oklch(0.80 0.13 230); --hc-soft: oklch(0.29 0.07 230); }
+html.dark [data-tab="sum"] { --hc: oklch(0.80 0.16 60); --hc-soft: oklch(0.30 0.08 60); }
+[data-tab="search"], [data-tab="docs"], .hc-veh { --hc: #7c3aed; --hc-soft: #efe7fd; }
+[data-tab="list"], .hc-tech { --hc: #c0267a; --hc-soft: #fbe7f1; }
+.hc-goods { --hc: #1d6fa8; --hc-soft: #e3effa; }
+[data-tab="sum"] { --hc: #c2410c; --hc-soft: #fdeee4; }
+html.dark .tabs button[aria-current="page"] { color: oklch(0.80 0.17 155); }
+
+/* Option 3: light green and turquoise, close to the header colour; goods and summary back to violet and pink. */
+html.dark [data-tab="search"], html.dark [data-tab="docs"], html.dark .hc-veh { --hc: oklch(0.86 0.16 132); --hc-soft: oklch(0.31 0.08 140); }
+html.dark [data-tab="list"], html.dark .hc-tech { --hc: oklch(0.82 0.13 205); --hc-soft: oklch(0.31 0.07 210); }
+html.dark .hc-road, html.dark [aria-labelledby="needH"] { --hc: oklch(0.82 0.12 170); --hc-soft: oklch(0.29 0.06 170); }
+html.dark .hc-goods { --hc: oklch(0.78 0.15 300); --hc-soft: oklch(0.29 0.08 300); }
+html.dark [data-tab="sum"] { --hc: oklch(0.78 0.16 355); --hc-soft: oklch(0.29 0.08 355); }
+[data-tab="search"], [data-tab="docs"], .hc-veh { --hc: #3f8f2f; --hc-soft: #e6f4df; }
+[data-tab="list"], .hc-tech { --hc: #0e7490; --hc-soft: #e0f3f8; }
+.hc-goods { --hc: #6b3fa0; --hc-soft: #efe7f8; }
+[data-tab="sum"] { --hc: #8f2d56; --hc-soft: #f8e7ee; }
+
+.doc summary, html.dark .doc summary { color: var(--muted); font-weight: 400; opacity: .8; }
+
+/* Whole app in the same green as «من أنت». */
+.card, [data-tab], .card[class*="hc-"] { --hc: #1f6b4f; --hc-soft: #e1f1e8; }
+html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: oklch(0.80 0.17 155); --hc-soft: oklch(0.29 0.07 155); }
+#needH, html.dark #needH { color: var(--hc); }
+</style>
+
+<div class="app" dir="rtl" lang="ar">
+  <header class="top">
+    <h1>وثائق الحاجز</h1>
+    <div class="top-end"><span id="barTxt" class="toptxt"></span><button type="button" class="themebtn" id="themeBtn">فاتح</button></div>
+  </header>
+
+  <section class="card" data-tab="who" aria-labelledby="whoH">
+    <h2 id="whoH">من أنت؟</h2>
+    <div class="chips" id="roleChips" role="group" aria-label="صفتك">
+      <button type="button" class="chip" data-role="private">سائق سيارتي الخاصة</button>
+      <button type="button" class="chip" data-role="moto">سائق دراجة نارية</button>
+      <button type="button" class="chip" data-role="taxi">سائق سيارة أجرة</button>
+      <button type="button" class="chip" data-role="bus">سائق حافلة (نقل المسافرين)</button>
+      <button type="button" class="chip" data-role="school">سائق نقل مدرسي</button>
+      <button type="button" class="chip" data-role="driver">سائق شاحنة أجير</button>
+      <button type="button" class="chip" data-role="carrier">ناقل بضائع لحساب الغير</button>
+      <button type="button" class="chip" data-role="owner">مالك السلعة ينقلها بنفسه</button>
+    </div>
+    <span class="lbl" id="vehLbl">المركبة</span>
+    <div class="chips" id="vehChips" role="group" aria-label="نوع المركبة">
+      <button type="button" class="chip" data-veh="light">نفعية حتى 3,5 طن</button>
+      <button type="button" class="chip" data-veh="heavy">شاحنة أكثر من 3,5 طن</button>
+      <button type="button" class="chip" data-veh="exceptional">حمولة استثنائية</button>
+    </div>
+    <span class="lbl">المكان</span>
+    <div class="chips" role="group" aria-label="المكان">
+      <button type="button" class="chip" id="zoneChip" aria-pressed="false">داخل النطاق الجمركي (ولاية حدودية)</button>
+    </div>
+    <label class="lbl" for="q">النشاط أو السلعة المنقولة (إن وُجدت)</label>
+    <input type="text" id="q" list="sugg" placeholder="مثال: سبائك ألمنيوم، مواشي، رمل، خضر وفواكه، خردة…" autocomplete="off">
+    <datalist id="sugg"></datalist>
+    <p class="match" id="match"></p>
+  </section>
+
+  <section class="card" data-tab="search" aria-labelledby="offH">
+    <h2 id="offH">اكتب مخالفة لمعرفة تكييفها</h2>
+    <p class="foot" style="margin:0">صف المخالفة بكلماتك (مثال: «سائق يتكلم في الهاتف»، «شاحنة بلا فاتورة»، «طفل في الكرسي الأمامي»، «سياقة بلا بيرمي»)، فتظهر المخالفات المطابقة بصيغتها والمادة الناصة والمعاقبة والإجراء.</p>
+    <input type="text" id="offQ" placeholder="اكتب المخالفة هنا…" autocomplete="off">
+    <div id="offOut" class="rcout"></div>
+  </section>
+
+  <section class="card" data-tab="who" aria-labelledby="needH">
+    <h2 id="needH">الوثائق اللازمة</h2>
+    <div id="needed" class="needed"></div>
+    <button type="button" class="primary" data-go2="docs">حدد حالة كل وثيقة</button>
+  </section>
+
+
+
+  <div id="groups" data-tab="docs" style="display:flex;flex-direction:column;gap:16px"></div>
+  <section class="card" data-tab="docs" aria-labelledby="rcH">
+    <h2 id="rcH">السجل التجاري: مقارنة النشاط المسجل بالنشاط الممارس</h2>
+    <p class="foot" style="margin:0">أدخل رموز النشاط (6 أرقام) ونص النشاط كما هما في مستخرج السجل المقدَّم، فتقارنهما الأداة بالسلعة المنقولة وبصفتك.</p>
+    <label class="lbl" for="rcOwner">السجل المقدَّم يخص</label>
+    <select id="rcOwner" class="sel">
+      <option value="owner">مالك السلعة (البائع أو المشتري)</option>
+      <option value="carrier">الناقل</option>
+    </select>
+    <label class="lbl" for="rcCodes">رموز النشاط</label>
+    <input type="text" id="rcCodes" class="num" inputmode="numeric" placeholder="مثال: 310005 106303" autocomplete="off">
+    <label class="lbl" for="rcAct">النشاط كما هو مكتوب في المستخرج</label>
+    <textarea id="rcAct" rows="2" placeholder="مثال: RECUPERATION DES DECHETS FERREUX ET NON FERREUX"></textarea>
+    <div id="rcOut" class="rcout"></div>
+  </section>
+  <div id="groupsRoad" data-tab="list" style="display:flex;flex-direction:column;gap:16px"></div>
+
+
+  <div id="summary" data-tab="sum"></div>
+
+  <section class="card" data-tab="sum">
+    <h2>كيف تُعالج المخالفة؟</h2>
+    <div class="legend">
+      <div><span class="type forfait">غرامة جزافية</span> مخالفة بسيطة: يسلّمك العون إشعاراً بالمخالفة، وتدفع الغرامة خلال 45 يوماً، وتُحتجز رخصة السياقة حتى الدفع.</div>
+      <div><span class="type court">محضر يُحال إلى وكيل الجمهورية</span> جنحة: يُحرَّر محضر ويُحال على المحكمة، والقاضي يحدد الغرامة أو الحبس بين الحدين.</div>
+      <div><span class="type admin">محضر وإجراء إداري</span> محضر مع إجراء فوري كالمحشر، ثم يُرسل إلى الوالي أو المحكمة.</div>
+      <div><span class="type court">جناية</span> أخطر الجرائم (مثل تزوير الوثائق الرسمية): تُحال على محكمة الجنايات.</div>
+      <div><span class="type settle">محضر إلى مديرية التجارة</span> مخالفات الفوترة: مصالحة لدى مدير التجارة أو الوزير، أو المحكمة حسب المبلغ.</div>
+    </div>
+    <p class="foot" style="margin:0">الإجراءات الجزائية يحكمها القانون 25-14 المؤرخ في 3 أوت 2025 المتضمن قانون الإجراءات الجزائية (الجريدة الرسمية 54 لسنة 2025): الجنحة المتلبس بها (المادة 72)، المثول الفوري (المادة 477 وما بعدها)، غرامة الصلح في المخالفات (المادة 489 وما بعدها)، الوساطة (المادة 59 وما بعدها). أرقام هذه المواد من مصدر واحد.<br><br>في «وثائقي» اختر حالة كل وثيقة، وفي «بحث» أضف أي مخالفة، فتظهر هنا مجتمعة مع الإجراءات.</p>
+  </section>
+
+  <p class="foot" data-tab="sum">مراجعة أولية وليست استشارة قانونية. مواد قانون المرور مأخوذة من نص القانون 26-09 المؤرخ في 12 ماي 2026 (الجريدة الرسمية رقم 36 بتاريخ 17 ماي 2026). النصوص الأخرى مذكورة تحت كل مخالفة، والموسوم منها «مصدر واحد» أو «غير مؤكد» يحتاج تحققاً.</p>
+</div>
+
+<nav class="tabs" aria-label="الأقسام">
+  <button type="button" data-go="who" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></svg><span>من أنت</span></button>
+  <button type="button" data-go="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span>بحث</span></button>
+  <button type="button" data-go="docs"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4"/></svg><span>وثائقي</span></button>
+  <button type="button" data-go="list"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l8-14 8 14z"/><path d="M12 10v3.5M12 16.2v.3"/></svg><span>المخالفات</span></button>
+  <button type="button" data-go="sum"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span>الملخص</span><b class="badge" id="badge" hidden></b></button>
+</nav>
+
+<script>
+// Laws, with the full title used in the closing of a report.
+var LAWS = {
+  route: 'القانون رقم 26-09 المؤرخ في 12 ماي 2026 المتضمن قانون المرور',
+  assur: 'الأمر رقم 95-07 المؤرخ في 25 جانفي 1995 المتعلق بالتأمينات',
+  assur74: 'الأمر رقم 74-15 المؤرخ في 30 جانفي 1974 المتعلق بإلزامية التأمين على السيارات وبنظام التعويض عن الأضرار',
+  pc: 'القانون رقم 04-02 المؤرخ في 23 جوان 2004 المحدد للقواعد المطبقة على الممارسات التجارية، المعدل والمتمم',
+  rc: 'القانون رقم 04-08 المؤرخ في 14 أوت 2004 المتعلق بشروط ممارسة الأنشطة التجارية، المعدل والمتمم',
+  tr: 'القانون رقم 01-13 المؤرخ في 7 أوت 2001 المتضمن توجيه النقل البري وتنظيمه',
+  forest: 'القانون رقم 23-21 المؤرخ في 23 ديسمبر 2023 المتعلق بالغابات والثروات الغابية',
+  smug: 'الأمر رقم 05-06 المؤرخ في 23 أوت 2005 المتعلق بمكافحة التهريب',
+  douane: 'قانون الجمارك',
+  waste: 'القانون رقم 01-19 المؤرخ في 12 ديسمبر 2001 المتعلق بتسيير النفايات ومراقبتها وإزالتها، المعدل والمتمم بالقانون 25-02',
+  mines: 'القانون رقم 25-12 المؤرخ في 3 أوت 2025 المتضمن قانون المناجم',
+  vet: 'القانون رقم 88-08 المؤرخ في 26 جانفي 1988 المتعلق بنشاطات الطب البيطري وحماية الصحة الحيوانية، المعدل والمتمم',
+  faux: 'القانون رقم 24-02 المؤرخ في 26 فيفري 2024 المتعلق بمكافحة التزوير واستعمال المزور',
+  penal: 'الأمر رقم 66-156 المؤرخ في 8 جوان 1966 المتضمن قانون العقوبات، المعدل والمتمم',
+  danger: 'المرسوم التنفيذي رقم 03-452 المؤرخ في 1 ديسمبر 2003 المحدد للشروط الخاصة المتعلقة بنقل المواد الخطرة عبر الطرق'
+};
+var NA = 'رقم المادة غير متوفر لدي';
+
+// Each document lists the situations a stop can reveal.
+// nature: 'جنحة' | 'مخالفة' | ''. type: forfait | court | admin | settle | customs | none. v: ok | one | no.
+var DOCS = {
+  id_card: {g: 'veh', name: 'بطاقة التعريف الوطنية للسائق', fr: "Carte d'identité", cases: [
+    {when: 'لم يقدّمها عند الطلب', nature: 'مخالفة', act: 'عدم تقديم وثائق السائق، من الدرجة الأولى', law: 'route', nass: NA, iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [3000, 3000], v: 'ok'}
+  ]},
+  permis: {g: 'veh', name: 'رخصة السياقة سارية ومن الصنف المطابق للمركبة', fr: 'Permis de conduire (C1, C, CE…)', cases: [
+    {when: 'يملكها لكن لم يحملها', nature: 'مخالفة', act: 'عدم تقديم وثائق السائق، من الدرجة الأولى', law: 'route', nass: 'المادة 64', iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [3000, 3000], v: 'ok'},
+    {when: 'منتهية الصلاحية ولم تُجدَّد', nature: 'مخالفة', act: 'عدم تجديد رخصة السياقة، من الدرجة الرابعة', law: 'route', nass: 'المادة 70', iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [10000, 10000], v: 'one'},
+    {when: 'لا يملك رخصة، أو صنفها لا يطابق المركبة', nature: 'جنحة', act: 'سياقة مركبة دون الحصول على رخصة سياقة صالحة لصنفها', law: 'route', nass: 'المادة 64', iqab: NA, type: 'court', amount: [50000, 100000], extra: 'حبس من 6 أشهر إلى سنة أو إحدى العقوبتين، وتوقيف المركبة', v: 'no'},
+    {when: 'رخصته مسحوبة أو معلقة', nature: 'جنحة', act: 'السياقة رغم سحب رخصة السياقة أو تعليقها', law: 'route', nass: 'المادة 142', iqab: 'المادة 142', type: 'court', amount: [100000, 200000], extra: 'حبس من سنة إلى سنتين', v: 'one'}
+  ]},
+  carte_grise: {g: 'veh', name: 'البطاقة الرمادية (شهادة ترقيم المركبة)', fr: "Carte d'immatriculation", cases: [
+    {when: 'لم تُحمل أو لم تُقدَّم', nature: 'مخالفة', act: 'عدم تقديم وثائق المركبة، من الدرجة الأولى', law: 'route', nass: 'المادة 94', iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [3000, 3000], extra: 'يجوز توقيف المركبة (المادة 173)', v: 'ok'},
+    {when: 'لوحة ترقيم مزورة أو لا تطابق المركبة', nature: 'جنحة', act: 'وضع مركبة حيز السير بلوحة ترقيم مزورة أو غير مطابقة', law: 'route', nass: 'المادة 144', iqab: 'المادة 144', type: 'court', amount: [300000, 500000], extra: 'حبس من 3 إلى 5 سنوات، وتضاعف العقوبة في العود', v: 'one'}
+  ]},
+  assurance: {g: 'veh', name: 'شهادة التأمين سارية', fr: "Attestation d'assurance", cases: [
+    {when: 'مؤمَّنة لكن الشهادة لم تُحمل', nature: 'مخالفة', act: 'عدم تقديم وثائق المركبة، من الدرجة الأولى', law: 'route', nass: 'المادة 94', iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [3000, 3000], v: 'ok'},
+    {when: 'المركبة غير مؤمَّنة', nature: 'جنحة', act: 'عدم الامتثال لإلزامية التأمين على المركبات', law: 'assur', nass: 'المادة 1 من الأمر 74-15', iqab: 'المادة 190 من الأمر 95-07', type: 'court', amount: [500, 4000], extra: 'حبس من 8 أيام إلى 3 أشهر أو إحدى العقوبتين. توقَّف المركبة، وإن لم تُسوَّ الوضعية خلال 48 ساعة تُوضع في المحشر', v: 'one'}
+  ]},
+  ct: {g: 'veh', name: 'محضر المراقبة التقنية ساري المفعول', fr: 'PV de contrôle technique', cases: [
+    {when: 'المراقبة سارية لكن المحضر لم يُحمل', nature: 'مخالفة', act: 'عدم تقديم وثائق المركبة، من الدرجة الأولى', law: 'route', nass: 'المادة 94', iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [3000, 3000], v: 'ok'},
+    {when: 'المراقبة التقنية منتهية أو لم تُجرَ', nature: 'مخالفة', act: 'عدم إخضاع المركبة للمراقبة التقنية الإجبارية، من الدرجة الرابعة', law: 'route', nass: 'المادة 96', iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [10000, 10000], extra: 'يجوز توقيف المركبة', v: 'one'}
+  ]},
+  brevet: {g: 'veh', name: 'الشهادة المهنية (شهادة الكفاءة المهنية) لسائقي نقل البضائع والمسافرين والأجرة والنقل المدرسي', fr: 'Brevet professionnel', cases: [
+    {when: 'يملكها لكن لم يحملها', nature: 'مخالفة', act: 'عدم تقديم وثائق السائق، من الدرجة الأولى', law: 'route', nass: 'المادة 79', iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [3000, 3000], v: 'ok'},
+    {when: 'منتهية ولم تُجدَّد', nature: 'مخالفة', act: 'عدم تجديد الشهادة المهنية، من الدرجة الرابعة', law: 'route', nass: 'المادة 79', iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [10000, 10000], v: 'one'},
+    {when: 'لا يملكها أصلاً', nature: 'جنحة', act: 'سياقة مركبة نقل بضائع أو أشخاص دون الشهادة المهنية', law: 'route', nass: 'المادة 79', iqab: NA, type: 'court', amount: null, extra: 'العقوبة لم أجد نصها', v: 'no'}
+  ]},
+  chrono: {g: 'veh', name: 'جهاز تسجيل السرعة وأوقات السياقة والراحة (كرونوتاكيغراف)', fr: 'Chronotachygraphe', cases: [
+    {when: 'غير مركّب أو غير مشغَّل، أو عدم احترام أوقات السياقة والراحة', nature: 'جنحة', act: 'عدم وضع أو تشغيل جهاز تسجيل السرعة وأوقات السياقة والراحة في مركبة نقل بضائع يفوق وزنها الإجمالي 3,5 طن', law: 'route', nass: 'المادة 85', iqab: NA, type: 'court', amount: [100000, 300000], extra: 'تعليق رخصة السياقة من شهر إلى 3 أشهر. والمستخدم: من 200.000 إلى 600.000 دج. التطبيق مرهون بالآجال التي تحددها السلطات (المادة 185)', v: 'ok'}
+  ]},
+  load: {g: 'veh', name: 'احترام الوزن الإجمالي المسموح', fr: 'Respect du PTAC', cases: [
+    {when: 'حمولة زائدة حتى 10%', nature: 'مخالفة', act: 'تجاوز الوزن الإجمالي المرخص به، من الدرجة الثالثة (الفئة الثانية)', law: 'route', nass: 'المادة 11', iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [7000, 7000], v: 'one'},
+    {when: 'حمولة زائدة من 10% إلى 20%', nature: 'مخالفة', act: 'تجاوز الوزن الإجمالي المرخص به، من الدرجة الثالثة (الفئة الثانية)', law: 'route', nass: 'المادة 11', iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [8000, 8000], v: 'one'},
+    {when: 'حمولة زائدة من 20% إلى 30%', nature: 'مخالفة', act: 'تجاوز الوزن الإجمالي المرخص به، من الدرجة الثالثة (الفئة الثانية)', law: 'route', nass: 'المادة 11', iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [9000, 9000], v: 'one'},
+    {when: 'حمولة زائدة بأكثر من 30%', nature: 'جنحة', act: 'تجاوز الوزن الإجمالي المرخص به بأكثر من 30%', law: 'route', nass: 'المادة 11', iqab: NA, type: 'court', amount: [100000, 700000], extra: 'في العود: حبس من 6 أشهر إلى سنتين ومضاعفة الغرامة', v: 'ok'}
+  ]},
+  transport_ex: {g: 'veh', name: 'رخصة النقل الاستثنائي', fr: 'Autorisation de transport exceptionnel', cases: [
+    {when: 'حمولة استثنائية دون رخصة مسبقة', nature: 'جنحة', act: 'القيام بنقل استثنائي دون رخصة مسبقة من السلطات المختصة', law: 'route', nass: 'المادة 11', iqab: NA, type: 'court', amount: null, extra: 'تُطبق عقوبات تجاوز الوزن إن وُجد. عقوبة غياب الرخصة وحدها لم أجد نصها', v: 'no'}
+  ]},
+  mission: {g: 'veh', name: 'أمر بمهمة أو تفويض من مالك المركبة', fr: 'Ordre de mission / procuration', rec: true, cases: [
+    {when: 'غير موجود', nature: '', act: 'لا أعرف نصاً يجعل غيابه مخالفة. يُطلب عادة لإثبات أن السائق يقود مركبة غيره بإذنه', type: 'none', amount: null, v: 'ok'}
+  ]},
+
+  rc_copy: {g: 'act', name: 'نسخة من مستخرج السجل التجاري (للتاجر مالك السلعة)', fr: 'Extrait du registre du commerce', cases: [
+    {when: 'مسجل لكن النسخة غير محمولة', nature: '', act: 'حمل النسخة غير مفروض صراحة في القانون 04-08', type: 'none', amount: null, v: 'ok'},
+    {when: 'تاجر غير مستقر غير مسجل في السجل التجاري', nature: 'جنحة', act: 'ممارسة نشاط تجاري غير قار دون القيد في السجل التجاري', law: 'rc', nass: 'المادة 4', iqab: 'المادة 32', type: 'court', amount: [5000, 50000], extra: 'حجز السلعة ووسيلة النقل', v: 'ok'},
+    {when: 'السلعة خارج نشاط السجل', nature: 'جنحة', act: 'ممارسة نشاط تجاري خارج موضوع مستخرج السجل التجاري', law: 'rc', nass: 'المادة 4', iqab: 'المادة 41', type: 'court', amount: [20000, 200000], extra: 'غلق إداري لشهر، والشطب إن لم تُسوَّ الوضعية خلال شهرين', v: 'ok'}
+  ]},
+  licence_tr: {g: 'act', name: 'رخصة ممارسة نشاط نقل البضائع لحساب الغير', fr: "Autorisation d'exploitation", cases: [
+    {when: 'النقل دون رخصة', nature: 'مخالفة', act: 'ممارسة نقل البضائع عبر الطرق دون رخصة', law: 'tr', nass: 'المادتان 17 و61 (البند 5)', iqab: 'المادتان 62 و64', type: 'admin', amount: [8000, 80000], extra: 'وضع المركبة في المحشر فوراً من 15 إلى 45 يوماً على نفقة المخالف. يُرسل المحضر إلى الوالي أو المحكمة خلال شهر (المادة 59). تتضاعف الغرامة في العود خلال 12 شهراً', v: 'ok'}
+  ]},
+  contrat_tr: {g: 'act', name: 'وثيقة النقل (عقد أو رسالة النقل) ووثائق الاستغلال', fr: 'Document de transport', cases: [
+    {when: 'وثائق ناقصة أو غير مطابقة', nature: 'مخالفة', act: 'عدم مطابقة وثائق الاستغلال', law: 'tr', nass: 'المادتان 15 و61 (البند 1)', iqab: 'المادتان 62 و63', type: 'admin', amount: [4000, 8000], extra: 'جواز وضع المركبة في المحشر من 3 إلى 45 يوماً', v: 'ok'}
+  ]},
+
+  invoice: {g: 'goods', name: 'فاتورة البضاعة أو وثيقة تقوم مقامها (وصل تسليم مع فاتورة إجمالية، أو سند تحويل)', fr: 'Facture / bon de livraison / bon de transfert', cases: [
+    {when: 'لا فاتورة، أو فاتورة ينقصها الاسم أو الرقم الجبائي أو العنوان أو الكمية أو التسمية أو سعر الوحدة', nature: 'مخالفة', act: 'عدم الفوترة', law: 'pc', nass: 'المادتان 10 و34 (الفقرة الأخيرة)', iqab: 'المادة 33', type: 'settle', pct: 0.8, extra: 'غرامة 80% من المبلغ الواجب فوترته. حجز البضاعة جائز (المادة 39) ومصادرتها بحكم (المادة 44)', v: 'ok'},
+    {when: 'فاتورة ينقصها بيان آخر (NIS، السجل، طريقة الدفع، الختم…)', nature: 'مخالفة', act: 'تحرير فاتورة غير مطابقة', law: 'pc', nass: 'المادة 12', iqab: 'المادة 34', type: 'settle', amount: [10000, 50000], v: 'ok'},
+    {when: 'رفض تقديم الفاتورة أو عرقلة المراقبة', nature: 'جنحة', act: 'معارضة المراقبة', law: 'pc', nass: 'المادة 54', iqab: 'المادة 53', type: 'court', amount: [100000, 1000000], extra: 'حبس من 6 أشهر إلى سنتين أو إحدى العقوبتين', v: 'ok'}
+  ]},
+  customs_circ: {g: 'goods', zone: true, name: 'رخصة التنقل داخل النطاق الجمركي', fr: 'Autorisation de circuler (rayon des douanes)', cases: [
+    {when: 'نقل سلعة من القائمة داخل النطاق دون رخصة', nature: 'جنحة', act: 'التهريب باستعمال وسيلة نقل', law: 'smug', nass: 'المواد 220 إلى 223 من قانون الجمارك', iqab: 'المادة 12 من الأمر 05-06', type: 'customs', amount: null, extra: 'حبس وغرامة جمركية تساوي 10 مرات قيمة البضاعة ووسيلة النقل معاً، ومصادرة البضاعة والمركبة ولو كانت لناقل عمومي (المادة 303 من قانون الجمارك)', v: 'one'}
+  ]},
+  vet_cert: {g: 'goods', name: 'الشهادة الصحية البيطرية ورخصة نقل المواشي', fr: 'Certificat sanitaire vétérinaire', cases: [
+    {when: 'نقل مواشٍ دون شهادة', nature: 'مخالفة', act: 'نقل حيوانات دون الشهادة الصحية البيطرية', law: 'vet', nass: NA, iqab: NA, type: 'court', amount: null, extra: 'حجز الحيوانات وفحصها، وذبحها وإتلافها إن كانت مشبوهة. العقوبة لم أتحقق منها', v: 'no'}
+  ]},
+  meat_cert: {g: 'goods', name: 'شهادة الصحة البيطرية للحوم ومركبة مبردة معتمدة', fr: 'Certificat de salubrité + agrément du véhicule', cases: [
+    {when: 'لحوم دون شهادة أو في مركبة غير مبردة', nature: 'مخالفة', act: 'نقل لحوم دون شهادة صحية أو في ظروف غير مطابقة', law: 'vet', nass: NA, iqab: NA, type: 'court', amount: null, extra: 'حجز اللحوم وإتلافها إن لم تثبت سلامتها. العقوبة لم أتحقق منها', v: 'no'}
+  ]},
+  forest_permit: {g: 'goods', name: 'رخصة نقل المنتوجات الغابية', fr: 'Permis de colportage', cases: [
+    {when: 'نقل خشب أو فحم أو فلين دون رخصة', nature: 'مخالفة', act: 'نقل منتوجات غابية دون رخصة نقل', law: 'forest', nass: 'المادة 108', iqab: 'المادتان 150 و159', type: 'court', pct: 2, extra: 'غرامة تساوي ضعف قيمة المنتوجات، ومصادرة المنتوجات والوسائل المستعملة ومنها المركبة', v: 'ok'}
+  ]},
+  plants_permit: {g: 'goods', name: 'رخصة جمع ونقل النباتات الطبية والعطرية والثمار الغابية', fr: 'Autorisation de collecte et transport', cases: [
+    {when: 'جمع أو نقل دون رخصة', nature: 'مخالفة', act: 'جمع أو نقل ثمار ونباتات طبية وعطرية دون رخصة', law: 'forest', nass: 'المادة 153', iqab: 'المادتان 153 و159', type: 'court', amount: [500000, 1500000], extra: 'لكل قنطار، مع المصادرة', v: 'ok'}
+  ]},
+  sand_bon: {g: 'goods', name: 'فاتورة أو وصل خروج من مقلع مرخص', fr: "Facture / bon d'enlèvement (carrière agréée)", cases: [
+    {when: 'لا يثبت مصدر الرمل أو الحصى', nature: 'جنحة', act: 'الاشتباه في استغلال مواد المحاجر دون سند منجمي', law: 'mines', nass: NA, iqab: NA, type: 'court', amount: null, extra: 'الاستغلال دون سند: حبس من سنة إلى 3 سنوات وغرامة من 1.000.000 إلى 3.000.000 دج. لم أجد نصاً لعقوبة الناقل وحده، والحجز معتاد', v: 'no'}
+  ]},
+  waste_auth: {g: 'goods', name: 'رخصة نقل النفايات الخاصة الخطرة', fr: 'Autorisation de transport des déchets dangereux', cases: [
+    {when: 'نقل نفايات خطرة دون رخصة', nature: 'جنحة', act: 'تسليم نفايات خاصة خطرة لناقل غير مرخص (يُتابع المسلِّم)', law: 'waste', nass: 'المادتان 19 و24', iqab: 'المادة 62', type: 'court', amount: [600000, 1800000], extra: 'حبس من سنة إلى 3 سنوات على المسلِّم. لا توجد عقوبة خاصة بالنقل وحده', v: 'one'}
+  ]},
+  dangerous: {g: 'goods', name: 'رخصة مسبقة من وزير النقل لنقل المواد الخطرة', fr: 'Autorisation préalable (matières dangereuses)', cases: [
+    {when: 'نقل مواد خطرة دون رخصة مسبقة', nature: 'مخالفة', act: 'نقل مواد خطرة عبر الطرق دون الرخصة المسبقة', law: 'danger', nass: 'المادة 5 من المرسوم 03-452', iqab: 'المادتان 62 و64 من القانون 01-13 (تكييف مقترح)', type: 'admin', amount: [8000, 80000], extra: 'المرسوم 03-452 لا يتضمن عقوبات، فيُلجأ إلى عقوبة النقل دون رخصة في القانون 01-13: غرامة ووضع المركبة في المحشر من 15 إلى 45 يوماً. توقيف المركبة وتأمين الحمولة فوراً', v: 'one'}
+  ]},
+  danger_docs: {g: 'goods', name: 'وثيقة البضاعة الخطرة: طبيعتها وصنفها (من 1 إلى 9) ووزنها', fr: 'Document : nature, classe et poids des marchandises', cases: [
+    {when: 'لا وثيقة تبيّن طبيعة المادة وصنفها ووزنها', nature: 'مخالفة', act: 'عدم تقديم الوثائق المبيّنة لطبيعة المواد الخطرة وصنفها ووزنها', law: 'danger', nass: 'المادة 19 من المرسوم 03-452', iqab: 'المادتان 62 و63 من القانون 01-13 (تكييف مقترح)', type: 'admin', amount: [4000, 8000], v: 'one'}
+  ]},
+  danger_driver: {g: 'goods', name: 'الشهادة المهنية للسائق وإثبات تكوينه الخاص بالمواد الخطرة', fr: 'Brevet professionnel + formation matières dangereuses', cases: [
+    {when: 'السائق دون تكوين خاص بالمواد الخطرة', nature: 'مخالفة', act: 'سياقة مركبة نقل مواد خطرة دون إثبات التكوين الخاص', law: 'danger', nass: 'المادة 18 من المرسوم 03-452', iqab: NA, type: 'court', amount: null, extra: 'لا عقوبة في المرسوم. قانون المرور 26-09 يشترط الشهادة المهنية لسائقي المواد الخطرة، وعقوبة غيابها لم أجد نصها', v: 'no'}
+  ]},
+  danger_signs: {g: 'goods', name: 'لوحات الإشارة على المركبة وملصقات الطرود حسب صنف الخطر', fr: 'Signalisation du véhicule et étiquetage des colis', cases: [
+    {when: 'المركبة أو الطرود دون إشارة', nature: 'مخالفة', act: 'نقل مواد خطرة في مركبة غير مُعلَّمة أو طرود غير موسومة', law: 'danger', nass: 'المادتان 9 و15 من المرسوم 03-452', iqab: NA, type: 'court', amount: null, extra: 'لا عقوبة في المرسوم نفسه. توقيف المركبة حتى المطابقة', v: 'no'},
+    {when: 'نقلها مع مواد غذائية أو مع مواد غير متوافقة', nature: 'مخالفة', act: 'نقل مواد خطرة مع مواد غذائية أو مع مواد غير متوافقة معها', law: 'danger', nass: 'المادة 12 من المرسوم 03-452', iqab: NA, type: 'court', amount: null, extra: 'خطر على الصحة العمومية. لا عقوبة في المرسوم نفسه، وقد تُحجز المواد الغذائية', v: 'no'}
+  ]},
+  tobacco: {g: 'goods', name: 'وثائق تنقل التبغ (اعتماد ووثيقة حركة)', fr: 'Agrément + titre de mouvement', cases: [
+    {when: 'نقل تبغ دون وثائق', nature: 'مخالفة', act: 'نقل التبغ دون وثائق الحركة', law: '', nass: NA, iqab: NA, type: 'court', amount: null, extra: 'الحجز معتاد. لم أتحقق من النص (قانون الضرائب غير المباشرة)', v: 'no'}
+  ]},
+  pharma: {g: 'goods', name: 'اعتماد مؤسسة توزيع المواد الصيدلانية', fr: 'Agrément de distribution pharmaceutique', cases: [
+    {when: 'نقل أدوية دون اعتماد', nature: 'مخالفة', act: 'نقل وتوزيع مواد صيدلانية دون اعتماد', law: '', nass: NA, iqab: NA, type: 'court', amount: null, extra: 'الحجز معتاد. لم أتحقق من النص (القانون 18-11 المتعلق بالصحة)', v: 'no'}
+  ]}
+};
+var CARRIER_DOCS = ['licence_tr', 'contrat_tr'];
+
+// General offences that can arise at any stop (shown for everyone).
+Object.assign(DOCS, {
+  obey: {g: 'gen', name: 'الامتثال لأمر التوقف', fr: "Obtempérer à l'ordre d'arrêt", cases: [
+    {when: 'عدم التوقف رغم أمر الأعوان', nature: 'جنحة', act: 'رفض الامتثال لإنذار التوقف الصادر عن الأعوان المؤهلين', law: 'route', nass: NA, iqab: NA, type: 'court', amount: [50000, 180000], extra: 'حبس من 6 أشهر إلى 18 شهراً', v: 'one'}
+  ]},
+  fake_doc: {g: 'gen', name: 'صحة الوثائق المقدَّمة', fr: 'Authenticité des documents', cases: [
+    {when: 'تقديم وثيقة إدارية مزورة (رخصة، بطاقة رمادية، شهادة…)', nature: 'جناية', act: 'تزوير وثيقة رسمية أو إدارية من شخص غير مختص بتحريرها', law: 'faux', nass: 'المادة 31', iqab: 'المادة 31', type: 'court', amount: [1000000, 2000000], extra: 'سجن من 10 إلى 20 سنة. حجز الوثيقة والمركبة عند الاقتضاء. عقوبة استعمال المزوَّر وحده لم أتحقق من مادتها', v: 'one'},
+    {when: 'فاتورة وهمية أو مزيفة', nature: 'مخالفة', act: 'تحرير أو استعمال فاتورة وهمية أو مزيفة (ممارسة تجارية تدليسية)', law: 'pc', nass: 'المادة 24', iqab: 'المادة 37', type: 'settle', amount: [300000, 10000000], extra: 'حجز البضاعة جائز', v: 'ok'}
+  ]},
+  respect: {g: 'gen', name: 'معاملة الأعوان أثناء المراقبة', fr: 'Comportement envers les agents', cases: [
+    {when: 'التعدي بالعنف أو القوة على العون أثناء مهامه', nature: 'جنحة', act: 'التعدي بالعنف أو القوة على موظف عمومي أثناء تأدية مهامه', law: 'penal', nass: NA, iqab: NA, type: 'court', amount: [200000, 500000], extra: 'حبس من سنتين إلى 5 سنوات (تعديل قانون العقوبات 2024)', v: 'one'}
+  ]}
+});
+
+// Closing paragraph of a report ("اختتام المحضر") for a case that leads to one.
+function closing(c){
+  if (!c || c.type === 'none' || c.type === 'forfait') return '';
+  var law = LAWS[c.law] || '';
+  var known = function(x){ return x && x !== NA; };
+  var ref = function(x){
+    if (!known(x)) return 'بالمادة ……';
+    if (/^المادتان/.test(x)) return 'بالمادتين' + x.slice('المادتان'.length);
+    if (/^المواد/.test(x)) return 'ب' + x;
+    return 'بالمادة ' + x.replace(/^المادة /, '');
+  };
+  var strip = function(x){ return x ? x.replace(/\s*\((تكييف مقترح|حسب مشروع القانون)\)/g, '') : x; };
+  var nass = ref(strip(c.nass)), iqab = ref(strip(c.iqab));
+  if (/ من /.test(c.iqab || '')) law = '';
+  var nat = c.nature || 'مخالفة';
+  var fem = nat === 'جنحة' || nat === 'مخالفة';
+  var dest = c.type === 'settle' ? 'ونرسله إلى السيد المدير الولائي للتجارة طبقاً للمادة 55 من القانون 04-02' : (c.type === 'admin' ? 'ونرسله إلى السيد الوالي أو الجهة القضائية المختصة طبقاً للمادة 59 من القانون 01-13' : 'ونرسله إلى العدالة');
+  var txt = 'اختتام المحضر\n' +
+    '- بما أن الوقائع المذكورة أعلاه تكوّن ' + nat + ' ' + c.act.replace(/، من الدرجة.*$/, '') + '، المنصوص عليها ' + nass + ' والمعاقب عليها ' + iqab + (law ? ' من ' + law : '') + '،\n' +
+    'أخبرنا المعني بأننا سنحرر محضراً ضده ' + dest + '.\n\n' +
+    'النسخ الموجهة:\n' +
+    '- الأصل + نسخة طبق الأصل إلى السيد وكيل الجمهورية لدى محكمة ……………' +
+    (c.type === 'settle' ? '\n- نسخة إلى السيد المدير الولائي للتجارة لولاية ……………' : '') +
+    (c.type === 'admin' ? '\n- نسخة إلى السيد مدير النقل لولاية ……………' : '') +
+    (c.type === 'customs' ? '\n- نسخة إلى مصالح الجمارك المختصة إقليمياً' : '') +
+    (c.law === 'forest' ? '\n- نسخة إلى السيد محافظ الغابات لولاية ……………' : '') +
+    '\n- نسخة للأرشيف.';
+  return txt;
+}
+
+// Passenger transport, private vehicles and motorcycles.
+Object.assign(DOCS, {
+  taxi_lic: {g: 'act', name: 'رخصة استغلال سيارة الأجرة', fr: "Licence / autorisation d'exploitation de taxi", cases: [
+    {when: 'نقل الأشخاص بالأجرة دون رخصة استغلال', nature: 'مخالفة', act: 'ممارسة نقل الأشخاص عبر الطرق دون رخصة', law: 'tr', nass: 'المادة 61 (البند 5)', iqab: 'المادتان 62 و64', type: 'admin', amount: [8000, 80000], extra: 'وضع المركبة في المحشر من 15 إلى 45 يوماً. تتضاعف الغرامة في العود خلال 12 شهراً', v: 'one'}
+  ]},
+  bus_lic: {g: 'act', name: 'رخصة استغلال خط النقل الجماعي للمسافرين', fr: "Autorisation d'exploitation de ligne", cases: [
+    {when: 'نقل جماعي للمسافرين دون رخصة استغلال', nature: 'مخالفة', act: 'ممارسة نقل الأشخاص عبر الطرق دون رخصة', law: 'tr', nass: 'المادة 61 (البند 5)', iqab: 'المادتان 62 و64', type: 'admin', amount: [8000, 80000], extra: 'وضع المركبة في المحشر من 15 إلى 45 يوماً', v: 'one'},
+    {when: 'الخروج عن الخط أو التوقفات المرخصة', nature: 'مخالفة', act: 'عدم احترام قواعد الاستغلال', law: 'tr', nass: 'المادة 61 (البند 3)', iqab: 'المادتان 62 و63', type: 'admin', amount: [4000, 8000], extra: 'جواز وضع المركبة في المحشر من 3 إلى 45 يوماً', v: 'one'}
+  ]},
+  school_lic: {g: 'act', name: 'رخصة النقل المدرسي', fr: 'Autorisation de transport scolaire', cases: [
+    {when: 'نقل مدرسي دون رخصة', nature: 'مخالفة', act: 'ممارسة نقل الأشخاص عبر الطرق دون رخصة', law: 'tr', nass: 'المادة 61 (البند 5)', iqab: 'المادتان 62 و64', type: 'admin', amount: [8000, 80000], extra: 'وضع المركبة في المحشر من 15 إلى 45 يوماً', v: 'no'}
+  ]},
+  passengers: {g: 'veh', name: 'احترام العدد المرخص به من الركاب', fr: 'Nombre de passagers autorisé', cases: [
+    {when: 'ركاب أكثر من العدد المرخص', nature: 'مخالفة', act: 'تجاوز العدد المحدد للركاب، من الدرجة الثالثة (الفئة الأولى)', law: 'route', nass: 'المادة 34', iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [6000, 6000], v: 'ok'}
+  ]},
+  helmet: {g: 'veh', name: 'الخوذة الواقية للسائق والراكب', fr: 'Casque', cases: [
+    {when: 'السائق أو الراكب دون خوذة', nature: 'مخالفة', act: 'عدم وضع الخوذة الواقية لسائق الدراجة النارية أو راكبها، من الدرجة الثالثة (الفئة الأولى)', law: 'route', nass: 'المادة 37', iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [6000, 6000], v: 'ok'},
+    {when: 'نقل طفل دون 8 سنوات على الدراجة', nature: 'مخالفة', act: 'نقل طفل يقل عمره عن 8 سنوات على دراجة نارية', law: 'route', nass: NA, iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [10000, 10000], extra: 'مذكورة في الدرجة الرابعة حسب مشروع القانون', v: 'one'}
+  ]},
+  belt: {g: 'veh', name: 'حزام الأمان وجلوس الأطفال', fr: 'Ceinture de sécurité', cases: [
+    {when: 'عدم وضع حزام الأمان', nature: 'مخالفة', act: 'عدم وضع حزام الأمان، من الدرجة الثالثة (الفئة الأولى)', law: 'route', nass: 'المادة 35', iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [6000, 6000], v: 'ok'},
+    {when: 'طفل دون 10 سنوات في المقعد الأمامي', nature: 'مخالفة', act: 'نقل طفل يقل عمره عن 10 سنوات في المقعد الأمامي، من الدرجة الثالثة (الفئة الأولى)', law: 'route', nass: 'المادة 36', iqab: 'المادة 121 (حسب مشروع القانون)', type: 'forfait', amount: [6000, 6000], v: 'ok'}
+  ]}
+});
+
+// What the officer does, by procedure type.
+var PROCS = {
+  forfait: ['يطلب وثائق السائق والمركبة (المادة 121، الدرجة الأولى، البند 2).', 'يسلّم للمخالف إخطاراً بالمخالفة يحدد طبيعتها ومبلغ الغرامة الجزافية الواجب دفعه في أجل 45 يوماً. إن تعددت المخالفات يجمعها في إخطار واحد (المادة 110).', 'ما عدا الدفع الإلكتروني الفوري، يحتفظ برخصة السياقة ويسلّم وثيقة تثبت ذلك. لا يوقف الاحتفاظ القدرة على السياقة خلال 10 أيام (المادة 111).', 'تُرد الرخصة بعد دفع الغرامة لدى مصالح المالية أو بريد الجزائر أو إلكترونياً (المادتان 112 و123).', 'إن لم تُدفع في الأجل يُرسل محضر عدم الدفع إلى الجهة القضائية التي تأمر بمضاعفة الغرامة بأمر جزائي (المادة 113).', 'يجوز توقيف المركبة إن لم تُقدَّم الوثائق المطلوبة (المادة 173)، ووضعها في المحشر إن لم تُسوَّ الوضعية خلال 48 ساعة (المادة 177).'],
+  court: ['يعاين الجنحة ويطلب الوثائق، ويحتفظ برخصة السياقة ويسلّم للسائق فوراً وثيقة تثبت ذلك (المادة 120).', 'يوقف المركبة عند الاقتضاء (المادة 173) ويأمر ضابط الشرطة القضائية بوضعها في المحشر في الحالات المحددة (المادة 177)، لمدة أقصاها 10 أيام (المادة 178).', 'يسمع المعني في محضر سماع ويدوّن تصريحه ويسأله إن كانت لديه إضافات، ثم يقرأ عليه التصريح فيوقعه أو يُدوَّن رفضه.', 'يختم المحضر بتكييف الوقائع (المادة الناصة والمعاقبة) ويُعلم المعني بأنه سيُرسل إلى العدالة.', 'يرسل محضر المعاينة بغير تمهل إلى وكيل الجمهورية المختص إقليمياً مرفقاً برخصة السياقة، وتطبق أحكام قانون الإجراءات الجزائية 25-14 (المادتان 119 و120).', 'يملك المعني الاعتراض على الوضع في المحشر أمام وكيل الجمهورية الذي يفصل في أجل 5 أيام (المادة 180). ولا تُسترجع المركبة إلا بعد دفع المصاريف (المادة 181).'],
+  admin: ['يعاين المخالفة ويحرر محضراً.', 'يضع المركبة في المحشر فوراً على نفقة المخالف (المادة 62 من القانون 01-13).', 'يرسل المحضر إلى الوالي أو المحكمة المختصة خلال شهر (المادة 59 من القانون 01-13).', 'قد يقترح الوالي على الوزير سحب الرخصة مؤقتاً، أو نهائياً في العود.'],
+  settle: ['يطلب الفاتورة، ويجب تقديمها عند أول طلب (المادة 13 من القانون 04-02).', 'يفتح الطرود بحضور الناقل ويقارن البضاعة بالفاتورة (المادة 52).', 'يحجز الوثائق والبضاعة عند الاقتضاء، ويحرر محضر جرد ويضع الأختام ويعيّن حارساً (المواد 39 إلى 41).', 'يحرر المحضر خلال 8 أيام موقعاً من الأعوان، ويوقعه المعني أو يُدوَّن رفضه (المادتان 56 و57).', 'يرسل المحضر إلى المدير الولائي للتجارة، الذي يقترح المصالحة أو يحيله إلى وكيل الجمهورية حسب المبلغ (المادتان 55 و60).'],
+  customs: ['يحجز البضاعة ووسيلة النقل.', 'يحرر محضر حجز ويُعلم مصالح الجمارك المختصة.', 'يُخطر وكيل الجمهورية، وتُفتح متابعة بتهمة التهريب.']
+};
+
+
+
+// ===== Official text: Law 26-09, JO 36 of 17 May 2026 (read from the PDF). Overrides earlier entries. =====
+var IMMO = 'يجوز توقيف المركبة فوراً (المادة 173)، وتوضع في المحشر إن لم تُسوَّ الوضعية خلال 48 ساعة (المادة 177)، لمدة أقصاها 10 أيام (المادة 178)';
+Object.assign(DOCS, {
+  id_card: {g: 'veh', name: 'بطاقة التعريف الوطنية للسائق', fr: "Carte d'identité", cases: [
+    {when: 'لم يقدّمها عند الطلب', nature: 'مخالفة', act: 'مخالفة إلزامية تقديم وثائق السائق، من الدرجة الأولى', law: 'route', nass: NA, iqab: 'المادة 121 (أ، البند 2)', type: 'forfait', amount: [3000, 3000], v: 'ok'}
+  ]},
+  permis: {g: 'veh', name: 'رخصة السياقة سارية ومن الصنف المطابق للمركبة', fr: 'Permis de conduire', cases: [
+    {when: 'يملكها لكن لم يحملها', nature: 'مخالفة', act: 'مخالفة إلزامية تقديم وثائق السائق، من الدرجة الأولى', law: 'route', nass: 'المادة 64', iqab: 'المادة 121 (أ، البند 2)', type: 'forfait', amount: [3000, 3000], extra: IMMO, v: 'ok'},
+    {when: 'منتهية الصلاحية ولم تُجدَّد', nature: 'مخالفة', act: 'الاستمرار في قيادة مركبة دون تجديد صنف رخصة السياقة، من الدرجة الرابعة', law: 'route', nass: 'المادة 70', iqab: 'المادة 121 (د، البند 16)', type: 'forfait', amount: [10000, 10000], v: 'ok'},
+    {when: 'لا يملك رخصة، أو صنفها لا يطابق المركبة', nature: 'جنحة', act: 'قيادة مركبة دون حيازة رخصة السياقة أو برخصة غير موافقة لصنف المركبة', law: 'route', nass: 'المادة 64', iqab: 'المادة 141', type: 'court', amount: [50000, 100000], extra: 'حبس من 6 أشهر إلى سنة، أو إحدى العقوبتين. ' + IMMO, v: 'ok'},
+    {when: 'رخصته مسحوبة أو معلقة، أو انقضت مدة القدرة على السياقة بعد الاحتفاظ بها', nature: 'جنحة', act: 'الاستمرار في قيادة المركبة رغم سحب رخصة السياقة أو انقضاء مدة القدرة على السياقة', law: 'route', nass: 'المادة 142', iqab: 'المادة 142', type: 'court', amount: [100000, 200000], extra: 'حبس من سنة إلى سنتين، أو إحدى العقوبتين', v: 'ok'},
+    {when: 'حصل عليها بتصريح كاذب', nature: 'جنحة', act: 'الحصول على رخصة سياقة أو محاولة الحصول عليها عن طريق تصريح كاذب', law: 'route', nass: 'المادة 140', iqab: 'المادة 140', type: 'court', amount: [200000, 300000], extra: 'حبس من سنتين إلى 3 سنوات', v: 'ok'}
+  ]},
+  carte_grise: {g: 'veh', name: 'البطاقة الرمادية (بطاقة ترقيم المركبة) ولوحة الترقيم', fr: "Carte d'immatriculation", cases: [
+    {when: 'لم تُحمل أو لم تُقدَّم', nature: 'مخالفة', act: 'مخالفة إلزامية تقديم وثائق المركبة، من الدرجة الأولى', law: 'route', nass: 'المادة 94', iqab: 'المادة 121 (أ، البند 2)', type: 'forfait', amount: [3000, 3000], extra: IMMO, v: 'ok'},
+    {when: 'لوحة الترقيم غير واضحة أو غير مقروءة', nature: 'مخالفة', act: 'مخالفة وجوب وضوح لوحات ترقيم المركبات ومقروئيتها، من الدرجة الثانية', law: 'route', nass: 'المادة 95', iqab: 'المادة 121 (ب، البند 4)', type: 'forfait', amount: [4000, 4000], v: 'ok'},
+    {when: 'لوحة ترقيم لا تتطابق مع المركبة أو مع مالكها', nature: 'جنحة', act: 'وضع مركبة للسير مزودة بلوحة ترقيم تحمل كتابة لا تتطابق مع المركبة أو مع مالكها، مع العلم بذلك', law: 'route', nass: 'المادة 95', iqab: 'المادة 144 (الفقرة 2)', type: 'court', amount: [50000, 200000], extra: 'حبس من 3 أشهر إلى سنتين، وتضاعف العقوبة في العود', v: 'ok'},
+    {when: 'لوحة ترقيم مزورة', nature: 'جنحة', act: 'وضع مركبة للسير مزودة بلوحة ترقيم مزورة مع العلم بذلك', law: 'route', nass: 'المادة 95', iqab: 'المادة 144 (الفقرة 1)', type: 'court', amount: [300000, 500000], extra: 'حبس من 3 إلى 5 سنوات', v: 'ok'},
+    {when: 'مركبة سُحبت نهائياً من السير وأُعيدت إليه', nature: 'جنحة', act: 'وضع مركبة في السير بعد سحبها النهائي', law: 'route', nass: 'المادة 100', iqab: 'المادة 145 (الفقرة 2)', type: 'court', amount: [100000, 200000], extra: 'حبس من سنة إلى سنتين ومصادرة المركبة، وتضاعف العقوبة في العود', v: 'ok'}
+  ]},
+  assurance: {g: 'veh', name: 'شهادة التأمين سارية', fr: "Attestation d'assurance", cases: [
+    {when: 'مؤمَّنة لكن الشهادة لم تُحمل', nature: 'مخالفة', act: 'مخالفة إلزامية تقديم وثائق المركبة، من الدرجة الأولى', law: 'route', nass: 'المادة 173', iqab: 'المادة 121 (أ، البند 2)', type: 'forfait', amount: [3000, 3000], extra: IMMO, v: 'ok'},
+    {when: 'المركبة غير مؤمَّنة', nature: 'جنحة', act: 'عدم الامتثال لإلزامية التأمين على المركبات', law: 'assur', nass: 'المادة 1 من الأمر 74-15', iqab: 'المادة 190 من الأمر 95-07', type: 'court', amount: [500, 4000], extra: 'حبس من 8 أيام إلى 3 أشهر أو إحدى العقوبتين. ' + IMMO, v: 'one'}
+  ]},
+  ct: {g: 'veh', name: 'محضر المراقبة التقنية ساري المفعول', fr: 'PV de contrôle technique', cases: [
+    {when: 'المراقبة سارية لكن المحضر لم يُحمل', nature: 'مخالفة', act: 'مخالفة إلزامية تقديم وثائق المركبة، من الدرجة الأولى', law: 'route', nass: 'المادة 94', iqab: 'المادة 121 (أ، البند 2)', type: 'forfait', amount: [3000, 3000], extra: IMMO, v: 'ok'},
+    {when: 'المراقبة التقنية منتهية أو لم تُجرَ', nature: 'مخالفة', act: 'مخالفة إلزامية المراقبة التقنية للمركبات، من الدرجة الرابعة', law: 'route', nass: 'المادة 96', iqab: 'المادة 121 (د، البند 23)', type: 'forfait', amount: [10000, 10000], v: 'ok'}
+  ]},
+  brevet: {g: 'veh', name: 'شهادة الكفاءة المهنية (لسائقي نقل البضائع والمسافرين والأجرة والنقل المدرسي والمواد الخطرة)', fr: 'Brevet professionnel', cases: [
+    {when: 'يملكها لكن لم يحملها', nature: 'مخالفة', act: 'مخالفة إلزامية تقديم وثائق السائق، من الدرجة الأولى', law: 'route', nass: 'المادة 79', iqab: 'المادة 121 (أ، البند 2)', type: 'forfait', amount: [3000, 3000], extra: IMMO, v: 'ok'},
+    {when: 'منتهية ولم تُجدَّد', nature: 'مخالفة', act: 'الاستمرار في قيادة مركبة دون تجديد شهادة الكفاءة المهنية، من الدرجة الرابعة', law: 'route', nass: 'المادة 79', iqab: 'المادة 121 (د، البند 16)', type: 'forfait', amount: [10000, 10000], v: 'ok'},
+    {when: 'لا يملكها أصلاً أو لا تطابق نشاط النقل', nature: 'جنحة', act: 'ممارسة نشاط نقل دون حيازة شهادة الكفاءة المهنية أو بشهادة غير مطابقة', law: 'route', nass: 'المادة 79', iqab: 'المادة 136 (مضاعفة العقوبة)', type: 'court', amount: null, extra: 'لا عقوبة مستقلة: تضاعف عقوبة جنحة تعريض حياة الغير للخطر (المادة 136) على السائق غير الحائز للشهادة، وتشدد عقوبات الحوادث (المادة 126). ' + IMMO, v: 'ok'}
+  ]},
+  chrono: {g: 'veh', name: 'جهاز تسجيل وقت السرعة بالميقت (كرونوتاكيغراف)', fr: 'Chronotachygraphe', cases: [
+    {when: 'غير مركّب أو غير مشغَّل، أو عدم احترام مدة الراحة والمدة القصوى للسياقة', nature: 'جنحة', act: 'عدم وضع جهاز تسجيل وقت السرعة أو عدم تشغيله أو عدم احترام مدة الراحة والسياقة', law: 'route', nass: 'المادتان 81 و85', iqab: 'المادة 148', type: 'court', amount: [100000, 300000], extra: 'تعليق رخصة السياقة من شهر إلى 3 أشهر. والمستخدم الذي يضع للسير مركبة دون الجهاز: من 200.000 إلى 600.000 دج. لا تُطبق أحكام الجهاز إلا بعد توفر ظروف تطبيقها (المادة 185)', v: 'ok'}
+  ]},
+  load: {g: 'veh', name: 'احترام الوزن الإجمالي المرخص به مع الحمولة', fr: 'Respect du PTAC', cases: [
+    {when: 'حمولة زائدة حتى 10%', nature: 'مخالفة', act: 'مخالفة الأحكام المتعلقة بالوزن الإجمالي المرخص به مع الحمولة، من الدرجة الثالثة (الفئة الثانية)', law: 'route', nass: 'المادة 11', iqab: 'المادة 121 (ج، الفئة الثانية، البند 1)', type: 'forfait', amount: [7000, 7000], v: 'ok'},
+    {when: 'حمولة زائدة من 10% إلى 20%', nature: 'مخالفة', act: 'مخالفة الأحكام المتعلقة بالوزن الإجمالي المرخص به مع الحمولة، من الدرجة الثالثة (الفئة الثانية)', law: 'route', nass: 'المادة 11', iqab: 'المادة 121 (ج، الفئة الثانية، البند 2)', type: 'forfait', amount: [8000, 8000], v: 'ok'},
+    {when: 'حمولة زائدة من 20% إلى 30%', nature: 'مخالفة', act: 'مخالفة الأحكام المتعلقة بالوزن الإجمالي المرخص به مع الحمولة، من الدرجة الثالثة (الفئة الثانية)', law: 'route', nass: 'المادة 11', iqab: 'المادة 121 (ج، الفئة الثانية، البند 3)', type: 'forfait', amount: [9000, 9000], v: 'ok'},
+    {when: 'حمولة زائدة بأكثر من 30%', nature: 'جنحة', act: 'مخالفة الأحكام المتعلقة بالوزن الإجمالي المرخص به بنسبة تزيد عن 30%', law: 'route', nass: 'المادة 11', iqab: 'المادة 149', type: 'court', amount: [100000, 700000], extra: 'في العود: حبس من 6 أشهر إلى سنتين ومضاعفة الغرامة', v: 'ok'},
+    {when: 'حمولة غير مغطاة أو غير مؤمّنة، أو حاويات دون شروط السلامة', nature: 'جنحة', act: 'مخالفة شروط السلامة والأمن المروريين الخاصة بالحمولة وبنقل الحاويات', law: 'route', nass: 'المادة 11', iqab: 'المادة 158', type: 'court', amount: [200000, 500000], extra: 'زيادة على التوقيف الفوري للمركبة', v: 'ok'}
+  ]},
+  transport_ex: {g: 'veh', name: 'رخصة النقل الاستثنائي', fr: 'Autorisation de transport exceptionnel', cases: [
+    {when: 'خرق التنظيم الذي يحكم النقل الاستثنائي', nature: 'جنحة', act: 'خرق التنظيم الذي يحكم النقل الاستثنائي', law: 'route', nass: 'المادة 11', iqab: 'المادة 136 (الفقرة الأخيرة)', type: 'court', amount: [50000, 200000], extra: 'حبس من 6 أشهر إلى سنتين', v: 'ok'},
+    {when: 'غياب إشارات النقل الاستثنائي', nature: 'مخالفة', act: 'مخالفة التجهيزات أو إشارات النقل الاستثنائي، من الدرجة الثالثة (الفئة الأولى)', law: 'route', nass: 'المادة 11', iqab: 'المادة 121 (ج، الفئة الأولى، البند 12)', type: 'forfait', amount: [6000, 6000], v: 'ok'}
+  ]},
+  passengers: {g: 'veh', name: 'احترام العدد المرخص به من الركاب', fr: 'Nombre de passagers', cases: [
+    {when: 'ركاب أكثر من العدد المرخص', nature: 'مخالفة', act: 'تجاوز العدد المحدد للركاب، من الدرجة الثالثة (الفئة الأولى)', law: 'route', nass: 'المادة 34', iqab: 'المادة 121 (ج، الفئة الأولى، البند 17)', type: 'forfait', amount: [6000, 6000], extra: 'في النقل الجماعي والمدرسي يجوز توقيف المركبة (المادة 173)', v: 'ok'},
+    {when: 'نقل أشخاص في مركبة غير مهيأة لذلك', nature: 'مخالفة', act: 'نقل الأشخاص على متن مركبة غير مهيأة لذلك، من الدرجة الثالثة (الفئة الأولى)', law: 'route', nass: 'المادة 34', iqab: 'المادة 121 (ج، الفئة الأولى، البند 15)', type: 'forfait', amount: [6000, 6000], extra: 'يجوز توقيف المركبة (المادة 173)', v: 'ok'}
+  ]},
+  helmet: {g: 'veh', name: 'الخوذة والقفاز (الدراجات النارية)', fr: 'Casque et gants', cases: [
+    {when: 'السائق أو الراكب دون خوذة، أو السائق دون قفاز', nature: 'مخالفة', act: 'مخالفة الارتداء الإجباري للخوذة و/أو القفاز، من الدرجة الثالثة (الفئة الأولى)', law: 'route', nass: 'المادة 37', iqab: 'المادة 121 (ج، الفئة الأولى، البند 4)', type: 'forfait', amount: [6000, 6000], v: 'ok'},
+    {when: 'نقل طفل دون 8 سنوات على دراجة نارية', nature: 'مخالفة', act: 'نقل طفل يقل عمره عن 8 سنوات على متن دراجة نارية، من الدرجة الرابعة', law: 'route', nass: 'المادة 37', iqab: 'المادة 121 (د، البند 24)', type: 'forfait', amount: [10000, 10000], v: 'ok'},
+    {when: 'نقل طفل دون 8 سنوات على دراجة متحركة (موتوسيكلات صغيرة)', nature: 'مخالفة', act: 'نقل طفل يقل عمره عن 8 سنوات على متن دراجة متحركة، من الدرجة الثانية', law: 'route', nass: 'المادة 37', iqab: 'المادة 121 (ب، البند 22)', type: 'forfait', amount: [4000, 4000], v: 'ok'},
+    {when: 'حمولة تعرقل اتزان الدراجة النارية', nature: 'مخالفة', act: 'نقل حمولة تعرقل اتزان الدراجة النارية، من الدرجة الثالثة (الفئة الأولى)', law: 'route', nass: NA, iqab: 'المادة 121 (ج، الفئة الأولى، البند 13)', type: 'forfait', amount: [6000, 6000], v: 'ok'}
+  ]},
+  belt: {g: 'veh', name: 'حزام الأمن وأمان الأطفال', fr: 'Ceinture et enfants', cases: [
+    {when: 'السائق دون حزام الأمن', nature: 'مخالفة', act: 'مخالفة إلزامية وضع حزام الأمن من قبل سائق مركبة ذات محرك، من الدرجة الثالثة (الفئة الأولى)', law: 'route', nass: 'المادة 35', iqab: 'المادة 121 (ج، الفئة الأولى، البند 3)', type: 'forfait', amount: [6000, 6000], v: 'ok'},
+    {when: 'راكب (غير السائق) دون حزام الأمن', nature: 'مخالفة', act: 'مخالفة إلزامية وضع حزام الأمن من قبل راكبي المركبات من غير السائق، من الدرجة الأولى', law: 'route', nass: 'المادة 35', iqab: 'المادة 121 (أ، البند 6)', type: 'forfait', amount: [3000, 3000], v: 'ok'},
+    {when: 'طفل دون 10 سنوات في المقعد الأمامي', nature: 'مخالفة', act: 'مخالفة منع نقل الأطفال الذين تقل أعمارهم عن عشر سنوات في المقاعد الأمامية للمركبة، من الدرجة الثالثة (الفئة الأولى)', law: 'route', nass: 'المادة 36', iqab: 'المادة 121 (ج، الفئة الأولى، البند 8)', type: 'forfait', amount: [6000, 6000], v: 'ok'},
+    {when: 'طفل غير مثبت بالاحتياطات اللازمة', nature: 'مخالفة', act: 'مخالفة إلزامية تثبيت الأطفال بالمركبة باتخاذ الاحتياطات اللازمة، من الدرجة الأولى', law: 'route', nass: 'المادة 36', iqab: 'المادة 121 (أ، البند 5)', type: 'forfait', amount: [3000, 3000], v: 'ok'}
+  ]},
+  obey: {g: 'gen', name: 'الامتثال لأمر التوقف والخضوع للتحقيقات', fr: "Obtempérer", cases: [
+    {when: 'رفض التوقف أو رفض الخضوع للتحقيقات المتعلقة بالمركبة أو بالشخص', nature: 'جنحة', act: 'رفض الامتثال لإنذار التوقف الصادر عن الأعوان الحاملين للشارات الظاهرة، أو رفض الخضوع للتحقيقات المتعلقة بالمركبة و/أو بالشخص', law: 'route', nass: 'المادة 138', iqab: 'المادة 138', type: 'court', amount: [50000, 180000], extra: 'حبس من 6 أشهر إلى 18 شهراً', v: 'ok'}
+  ]},
+  licence_tr: {g: 'act', name: 'رخصة ممارسة نشاط نقل البضائع لحساب الغير', fr: "Autorisation d'exploitation", cases: [
+    {when: 'النقل دون رخصة', nature: 'جنحة', act: 'مخالفة الأحكام المتعلقة بتنظيم النقل الخاضع للرخصة', law: 'route', nass: 'المادة 17 من القانون 01-13', iqab: 'المادة 158', type: 'court', amount: [200000, 500000], extra: 'زيادة على التوقيف الفوري للمركبة (المادة 158). ويعاقب القانون 01-13 أيضاً بالمحشر من 15 إلى 45 يوماً (المادتان 62 و64)', v: 'ok'}
+  ]},
+  taxi_lic: {g: 'act', name: 'رخصة استغلال سيارة الأجرة', fr: "Licence d'exploitation de taxi", cases: [
+    {when: 'نقل الأشخاص بالأجرة دون رخصة', nature: 'جنحة', act: 'مخالفة الأحكام المتعلقة بتنظيم النقل الخاضع للرخصة', law: 'route', nass: 'المادة 61 من القانون 01-13', iqab: 'المادة 158', type: 'court', amount: [200000, 500000], extra: 'زيادة على التوقيف الفوري للمركبة', v: 'ok'}
+  ]},
+  bus_lic: {g: 'act', name: 'ترخيص وضع المركبة حيز السير ورخصة استغلال الخط (النقل الجماعي)', fr: "Autorisation d'exploitation de ligne", cases: [
+    {when: 'لا يقدم ترخيص وضع المركبة حيز السير أو رخصة الاستغلال', nature: 'جنحة', act: 'مخالفة الأحكام المتعلقة بتنظيم النقل الخاضع للرخصة', law: 'route', nass: 'المادة 173', iqab: 'المادة 158', type: 'court', amount: [200000, 500000], extra: 'زيادة على التوقيف الفوري للمركبة (المادتان 158 و173)', v: 'ok'}
+  ]},
+  school_lic: {g: 'act', name: 'رخصة النقل المدرسي', fr: 'Autorisation de transport scolaire', cases: [
+    {when: 'نقل مدرسي دون رخصة', nature: 'جنحة', act: 'مخالفة الأحكام المتعلقة بتنظيم النقل الخاضع للرخصة', law: 'route', nass: NA, iqab: 'المادة 158', type: 'court', amount: [200000, 500000], extra: 'زيادة على التوقيف الفوري للمركبة', v: 'ok'}
+  ]},
+  dangerous: {g: 'goods', name: 'رخصة مسبقة من وزير النقل لنقل المواد الخطرة', fr: 'Autorisation (matières dangereuses)', cases: [
+    {when: 'نقل مواد خطرة دون رخصة مسبقة', nature: 'جنحة', act: 'مخالفة الأحكام المتعلقة بتنظيم النقل الخاضع للرخصة (نقل المواد الخطرة)', law: 'route', nass: 'المادة 5 من المرسوم 03-452', iqab: 'المادة 158', type: 'court', amount: [200000, 500000], extra: 'زيادة على التوقيف الفوري للمركبة. والمادة 173 تجيز توقيف كل مركبة تسير بصفة مخالفة للأحكام التنظيمية المتعلقة بنقل المواد الخطرة', v: 'ok'}
+  ]}
+});
+['danger_docs', 'danger_driver', 'danger_signs'].forEach(function(k){
+  DOCS[k].cases.forEach(function(c){ c.extra = (c.extra ? c.extra + '. ' : '') + 'المادة 173 من قانون المرور تجيز توقيف المركبة التي تسير بصفة مخالفة لأحكام نقل المواد الخطرة'; });
+});
+DOCS.danger_driver.cases[0].iqab = 'المادة 136 (مضاعفة العقوبة)';
+DOCS.danger_driver.cases[0].v = 'one';
+
+// Traffic offences (not documents), searchable.
+function R(id, name, nature, act, nass, iqab, type, amount, extra){ DOCS['road_' + id] = {g: 'road', name: name, fr: '', cases: [{when: 'ارتكبتها', nature: nature, act: act, law: 'route', nass: nass, iqab: iqab, type: type, amount: amount, extra: extra || '', v: 'ok'}]}; }
+var F = 'forfait', C = 'court';
+R('speed10', 'تجاوز السرعة بأقل من 10%', 'مخالفة', 'تجاوز حد السرعة المرخص بها بنسبة لا تفوق 10%، من الدرجة الثانية', NA, 'المادة 121 (ب، البند 12)', F, [4000, 4000]);
+R('speed20', 'تجاوز السرعة من 10% إلى 20%', 'مخالفة', 'تجاوز حد السرعة بنسبة تفوق 10% ولا تزيد عن 20%، من الدرجة الثالثة', NA, 'المادة 121 (ج، الفئة الأولى، البند 1)', F, [6000, 6000]);
+R('speed30', 'تجاوز السرعة من 20% إلى 30%', 'مخالفة', 'تجاوز حد السرعة بنسبة تفوق 20% ولا تزيد عن 30%، من الدرجة الرابعة', NA, 'المادة 121 (د، البند 22)', F, [10000, 10000]);
+R('speed30p', 'تجاوز السرعة بأكثر من 30%', 'جنحة', 'تجاوز السرعة المرخص بها بنسبة تفوق 30%', NA, 'المادة 139', C, [25000, 80000], 'الاحتفاظ بالرخصة يوقف القدرة على السياقة بعد 48 ساعة (المادة 120)');
+R('phone', 'الهاتف باليد أو السماعات في الأذنين', 'مخالفة', 'الاستعمال اليدوي للهاتف المحمول أو وسائل التصنت السمعي بكلتا الأذنين أثناء السير، من الدرجة الرابعة', NA, 'المادة 121 (د، البند 17)', F, [10000, 10000]);
+R('av', 'تشغيل أجهزة سمعية بصرية أمام السائق', 'مخالفة', 'استعمال الأجهزة السمعية البصرية في مقدمة المركبة أثناء السياقة، من الدرجة الرابعة', NA, 'المادة 121 (د، البند 14)', F, [10000, 10000]);
+R('stop', 'عدم احترام إشارة «قف»', 'مخالفة', 'مخالفة إشارات الأمر بالتوقف التام، من الدرجة الرابعة', NA, 'المادة 121 (د، البند 4)', F, [10000, 10000]);
+R('prio', 'عدم احترام الأولوية أو قواعد التقاطعات', 'مخالفة', 'مخالفة الأحكام المتعلقة بتقاطع الطرقات وأولوية المرور، من الدرجة الرابعة', NA, 'المادة 121 (د، البند 2)', F, [10000, 10000]);
+R('overtake', 'تجاوز ممنوع أو خطير', 'مخالفة', 'مخالفة الأحكام المتعلقة بالتقاطع والتجاوز، من الدرجة الرابعة', NA, 'المادة 121 (د، البند 3)', F, [10000, 10000]);
+R('line', 'اجتياز الخط المتواصل', 'مخالفة', 'اجتياز خط متواصل، من الدرجة الرابعة', NA, 'المادة 121 (د، البند 13)', F, [10000, 10000]);
+R('lineride', 'السير على الخط المتواصل', 'مخالفة', 'مخالفة منع السير على الخط المتواصل، من الدرجة الثانية', NA, 'المادة 121 (ب، البند 9)', F, [4000, 4000]);
+R('direction', 'السير في الاتجاه المعاكس الإلزامي', 'مخالفة', 'مخالفة اتجاه المرور الإلزامي، من الدرجة الرابعة', NA, 'المادة 121 (د، البند 1)', F, [10000, 10000]);
+R('accel', 'الزيادة في السرعة أثناء تجاوز الغير لك', 'مخالفة', 'زيادة السرعة أثناء محاولة التجاوز من قبل سائق آخر، من الدرجة الرابعة', NA, 'المادة 121 (د، البند 5)', F, [10000, 10000]);
+R('lights', 'السير ليلاً أو في الضباب دون إنارة', 'مخالفة', 'مخالفة إلزامية استعمال أجهزة الإنارة والإشارة ليلاً أو أثناء الضباب، من الدرجة الرابعة', NA, 'المادة 121 (د، البند 6)', F, [10000, 10000]);
+R('distance', 'عدم احترام مسافة الأمان', 'مخالفة', 'مخالفة مسافة الأمان النظامية بين المركبات، من الدرجة الرابعة', NA, 'المادة 121 (د، البند 19)', F, [10000, 10000]);
+R('leftlane', 'شاحنة أو حافلة في المسلك الأيسر', 'مخالفة', 'مرور مركبة نقل أكثر من 9 مقاعد أو بضائع (أكثر من 7 أمتار أو 3,5 طن) على المسلك الأيسر لطريق من 3 مسالك أو أكثر، من الدرجة الرابعة', NA, 'المادة 121 (د، البند 7)', F, [10000, 10000]);
+R('priority_veh', 'عدم فسح الطريق لمركبات الأولوية', 'مخالفة', 'مخالفة إلزامية إفساح الطريق للمركبات ذات الأولوية، من الدرجة الرابعة', NA, 'المادة 121 (د، البند 26)', F, [10000, 10000]);
+R('horn', 'سوء استعمال المنبه الصوتي', 'مخالفة', 'مخالفة الأحكام المتعلقة باستعمال أجهزة التنبيه الصوتي، من الدرجة الثانية', NA, 'المادة 121 (ب، البند 1)', F, [4000, 4000]);
+R('parking', 'وقوف أو توقف ممنوع', 'مخالفة', 'مخالفة منع الوقوف أو التوقف، من الدرجة الثانية', NA, 'المادة 121 (ب، البند 17)', F, [4000, 4000]);
+R('danger_park', 'توقف أو وقوف خطير', 'مخالفة', 'التوقف والوقوف الخطيرين، من الدرجة الثالثة', NA, 'المادة 121 (ج، الفئة الأولى، البند 6)', F, [6000, 6000]);
+R('emerg', 'السير أو التوقف على شريط الطوارئ', 'مخالفة', 'المرور أو التوقف أو الوقوف بدون ضرورة على شريط الوقوف الاستعجالي، من الدرجة الثالثة', NA, 'المادة 121 (ج، الفئة الأولى، البند 5)', F, [6000, 6000]);
+R('films', 'زجاج معتم أو شريط بلاستيكي على الزجاج', 'مخالفة', 'مخالفة منع وضع شريط بلاستيكي أو أية مادة معتمة على زجاج المركبة، من الدرجة الثالثة', 'المادة 84', 'المادة 121 (ج، الفئة الأولى، البند 10)', F, [6000, 6000]);
+R('tyres', 'إطارات غير مطابقة أو مهترئة', 'مخالفة', 'مخالفة طبيعة وشكل وحالة الأطر المطاطية غير المطابقة، من الدرجة الثالثة', NA, 'المادة 121 (ج، الفئة الأولى، البند 11)', F, [6000, 6000]);
+R('brakes', 'مكابح أو ربط المقطورة غير مطابق', 'مخالفة', 'مخالفة الأحكام المتعلقة بمكابح المركبات وربط المقطورات، من الدرجة الرابعة', NA, 'المادة 121 (د، البند 10)', F, [10000, 10000]);
+R('smoke', 'دخان أو غازات سامة أو ضجيج مفرط', 'مخالفة', 'مخالفة مستويات انبعاث الدخان والغازات السامة والضجيج، من الدرجة الرابعة', 'المادة 83', 'المادة 121 (د، البند 21)', F, [10000, 10000], 'يجوز توقيف المركبة (المادة 173)');
+R('equip', 'نقص تجهيزات السلامة الإجبارية', 'مخالفة', 'مخالفة إلزامية توفر المركبة على التجهيزات الإجبارية للسلامة المرورية، من الدرجة الثانية', NA, 'المادة 121 (ب، البند 7)', F, [4000, 4000]);
+R('windows', 'زجاج متسخ يعيق الرؤية', 'مخالفة', 'مخالفة إلزامية نظافة زجاج المركبات، من الدرجة الأولى', NA, 'المادة 121 (أ، البند 4)', F, [3000, 3000]);
+R('litter', 'رمي النفايات من المركبة', 'مخالفة', 'مخالفة منع رمي النفايات أو أي أشياء من المركبات، من الدرجة الثانية', NA, 'المادة 121 (ب، البند 23)', F, [4000, 4000]);
+R('owner_change', 'عدم نقل الملكية أو تغيير الإقامة في الآجال', 'مخالفة', 'مخالفة إلزامية القيام بإجراءات نقل ملكية المركبة أو التصريح بتغيير الإقامة، من الدرجة الثانية', NA, 'المادة 121 (ب، البند 11)', F, [4000, 4000]);
+R('mods_decl', 'تغييرات على المركبة غير مصرح بها', 'مخالفة', 'مخالفة وجوب التصريح بالتغييرات التي أجريت على المركبة، من الدرجة الثانية', NA, 'المادة 121 (ب، البند 10)', F, [4000, 4000]);
+R('mods', 'تغييرات جوهرية على بنية المركبة دون مراقبة المطابقة', 'جنحة', 'إدخال تغييرات جوهرية على مركبة ووضعها في السير دون عرضها على مراقبة المطابقة', 'المادة 97', 'المادة 146', C, [20000, 50000], 'حبس من شهرين إلى 6 أشهر؛ ومن سنة إلى 3 سنوات و100.000 إلى 300.000 دج إن تسببت في حادث، مع مصادرة المركبة');
+R('endanger', 'تعريض حياة الغير للخطر أو مناورات خطيرة', 'جنحة', 'تعريض حياة الغير أو سلامته الجسدية للخطر بانتهاك متعمد لواجب الاحتياط أو السلامة أو بمناورات خطيرة', NA, 'المادة 136', C, [50000, 200000], 'حبس من 6 أشهر إلى سنتين؛ ومن 3 إلى 5 سنوات و300.000 إلى 500.000 دج لمركبات الوزن الثقيل والنقل الجماعي والمدرسي والأجرة والبضائع والمواد الخطرة');
+R('drunk', 'السياقة في حالة سكر أو تحت تأثير المخدرات', 'جنحة', 'قيادة مركبة في حالة سكر أو تحت تأثير المخدرات و/أو المؤثرات العقلية', 'المادة 3', 'المادة 137', C, [100000, 200000], 'حبس من سنة إلى سنتين. الاحتفاظ بالرخصة يوقف القدرة على السياقة فوراً (المادة 120). لا ظروف تخفيف إذا اجتمع السكر والمخدرات (المادة 166)');
+R('refuse_test', 'رفض فحص الكحول أو المخدرات', 'جنحة', 'رفض الخضوع لجهاز مقياس الكحول أو للفحوص الطبية أو البيولوجية', 'المادة 56', 'المادة 143', C, [100000, 200000], 'تطبق عقوبات السياقة في حالة سكر');
+R('detector', 'جهاز كشف الرادارات', 'جنحة', 'حيازة أو استعمال جهاز مخصص للكشف عن أجهزة معاينة الجرائم أو عرقلة تشغيلها', NA, 'المادة 157', C, [50000, 200000], 'حبس من 6 أشهر إلى سنتين أو إحدى العقوبتين');
+R('sirens', 'أنظمة إشارة ضوئية أو صوتية خاصة دون ترخيص', 'جنحة', 'حيازة أو استعمال أنظمة الإشارة الضوئية أو الصوتية الخاصة دون التراخيص القانونية', NA, 'المادة 157 (الفقرة 2)', C, [100000, 200000], 'حبس من سنة إلى سنتين أو إحدى العقوبتين، ومصادرة الجهاز');
+R('race', 'سباق على الطريق العمومي', 'جنحة', 'تنظيم أو المشاركة في سباقات على المسلك العمومي دون ترخيص مسبق', NA, 'المادة 159', C, [50000, 200000], 'حبس من 6 أشهر إلى سنتين، وتشدد إن ترتب حادث، وتضاعف في العود');
+R('hide_driver', 'إخفاء هوية السائق من طرف المالك', 'مخالفة', 'إخفاء مالك المركبة عمداً هوية السائق', 'المادة 116', 'المادة 58', F, null, 'تضاعف الغرامة. ويلزم المالك بإعلام السلطة بهوية السائق خلال 10 أيام (المادة 116)');
+R('flee', 'الفرار بعد حادث مرور', 'جنحة', 'ارتكاب حادث مرور ومحاولة الإفلات من المسؤولية بالفرار أو بتغيير الأماكن أو بانتحال هوية', NA, 'المادة 135', C, [100000, 300000], 'حبس من سنة إلى 3 سنوات');
+R('injury', 'حادث مرور نتج عنه جرح (عجز أكثر من 3 أشهر)', 'جنحة', 'الجرح الخطأ إثر حادث مرور نتج عنه عجز كلي عن العمل لمدة تتجاوز 3 أشهر', NA, 'المادة 130', C, [50000, 200000], 'حبس من 6 أشهر إلى سنتين أو إحدى العقوبتين؛ تشدد العقوبات في المواد 131 إلى 134');
+R('homicide', 'حادث مرور أدى إلى وفاة', 'جنحة', 'القتل الخطأ إثر حادث مرور', NA, 'المادة 124', C, [100000, 500000], 'حبس من سنة إلى 5 سنوات؛ ومن 3 إلى 7 سنوات مع ظرف مشدد (المادة 125)، وتصل إلى 20 سنة لمركبات الوزن الثقيل والنقل الجماعي (المادة 129)، مع مصادرة المركبة (المادة 163)');
+
+// Vehicle condition offences (المخالفات العينية), from Law 26-09 art. 121 and 173.
+function TC(id, name, act, nass, iqab, amount, extra, v){ DOCS['tech_' + id] = {g: 'tech', name: name, fr: '', cases: [{when: 'موجودة', nature: 'مخالفة', act: act, law: 'route', nass: nass, iqab: iqab, type: 'forfait', amount: amount, extra: extra || '', v: v || 'ok'}]}; }
+var LIGHT = 'مخالفة الأحكام المتعلقة باستعمال وتركيب أجهزة الإنارة وإشارة المركبات، من الدرجة الثالثة (الفئة الأولى)';
+var L_IQ = 'المادة 121 (ج، الفئة الأولى، البند 7)';
+var DANGER = 'إذا شكلت حالة المركبة خطراً كبيراً على مستعملي الطريق، لا سيما قصور تجهيزها في المكابح أو الإنارة، يجوز توقيفها فوراً (المادة 173) حتى إصلاحها';
+TC('front', 'الأضواء الأمامية معطلة أو ناقصة (المصابيح الأمامية، الضوء العالي والمنخفض)', LIGHT, 'المادة 93', L_IQ, [6000, 6000], DANGER);
+TC('rear', 'الأضواء الخلفية معطلة (أضواء الوضعية الخلفية الحمراء)', LIGHT, 'المادة 93', L_IQ, [6000, 6000], DANGER);
+TC('brake_light', 'أضواء التوقف (الفرامل / الستوب) معطلة', LIGHT, 'المادة 93', L_IQ, [6000, 6000], DANGER);
+TC('indicators', 'إشارات تغيير الاتجاه (الغمازات) معطلة', LIGHT, 'المادة 93', L_IQ, [6000, 6000], DANGER);
+TC('plate_light', 'إضاءة لوحة الترقيم الخلفية معطلة', LIGHT, 'المادة 93', L_IQ, [6000, 6000]);
+TC('fog_reverse', 'أضواء الضباب أو الرجوع إلى الخلف معطلة', LIGHT, 'المادة 93', L_IQ, [6000, 6000]);
+TC('light_mod', 'أضواء مضافة أو غير مطابقة (ألوان، LED، زينون، أضواء مبهرة)', LIGHT, 'المادة 93', L_IQ, [6000, 6000]);
+TC('hazard', 'أضواء التحذير (الأربعة غمازات) أو العاكسات معطلة', LIGHT, 'المادة 93', L_IQ, [6000, 6000]);
+TC('no_signal', 'تغيير الاتجاه دون استعمال الغماز أو دون تنبيه', 'التغيير المفاجئ للاتجاه دون تأكد السائق من انعدام الخطر ودون تنبيه المستعملين الآخرين، من الدرجة الرابعة', 'المادة 33', 'المادة 121 (د، البند 12)', [10000, 10000]);
+TC('tyres_worn', 'إطارات مهترئة أو ممسوحة', 'مخالفة طبيعة وشكل وحالة الأطر المطاطية غير المطابقة لمواصفات المركبات، من الدرجة الثالثة (الفئة الأولى)', 'المادة 82', 'المادة 121 (ج، الفئة الأولى، البند 11)', [6000, 6000], 'يؤهل مفتشو النقل البري أيضاً لمعاينة حالة الأطر المطاطية (المادة 107). ' + DANGER);
+TC('tyres_mixed', 'إطارات غير متجانسة أو بمقاس غير مطابق', 'مخالفة طبيعة وشكل وحالة الأطر المطاطية غير المطابقة لمواصفات المركبات، من الدرجة الثالثة (الفئة الأولى)', 'المادة 82', 'المادة 121 (ج، الفئة الأولى، البند 11)', [6000, 6000]);
+TC('tyres_damaged', 'إطار مثقوب أو منتفخ أو مقطوع', 'مخالفة طبيعة وشكل وحالة الأطر المطاطية غير المطابقة لمواصفات المركبات، من الدرجة الثالثة (الفئة الأولى)', 'المادة 82', 'المادة 121 (ج، الفئة الأولى، البند 11)', [6000, 6000], DANGER);
+TC('brakes', 'مكابح (فرامل) معطلة أو ضعيفة', 'مخالفة الأحكام المتعلقة بمكابح المركبات ذات محرك، من الدرجة الرابعة', 'المادة 82', 'المادة 121 (د، البند 10)', [10000, 10000], DANGER);
+TC('handbrake', 'فرامل اليد معطلة', 'مخالفة الأحكام المتعلقة بمكابح المركبات ذات محرك، من الدرجة الرابعة', 'المادة 82', 'المادة 121 (د، البند 10)', [10000, 10000]);
+TC('trailer', 'ربط المقطورة أو نصف المقطورة غير مطابق', 'مخالفة الأحكام المتعلقة بربط المقطورات ونصف المقطورات، من الدرجة الرابعة', 'المادة 82', 'المادة 121 (د، البند 10)', [10000, 10000], DANGER);
+TC('moto_brakes', 'مكابح الدراجة النارية معطلة', 'مخالفة الأحكام المتعلقة بكبح الدراجات النارية، من الدرجة الرابعة', 'المادة 82', 'المادة 121 (د، البند 11)', [10000, 10000], DANGER);
+TC('bike', 'إنارة أو كبح الدراجة العادية أو الدراجة المتحركة معطل', 'مخالفة الأحكام المتعلقة بالإنارة وكبح الدراجات، من الدرجة الأولى', 'المادة 93', 'المادة 121 (أ، البندان 1 و8)', [3000, 3000]);
+TC('mirrors', 'المرايا العاكسة (الرتروفيزور) ناقصة أو مكسورة', 'مخالفة تزويد المركبات بالتجهيزات التي تسمح للسائق بأن يكون له مجال رؤية كاف، من الدرجة الثالثة (الفئة الأولى)', 'المادة 84', 'المادة 121 (ج، الفئة الأولى، البند 9)', [6000, 6000]);
+TC('wipers', 'ماسحات الزجاج معطلة', 'مخالفة تزويد المركبات بالتجهيزات التي تسمح للسائق بأن يكون له مجال رؤية كاف، من الدرجة الثالثة (الفئة الأولى)', 'المادة 84', 'المادة 121 (ج، الفئة الأولى، البند 9)', [6000, 6000]);
+TC('windscreen', 'الزجاج الأمامي مكسور أو مشقق يحجب الرؤية', 'مخالفة تزويد المركبات بالتجهيزات التي تسمح للسائق بأن يكون له مجال رؤية كاف، من الدرجة الثالثة (الفئة الأولى)', 'المادة 84', 'المادة 121 (ج، الفئة الأولى، البند 9)', [6000, 6000]);
+TC('tint', 'زجاج معتم أو شريط بلاستيكي على الزجاج', 'مخالفة منع وضع شريط بلاستيكي أو أية مادة معتمة أخرى على زجاج المركبة، من الدرجة الثالثة (الفئة الأولى)', 'المادة 84', 'المادة 121 (ج، الفئة الأولى، البند 10)', [6000, 6000]);
+TC('dirty', 'زجاج متسخ لا يسمح بسياقة آمنة', 'مخالفة إلزامية نظافة زجاج المركبات بما يسمح بسياقة آمنة، من الدرجة الأولى', 'المادة 84', 'المادة 121 (أ، البند 4)', [3000, 3000]);
+TC('safety_kit', 'التجهيزات الإجبارية للسلامة ناقصة (المثلث العاكس، مطفأة الحريق، العجلة الاحتياطية… حسب التنظيم)', 'مخالفة إلزامية توفر المركبة على التجهيزات الإجبارية للسلامة المرورية، من الدرجة الثانية', 'المادة 93', 'المادة 121 (ب، البند 7)', [4000, 4000], 'قائمة التجهيزات الإجبارية يحددها التنظيم', 'one');
+TC('horn_bad', 'منبه صوتي معطل أو غير مطابق (منبهات موسيقية أو مزعجة)', 'مخالفة منع استخدام آلة أو جهاز مركبة غير مطابق، من الدرجة الثانية', 'المادة 82', 'المادة 121 (ب، البند 2)', [4000, 4000]);
+TC('exhaust', 'عادم مثقوب أو دخان كثيف أو ضجيج مفرط', 'مخالفة مستويات انبعاث الدخان والغازات السامة والضجيج المحددة في التنظيم، من الدرجة الرابعة', 'المادة 83', 'المادة 121 (د، البند 21)', [10000, 10000], 'يجوز توقيف المركبة (المادة 173)');
+TC('seat', 'وضعية جلوس السائق أو الركاب غير مطابقة', 'مخالفة وضعية جلوس السائق وركاب المركبة، من الدرجة الثالثة (الفئة الأولى)', NA, 'المادة 121 (ج، الفئة الأولى، البند 16)', [6000, 6000]);
+TC('size_sign', 'لوحة بيان أبعاد ووزن شاحنة نقل البضائع غير موجودة', 'مخالفة الإشارة الخاصة بحجم مركبات نقل البضائع، من الدرجة الثانية', 'المادة 88', 'المادة 121 (ب، البند 15)', [4000, 4000]);
+TC('mudflaps', 'واقيات الطين أو الأجهزة المضادة للقذف ناقصة (شاحنة أكثر من 7,5 طن أو مقطورة أكثر من 3,5 طن)', 'مخالفة إلزامية تجهيز مركبات نقل البضائع بأجهزة مضادة للقذف', 'المادة 90', NA, null, 'لم أجد بنداً صريحاً في المادة 121 يخص هذه المخالفة', 'no');
+TC('signal_mod', 'تغييرات على المركبة غير مصرح بها لدى مصالح المناجم', 'مخالفة وجوب التصريح بالتغييرات التي أجريت على المركبة المصادق عليها، من الدرجة الثانية', 'المادة 97', 'المادة 121 (ب، البند 10)', [4000, 4000]);
+DOCS.tech_unfit = {g: 'tech', name: 'مركبة غير صالحة للسير (أضرار جسيمة بعد حادث)', fr: '', cases: [{when: 'موجودة', nature: 'مخالفة', act: 'وضع مركبة في السير بعد تعرضها لأضرار جسيمة دون تقرير خبرة أو محضر مراقبة تقنية يثبت قبولها للسير', law: 'route', nass: 'المادة 99', iqab: NA, type: 'court', amount: null, extra: 'توقيف المركبة (المادتان 99 و173). وإذا وقع حادث أدى إلى وفاة تُعد إعادة مركبة غير صالحة للسير ظرفاً مشدداً (المادة 125)', v: 'one'}]};
+['tyres', 'films', 'windows', 'equip', 'brakes', 'smoke'].forEach(function(k){ delete DOCS['road_' + k]; });
+
+delete DOCS.id_card;
+
+
+var CUSTOMS_NOTE = 'إن كنت في ولاية حدودية (تلمسان، النعامة، الطارف، تبسة، سوق أهراس، الوادي، بشار، تندوف، أدرار، تمنراست، ورقلة، إليزي) فعّل خيار «داخل النطاق الجمركي».';
+var PROFILES = [
+  {id: 'metals', label: 'معادن غير حديدية وسبائك (ألمنيوم، نحاس، رصاص، زنك)', keys: ['سبائك', 'سبيكة', 'ألمنيوم', 'المنيوم', 'نحاس', 'رصاص', 'زنك', 'lingot', 'aluminium', 'cuivre', 'plomb', 'zinc'], docs: ['customs_circ'],
+    note: 'خارج النطاق الجمركي تكفي الفاتورة. داخله تُشترط رخصة التنقل دون أي حد مسموح. تأكد أن نشاط البائع في السجل يغطي الصهر أو تجارة المعادن.'},
+  {id: 'scrap', label: 'خردة ونفايات حديدية وغير حديدية', keys: ['خردة', 'نفايات حديدية', 'حديد قديم', 'نفايات', 'ferraille', 'déchets', 'récupération'], docs: ['customs_circ'],
+    note: 'تلزم الفاتورة ونشاط استرجاع النفايات في سجل البائع. داخل النطاق الجمركي تُشترط رخصة التنقل لنفايات النحاس والألمنيوم والرصاص والزنك.'},
+  {id: 'hazwaste', label: 'نفايات خطرة (زيوت مستعملة، بطاريات…)', keys: ['نفايات خطرة', 'زيوت مستعملة', 'بطاريات', 'بطارية', 'déchets dangereux', 'huiles usagées'], docs: ['waste_auth']},
+  {id: 'livestock', label: 'مواشي (أغنام، أبقار، ماعز، إبل)', keys: ['مواشي', 'ماشية', 'أغنام', 'غنم', 'خرفان', 'كباش', 'أبقار', 'بقر', 'عجول', 'ماعز', 'إبل', 'جمال', 'خيول', 'حمير', 'ovins', 'bovins', 'moutons', 'bétail'], docs: ['vet_cert', 'customs_circ'],
+    note: 'نقل الأغنام من أقصى الجنوب نحو الشمال كان ممنوعاً في 2025 لأسباب صحية. تحقق من قرارات الولاية السارية.'},
+  {id: 'meat', label: 'لحوم ودواجن', keys: ['لحوم', 'لحم', 'دجاج', 'دواجن', 'viande', 'poulet', 'volaille'], docs: ['meat_cert']},
+  {id: 'food', label: 'مواد غذائية أساسية (حليب، سكر، زيت، دقيق، سميد، عجائن، حبوب، بقول، تمر)', keys: ['مواد غذائية', 'حليب', 'سكر', 'زيت', 'دقيق', 'فرينة', 'سميد', 'سميدة', 'عجائن', 'كسكس', 'حبوب', 'قمح', 'شعير', 'عدس', 'حمص', 'فاصوليا', 'جلبانة', 'تمر', 'تمور', 'lait', 'sucre', 'huile', 'farine', 'semoule', 'dattes', 'céréales'], docs: ['customs_circ'],
+    note: 'المواد سريعة التلف تحتاج مركبة مبردة. داخل النطاق الجمركي تُشترط رخصة التنقل.'},
+  {id: 'veg', label: 'خضر وفواكه', keys: ['خضر', 'خضرة', 'فواكه', 'بطاطا', 'طماطم', 'بصل', 'برتقال', 'fruits', 'légumes', 'pomme de terre'], docs: [],
+    note: 'لم أجد وثيقة خاصة بالخضر والفواكه غير الفاتورة أو وصل الشراء من سوق الجملة.'},
+  {id: 'wood', label: 'خشب وحطب وفحم وفلين', keys: ['خشب', 'حطب', 'فحم', 'فلين', 'أعمدة', 'جذوع', 'bois', 'charbon', 'liège'], docs: ['forest_permit']},
+  {id: 'plants', label: 'نباتات طبية وعطرية وثمار غابية', keys: ['أعشاب', 'نباتات طبية', 'نباتات عطرية', 'إكليل', 'زعتر', 'شيح', 'خروب', 'romarin', 'plantes'], docs: ['plants_permit']},
+  {id: 'sand', label: 'رمل وحصى ومواد المحاجر', keys: ['رمل', 'رملة', 'حصى', 'تراب', 'توف', 'حجارة', 'بحص', 'sable', 'gravier', 'agrégats', 'tuf'], docs: ['sand_bon'],
+    note: 'استخراج الرمل من الشواطئ ممنوع، ونقله يعرّض للحجز.'},
+  {id: 'cement', label: 'إسمنت وحديد البناء', keys: ['إسمنت', 'اسمنت', 'سيمة', 'حديد البناء', 'حديد التسليح', 'ciment', 'rond à béton', 'fer à béton'], docs: ['customs_circ'],
+    note: 'لم أجد رخصة نقل خاصة خارج النطاق الجمركي. التخزين بغرض المضاربة يعاقب عليه القانون 21-15.'},
+  {id: 'chem', label: 'مواد كيميائية خطرة (كلور، جافيل، أحماض، أمونياك، مذيبات، مبيدات، أسمدة كيميائية)', keys: ['كلور', 'الكلور', 'جافيل', 'ماء جافيل', 'هيبوكلوريت', 'حمض', 'أحماض', 'أسيد', 'أمونياك', 'نشادر', 'صودا كاوية', 'مذيبات', 'تنر', 'دهانات', 'مبيدات', 'أسمدة', 'نترات', 'مواد كيميائية', 'مادة كيميائية', 'مواد خطرة', 'مادة خطرة', 'chlore', 'javel', 'hypochlorite', 'acide', 'ammoniac', 'soude', 'solvant', 'pesticide', 'engrais', 'nitrate', 'chimique', 'dangereux'], docs: ['dangerous', 'danger_docs', 'danger_driver', 'danger_signs'],
+    note: 'الكلور السائل غاز مضغوط (الصنف 2)، وماء جافيل والأحماض مواد أكّالة (الصنف 8)، حسب أصناف المادة 4 من المرسوم 03-452.'},
+  {id: 'gas', label: 'غازات مضغوطة (قارورات غاز البوتان والبروبان، أكسجين، أسيتيلين)', keys: ['قارورات غاز', 'قارورة غاز', 'بوتان', 'بروبان', 'أكسجين', 'أوكسجين', 'أسيتيلين', 'غاز مضغوط', 'butane', 'propane', 'oxygène', 'acétylène', 'bouteilles de gaz'], docs: ['dangerous', 'danger_docs', 'danger_driver', 'danger_signs'],
+    note: 'الغازات من الصنف 2 حسب المادة 4 من المرسوم 03-452.'},
+  {id: 'fuel', label: 'محروقات (مازوت، بنزين، وقود)', keys: ['محروقات', 'مازوت', 'بنزين', 'وقود', 'carburant', 'gasoil', 'essence'], docs: ['dangerous', 'danger_docs', 'danger_driver', 'danger_signs', 'customs_circ'],
+    note: 'داخل النطاق الجمركي لا يُسمح بأي كمية وقود خارج خزان المركبة في المنطقتين الشرقية والغربية، و50 لتر مازوت أو 90 لتر بنزين في الجنوب.'},
+  {id: 'tobacco', label: 'تبغ', keys: ['تبغ', 'دخان', 'سجائر', 'شمة', 'tabac', 'cigarettes'], docs: ['tobacco', 'customs_circ']},
+  {id: 'pharma', label: 'أدوية ومواد صيدلانية', keys: ['أدوية', 'دواء', 'مواد صيدلانية', 'médicaments'], docs: ['pharma', 'customs_circ']},
+  {id: 'appliances', label: 'أجهزة كهرومنزلية (ثلاجات، مكيفات، تلفاز، مستقبلات)', keys: ['ثلاجة', 'ثلاجات', 'مكيف', 'مكيفات', 'تلفاز', 'تلفزيون', 'مجمد', 'طباخة', 'ديمو', 'أجهزة كهرومنزلية', 'climatiseur', 'réfrigérateur', 'télévision', 'démodulateur'], docs: ['customs_circ']},
+  {id: 'tyres', label: 'إطارات جديدة', keys: ['عجلات', 'إطارات', 'pneus'], docs: ['customs_circ']},
+  {id: 'hides', label: 'جلود خام', keys: ['جلود', 'peaux'], docs: ['customs_circ']},
+  {id: 'coral', label: 'مرجان', keys: ['مرجان', 'corail'], docs: ['customs_circ']}
+];
+
+// Selected CNRC activity codes (nomenclature 2026, as published by UpGrowth). covers = goods profile ids.
+var SECTORS = {'1': 'إنتاج السلع', '2': 'الإنتاج الحرفي', '3': 'التوزيع بالجملة', '4': 'الاستيراد لإعادة البيع على حالها', '5': 'التوزيع بالتجزئة', '6': 'الخدمات', '7': 'التصدير'};
+var CODES = {
+  '106108': {fr: "Métallurgie de l'aluminium", covers: ['metals']},
+  '106112': {fr: 'Métallurgie et affinage des métaux communs et leurs alliages', covers: ['metals']},
+  '106203': {fr: 'Fonderie', covers: ['metals'], status: 'blocked'},
+  '106303': {fr: 'Fonderie de métaux légers (aluminium, titane, magnésium, zinc)', covers: ['metals']},
+  '106304': {fr: "Fonderie d'autres métaux non ferreux", covers: ['metals']},
+  '202301': {fr: 'Entreprise artisanale de fonderie', covers: ['metals']},
+  '310004': {fr: 'Commerce de gros des métaux', covers: ['metals', 'cement']},
+  '310005': {fr: 'Commerce de gros des vieux fers, métaux, tesson, débris de verre et brocanterie', covers: ['scrap', 'metals']},
+  '310006': {fr: 'Commerce de gros des déchets industriels divers et autres produits récupérés', covers: ['scrap']},
+  '509003': {fr: 'Commerce de récupération de vieux métaux, brocanterie et déchets industriels divers', covers: ['scrap']},
+  '112001': {fr: 'Récupération des matières métalliques recyclables', covers: ['scrap'], status: 'blocked'},
+  '112007': {fr: 'Récupération et valorisation des déchets ménagers et assimilés et déchets inertes', covers: ['scrap']},
+  '112008': {fr: 'Récupération et valorisation des déchets spéciaux (y compris dangereux)', covers: ['hazwaste', 'scrap']},
+  '304101': {fr: 'Commerce de gros de matériaux de construction, céramique sanitaire, verre plat', covers: ['cement', 'sand']},
+  '504101': {fr: 'Commerce de détail de matériaux de construction', covers: ['cement', 'sand']},
+  '103202': {fr: 'Exploitation de carrières de pierres de taille', covers: ['sand']},
+  '103203': {fr: 'Extraction et préparation de sables, extraction de matériaux alluvionnaires', covers: ['sand']},
+  '109101': {fr: 'Fabrication industrielle de ciments (cimenterie)', covers: ['cement']},
+  '304104': {fr: 'Commerce de gros du bois, du liège et produits dérivés', covers: ['wood']},
+  '110201': {fr: 'Scierie industrielle', covers: ['wood']},
+  '104209': {fr: 'Fabrication de charbon en toutes matières', covers: ['wood']},
+  '309006': {fr: "Commerce de gros d'animaux vivants (sauf espèces menacées)", covers: ['livestock']},
+  '101112': {fr: "Élevage d'animaux domestiques", covers: ['livestock']},
+  '101201': {fr: 'Engraissement industriel de bovins et ovins', covers: ['livestock']},
+  '301204': {fr: "Commerce de gros d'abats et viande préparés crus", covers: ['meat']},
+  '107607': {fr: 'Abattage et découpage industriel de viandes (abattoir)', covers: ['meat']},
+  '107610': {fr: 'Production de viandes de boucherie, volailles et lapins', covers: ['meat']},
+  '309004': {fr: 'Commerce de gros des céréales et aliments du bétail', covers: ['food']},
+  '309007': {fr: 'Commerce de gros de cuirs et peaux', covers: ['hides']},
+  '301104': {fr: 'Commerce de gros des légumes condimentés ou épluchés', covers: ['veg']},
+  '301106': {fr: 'Commerce de gros de la datte et des fruits confits', covers: ['food', 'veg']},
+  '301108': {fr: 'Commerce de gros des légumes secs et des produits de la minoterie', covers: ['food']},
+  '301112': {fr: 'Mandataire grossiste en fruits et légumes', covers: ['veg'], status: 'regulated'},
+  '301105': {fr: 'Commerce de gros de lait, produits laitiers et œufs', covers: ['food']},
+  '301109': {fr: 'Commerce de gros des produits de la conserverie alimentaire', covers: ['food']},
+  '301110': {fr: 'Commerce de gros des huiles animales, végétales et autres corps gras', covers: ['food']},
+  '301113': {fr: "Commerce de gros des produits liés à l'alimentation humaine", covers: ['food']},
+  '310001': {fr: 'Commerce de gros des combustibles solides, liquides et gazeux', covers: ['fuel']},
+  '310011': {fr: 'Centre de stockage et de distribution des carburants', covers: ['fuel'], status: 'regulated'},
+  '310101': {fr: "Commerce de gros de produits électroménagers, électriques et électroniques d'occasion", covers: ['appliances']},
+  '107509': {fr: 'Collecte, traitement et distribution de tabac en feuilles', covers: ['tobacco'], status: 'regulated'},
+  '104207': {fr: 'Établissement pharmaceutique de fabrication', covers: ['pharma'], status: 'regulated'},
+  '116101': {fr: 'Fabrication et rechapage de pneumatiques', covers: ['tyres']},
+  '604105': {fr: 'Transport de marchandises', covers: [], transport: true, status: 'regulated'},
+  '604113': {fr: 'Auxiliaire de transport routier de marchandises', covers: [], transport: true, status: 'regulated'},
+  '604616': {fr: 'Commissionnaire de transport de marchandises', covers: [], transport: true}
+};
+var STATUS_AR = {blocked: 'محظور التسجيل حالياً', regulated: 'نشاط منظم يتطلب رخصة'};
+
+// Compare the register (codes + activity text) with the goods and role.
+function rcCheck(codesTxt, actTxt, profs, role){
+  var codes = String(codesTxt || '').replace(/[٠-٩]/g, function(c){ return c.charCodeAt(0) - 0x660; }).match(/\d{6}/g) || [];
+  var rows = codes.map(function(c){ var k = CODES[c]; return {code: c, sector: SECTORS[c[0]] || 'غير معروف', known: !!k, fr: k ? k.fr : '', covers: k ? k.covers : [], transport: k && k.transport, status: k && k.status}; });
+  var nAct = normAr(actTxt);
+  var res = {rows: rows, goods: [], transportOk: null, empty: !codes.length && !nAct};
+  profs.forEach(function(p){
+    var byCode = rows.filter(function(r){ return r.covers.indexOf(p.id) >= 0; });
+    var byText = nAct && p.keys.some(function(k){ return nAct.indexOf(normAr(k)) >= 0; });
+    var unknownCodes = rows.some(function(r){ return !r.known; });
+    var verdict = byCode.length || byText ? 'ok' : (unknownCodes ? 'unknown' : 'bad');
+    var onlyProd = byCode.length && byCode.every(function(r){ return r.code[0] === '1' || r.code[0] === '2'; });
+    res.goods.push({p: p, verdict: verdict, byCode: byCode, byText: byText, onlyProd: onlyProd});
+  });
+  if (role === 'carrier') {
+    var t = rows.some(function(r){ return r.transport; }) || /نقل البضائع|transport de marchandises/.test(nAct);
+    res.transportOk = t ? 'ok' : (rows.some(function(r){ return !r.known && r.code.slice(0, 3) === '604'; }) ? 'unknown' : 'bad');
+  }
+  return res;
+}
+
+// <logic>
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function fmt0(n){ return new Intl.NumberFormat('fr-FR', {maximumFractionDigits: 0}).format(n); }
+function normAr(s){
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f\u064b-\u0655\u0670\u0640]/g, '')
+    .replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/\s+/g, ' ').trim();
+}
+// Score each goods profile against the query; return the best ones.
+function matchProfiles(q){
+  var n = normAr(q);
+  if (!n) return [];
+  var words = n.split(' ').filter(function(w){ return w.length > 1; });
+  var res = [];
+  PROFILES.forEach(function(p){
+    var score = 0;
+    p.keys.forEach(function(k){
+      var nk = normAr(k);
+      if (n.indexOf(nk) >= 0) score += 3 + nk.length / 10;
+      else words.forEach(function(w){ if (w.length > 2 && (nk.indexOf(w) === 0 || w.indexOf(nk) === 0)) score += 1; });
+    });
+    if (score > 0) res.push({p: p, score: score});
+  });
+  res.sort(function(a, b){ return b.score - a.score; });
+  var top = res.length ? res[0].score : 0;
+  return res.filter(function(r){ return r.score >= Math.max(2, top * 0.6); }).slice(0, 3).map(function(r){ return r.p; });
+}
+// Build the list of documents for a context.
+var GOODS_ROLES = ['driver', 'carrier', 'owner'];
+function buildList(ctx){
+  var r = ctx.role, ids = ['permis', 'carte_grise', 'assurance'];
+  var goodsRole = GOODS_ROLES.indexOf(r) >= 0;
+  if (r !== 'moto') ids.push('ct');
+  if (r === 'moto') ids.push('helmet');
+  if (r === 'private' || r === 'taxi') ids.push('belt');
+  if (r === 'taxi') ids.push('brevet', 'taxi_lic', 'passengers');
+  if (r === 'bus' || r === 'school') ids.push('brevet', 'chrono', r === 'bus' ? 'bus_lic' : 'school_lic', 'passengers');
+  if (goodsRole && ctx.veh !== 'light') ids.push('brevet', 'chrono', 'load');
+  if (goodsRole && ctx.veh === 'exceptional') ids.push('transport_ex');
+  if (r === 'driver') ids.push('mission');
+  if (r === 'carrier') ids = ids.concat(CARRIER_DOCS);
+  if (r === 'owner') ids.push('rc_copy');
+  var profs = ctx.profiles;
+  var hasGoods = goodsRole || profs.length;
+  if (hasGoods) {
+    var commercial = !profs.length || profs.some(function(p){ return p.commercial !== false; });
+    if (commercial) ids.push('invoice');
+    profs.forEach(function(p){ p.docs.forEach(function(id){ if (ids.indexOf(id) < 0 && DOCS[id] && (!DOCS[id].zone || ctx.zone)) ids.push(id); }); });
+  }
+  ids.push('obey', 'fake_doc', 'respect');
+  Object.keys(DOCS).forEach(function(k){ if (DOCS[k].g === 'road' || DOCS[k].g === 'tech') ids.push(k); });
+  return ids.filter(function(id, i){ return DOCS[id] && ids.indexOf(id) === i; });
+}
+function procsHtml(items){
+  var order = ['forfait', 'admin', 'settle', 'customs', 'court'], out = '';
+  order.forEach(function(t){
+    var mine = items.filter(function(x){ return x.c.type === t; });
+    if (!mine.length) return;
+    out += '<div class="pvbox"><b>الإجراءات المتخذة من رجل الأمن: ' + TYPES[t].label + '</b><span class="foot" style="color:var(--ink)">تخص: ' + mine.map(function(x){ return esc(x.c.act.replace(/، من الدرجة.*$/, '')); }).join('؛ ') + '</span><ol class="steps">' +
+      PROCS[t].map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ol>' +
+      mine.filter(function(x){ return x.c.extra; }).map(function(x){ return '<div class="extra">' + esc(x.c.extra) + '</div>'; }).join('') + '</div>';
+  });
+  return out;
+}
+function qualOf(c){ return (c.nature ? c.nature + ' ' : '') + c.act; }
+var TYPES = {
+  forfait: {label: 'غرامة جزافية', cls: 'forfait', how: 'يحرر العون مخالفة ويسلّم إشعاراً. تُدفع الغرامة خلال 45 يوماً، وتُحتجز رخصة السياقة إلى حين الدفع.'},
+  court: {label: 'محضر يُحال إلى وكيل الجمهورية', cls: 'court', how: 'جنحة: يحرر ضابط الشرطة القضائية محضراً ويُحال الملف على المحكمة التي تحدد العقوبة بين الحدين.'},
+  admin: {label: 'محضر وإجراء إداري', cls: 'admin', how: 'يحرر العون محضراً ويُتخذ إجراء إداري فوري (المحشر)، ثم يُرسل المحضر إلى الوالي أو المحكمة.'},
+  settle: {label: 'محضر إلى مديرية التجارة', cls: 'settle', how: 'يُرسل المحضر إلى المدير الولائي للتجارة الذي يقترح المصالحة إن كانت الغرامة ≤ 1.000.000 دج، أو يُحال إلى المحكمة.'},
+  customs: {label: 'محضر جمركي ومتابعة جزائية', cls: 'court', how: 'حجز جمركي ومتابعة أمام المحكمة بتهمة التهريب.'},
+  none: {label: 'لا مخالفة', cls: 'none', how: ''}
+};
+// Selected situations -> totals by procedure type.
+function exposure(ids, sel, value){
+  var forfait = 0, courtMin = 0, courtMax = 0, unknown = 0, seize = false, pound = false, items = [];
+  ids.forEach(function(id){
+    var k = sel[id];
+    if (k == null || k === '') return;
+    var d = DOCS[id], c = d.cases[+k];
+    if (!c || c.type === 'none') return;
+    items.push({d: d, c: c});
+    var extra = c.extra || '';
+    if (/حجز|مصادرة/.test(extra)) seize = true;
+    if (/المحشر|توقيف/.test(extra)) pound = true;
+    var lo = null, hi = null;
+    if (c.pct) { if (value > 0) lo = hi = Math.round(value * c.pct); }
+    else if (c.amount) { lo = c.amount[0]; hi = c.amount[1]; }
+    if (lo == null) { unknown++; return; }
+    if (c.type === 'forfait') forfait += lo;
+    else { courtMin += lo; courtMax += hi; }
+  });
+  return {items: items, forfait: forfait, courtMin: courtMin, courtMax: courtMax, unknown: unknown, seize: seize, pound: pound};
+}
+var SYN = {
+  'بيرمي': 'رخصه السياقه', 'برمي': 'رخصه السياقه', 'permis': 'رخصه السياقه', 'رخصة': 'رخصه', 'لاكارت': 'بطاقه', 'كارت': 'بطاقه', 'جريز': 'رماديه ترقيم', 'غريز': 'رماديه ترقيم', 'carte grise': 'بطاقه الترقيم',
+  'لاسيرونس': 'تامين', 'اسيرونس': 'تامين', 'assurance': 'تامين', 'تيليفون': 'هاتف', 'تلفون': 'هاتف', 'بورتابل': 'هاتف', 'portable': 'هاتف', 'نقال': 'هاتف', 'يتكلم': 'هاتف',
+  'سانتير': 'حزام', 'ceinture': 'حزام', 'كاسك': 'خوذه', 'casque': 'خوذه', 'فيتاس': 'سرعه', 'vitesse': 'سرعه', 'يجري': 'سرعه', 'رادار': 'سرعه',
+  'سكران': 'حاله سكر', 'شارب': 'حاله سكر', 'خمر': 'حاله سكر', 'بيره': 'حاله سكر', 'كحول': 'حاله سكر', 'زطله': 'مخدرات', 'كيف': 'مخدرات', 'حبوب': 'مخدرات', 'psychotrope': 'مخدرات',
+  'فاكتوره': 'فاتوره', 'فاكتورة': 'فاتوره', 'facture': 'فاتوره', 'شارجه': 'حموله', 'شارجة': 'حموله', 'surcharge': 'حموله زائده', 'وزن': 'حموله',
+  'ستوب': 'قف التوقف التام', 'stop': 'قف التوقف التام', 'كرسي': 'مقعد', 'قدام': 'الامامي', 'الامام': 'الامامي', 'ولد': 'طفل', 'صغير': 'طفل', 'ذراري': 'طفل',
+  'كونترول': 'المراقبه التقنيه', 'controle': 'المراقبه التقنيه', 'فيزيت': 'المراقبه التقنيه', 'لوحه': 'لوحه ترقيم', 'ماتريكيل': 'لوحه ترقيم', 'matricule': 'لوحه ترقيم',
+  'هرب': 'الفرار', 'فر': 'الفرار', 'ما حبسش': 'رفض الامتثال التوقف', 'ماحبسش': 'رفض الامتثال التوقف', 'ما وقفش': 'رفض الامتثال التوقف', 'باراج': 'التوقف', 'سد': 'التوقف',
+  'لافيتر': 'زجاج معتم', 'فيمي': 'زجاج معتم', 'fumé': 'زجاج معتم', 'تاكسي': 'الاجره', 'taxi': 'الاجره', 'كار': 'حافله', 'بيس': 'حافله', 'موتو': 'دراجه ناريه', 'moto': 'دراجه ناريه',
+  'بلا': 'دون', 'بدون': 'دون', 'ماعندوش': 'دون', 'ما عندوش': 'دون', 'كاميو': 'شاحنه', 'camion': 'شاحنه', 'سلعه': 'بضائع', 'مزور': 'مزوره', 'مزوره': 'مزوره', 'تزوير': 'مزوره',
+  'كلور': 'مواد خطره', 'جافيل': 'مواد خطره', 'غاز': 'مواد خطره', 'مازوت': 'مواد خطره', 'اسيد': 'مواد خطره',
+  'ضو الستوب': 'اضواء التوقف الفرامل', 'ستوب الخلفي': 'اضواء التوقف الفرامل', 'فار': 'الاضواء الاماميه', 'phare': 'الاضواء الاماميه', 'فيز': 'الاضواء', 'feux': 'الاضواء', 'ضواو': 'الاضواء', 'الضو': 'الاضواء', 'ضوء': 'الاضواء', 'اضاءه': 'الاضواء', 'ضو': 'الاضواء',
+  'اللور': 'الخلفيه', 'لور': 'الخلفيه', 'arriere': 'الخلفيه', 'القدامي': 'الاماميه', 'avant': 'الاماميه', 'الامامي': 'الاماميه',
+  'غماز': 'اشارات تغيير الاتجاه', 'غمازات': 'اشارات تغيير الاتجاه', 'clignotant': 'اشارات تغيير الاتجاه', 'كلينيوتو': 'اشارات تغيير الاتجاه', 'ليكلينيو': 'اشارات تغيير الاتجاه', 'وارنينغ': 'التحذير', 'warning': 'التحذير',
+  'فران': 'مكابح فرامل', 'فرانة': 'مكابح فرامل', 'فرامل': 'مكابح', 'frein': 'مكابح فرامل', 'فرانبيد': 'فرامل اليد', 'frein a main': 'فرامل اليد',
+  'لاروا': 'اطارات', 'روضه': 'اطارات', 'رويضه': 'اطارات', 'عجله': 'اطارات', 'عجلات': 'اطارات', 'pneu': 'اطارات', 'pneus': 'اطارات', 'ممسوحه': 'مهترئه', 'مقطوعه': 'مقطوع', 'كريفي': 'مثقوب',
+  'ريتروفيزور': 'المرايا', 'retroviseur': 'المرايا', 'مرايه': 'المرايا', 'مرايا': 'المرايا', 'ايسوي': 'ماسحات', 'essuie': 'ماسحات', 'بارابريز': 'الزجاج الامامي', 'pare-brise': 'الزجاج الامامي', 'parebrise': 'الزجاج الامامي', 'زاج': 'زجاج',
+  'مثلث': 'تجهيزات السلامه', 'triangle': 'تجهيزات السلامه', 'extincteur': 'تجهيزات السلامه مطفاه', 'مطفيه': 'تجهيزات السلامه مطفاه', 'روديسكور': 'العجله الاحتياطيه', 'secours': 'العجله الاحتياطيه',
+  'شابمو': 'عادم', 'echappement': 'عادم', 'دخان': 'عادم دخان', 'كلاكسون': 'منبه', 'klaxon': 'منبه', 'بوري': 'منبه', 'زمار': 'منبه', 'كسيون': 'زينون', 'xenon': 'زينون', 'led': 'led',
+  'معطل': 'معطله', 'خاسر': 'معطله', 'طافي': 'معطله', 'مطفي': 'معطله', 'مكسور': 'مكسوره', 'ماخدامش': 'معطله', 'ما يخدمش': 'معطله', 'ضوء': 'اناره', 'ليل': 'ليلا', 'خط': 'الخط المتواصل', 'تجاوز': 'التجاوز', 'دوبلاج': 'التجاوز', 'doublage': 'التجاوز'
+};
+var GENERIC = {'دون': 1, 'رخصه': 1, 'نقل': 1, 'وثائق': 1, 'مخالفه': 1, 'عدم': 1};
+var STOP = {'في': 1, 'من': 1, 'على': 1, 'الى': 1, 'او': 1, 'و': 1, 'مع': 1, 'عند': 1, 'سائق': 1, 'يقود': 1, 'مركبه': 1, 'السائق': 1, 'كان': 1, 'هو': 1, 'عنده': 1, 'لديه': 1, 'وهو': 1};
+function searchOffences(q){
+  var n = normAr(q);
+  if (n.length < 2) return [];
+  Object.keys(SYN).forEach(function(k){ var nk = normAr(k); if (nk && n.indexOf(nk) >= 0) n += ' ' + normAr(SYN[k]); });
+  var words = n.split(' ').filter(function(w){ return w.length > 1 && !STOP[w]; });
+  var stem = function(w){
+    var p = w.replace(/^(وال|بال|فال|كال|لل|ال)/, ''); if (p.length >= 3) w = p;
+    var s = w.replace(/(ات|ون|ين|ه)$/, ''); if (s.length >= 4) w = s;
+    return w;
+  };
+  var stems = words.map(stem).filter(function(w){ return w.length > 1; });
+  var boost = [];
+  matchProfiles(q).forEach(function(p){ boost = boost.concat(p.docs); });
+  var res = [];
+  Object.keys(DOCS).forEach(function(id){
+    var d = DOCS[id];
+    d.cases.forEach(function(c, i){
+      if (c.type === 'none') return;
+      var hay = normAr(d.name + ' ' + c.when + ' ' + c.act);
+      var score = 0;
+      stems.forEach(function(s){ if (hay.indexOf(s) >= 0) score += GENERIC[s] ? 0.5 : (s.length > 3 ? 2 : 1); });
+      if (boost.indexOf(id) >= 0 && !d.zone) score += 2;
+      if (score > 0) res.push({id: id, i: i, d: d, c: c, score: score});
+    });
+  });
+  res.sort(function(a, b){ return b.score - a.score; });
+  var top = res.length ? res[0].score : 0;
+  return res.filter(function(r){ return r.score >= Math.max(1, top * 0.6); }).slice(0, 6);
+}
+// </logic>
+
+function selectText(el){ try { var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); } catch (e) {} }
+var $ = function(id){ return document.getElementById(id); };
+var state = {role: 'carrier', veh: 'heavy', zone: false, q: 'سبائك ألمنيوم', sel: {}, extra: {}, offQ: '', value: '', rcCodes: '', rcAct: '', rcOwner: 'owner'};
+try { var saved = JSON.parse(localStorage.getItem('rbdocs') || 'null'); if (saved) { state.role = saved.role || state.role; state.veh = saved.veh || state.veh; state.q = saved.q != null ? saved.q : state.q; state.zone = !!saved.zone; state.rcCodes = saved.rcCodes || ''; state.rcAct = saved.rcAct || ''; state.rcOwner = saved.rcOwner || 'owner'; } } catch (e) {}
+function save(){ try { localStorage.setItem('rbdocs', JSON.stringify({role: state.role, veh: state.veh, q: state.q, zone: state.zone, rcCodes: state.rcCodes, rcAct: state.rcAct, rcOwner: state.rcOwner})); } catch (e) {} }
+
+var GROUPS = [['veh', 'وثائق السائق والمركبة'], ['act', 'وثائق النشاط'], ['goods', 'وثائق السلعة'], ['gen', 'مخالفات عامة أثناء التوقيف'], ['tech', 'حالة المركبة: المخالفات العينية (أضواء، إطارات، فرامل…)'], ['road', 'مخالفات السير (قانون المرور 26-09)']];
+$('sugg').innerHTML = PROFILES.map(function(p){ return '<option value="' + esc(p.label) + '">'; }).join('');
+$('q').value = state.q; $('rcCodes').value = state.rcCodes; $('rcAct').value = state.rcAct; $('rcOwner').value = state.rcOwner;
+
+function docHtml(id){
+        var d = DOCS[id], k = state.sel[id] == null ? '' : String(state.sel[id]);
+        var cur = k === '' ? null : d.cases[+k];
+        var bad = cur && cur.type !== 'none';
+        var worstV = d.cases.some(function(c){ return c.v === 'no'; }) ? 'no' : (d.cases.some(function(c){ return c.v === 'one'; }) ? 'one' : 'ok');
+        var tags = (d.rec ? '<span class="tag rec">موصى به</span>' : '') + (worstV === 'no' ? '<span class="tag part">فيها عقوبة غير مؤكدة</span>' : '');
+        var opts = '<option value="">' + (d.g === 'road' ? 'لم أرتكبها' : d.g === 'tech' ? 'سليمة' : (d.g === 'gen' ? 'لا' : 'معي وسارية')) + '</option>' + d.cases.map(function(c, i){ return '<option value="' + i + '"' + (k === String(i) ? ' selected' : '') + '>' + esc(c.when) + '</option>'; }).join('');
+        var rows = d.cases.map(function(c, i){
+          var T = TYPES[c.type];
+          var amt = c.pct ? (c.pct === 2 ? 'ضعف قيمة البضاعة' : Math.round(c.pct * 100) + '% من قيمة البضاعة') : (c.amount ? (c.amount[0] === c.amount[1] ? '<span class="num">' + fmt0(c.amount[0]) + '</span> دج' : 'من <span class="num">' + fmt0(c.amount[0]) + '</span> إلى <span class="num">' + fmt0(c.amount[1]) + '</span> دج') : (c.type === 'none' ? '—' : 'غير محدد'));
+          var vt = {ok: '<span class="v ok">مؤكد</span>', one: '<span class="v one">مصدر واحد</span>', no: '<span class="v no">غير مؤكد</span>'}[c.v];
+          return '<div class="case' + (k === String(i) ? ' on' : '') + '"><div class="case-h"><span class="when">' + esc(c.when) + '</span>' + vt + '</div>' +
+            '<div class="qual"><b>صيغة المخالفة:</b> ' + esc(qualOf(c)) + '</div>' +
+            (c.type !== 'none' ? '<div class="arts"><div><b>المادة الناصة:</b> ' + esc(c.nass || '—') + '</div><div><b>المادة المعاقبة:</b> ' + esc(c.iqab || '—') + '</div>' + (LAWS[c.law] ? '<div class="lawname">' + esc(LAWS[c.law]) + '</div>' : '') + '</div>' : '') +
+            '<div class="meta"><span class="type ' + T.cls + '">' + T.label + '</span><span class="amt">' + amt + '</span></div>' +
+            (c.extra ? '<div class="extra">' + esc(c.extra) + '</div>' : '') +
+            (closing(c) ? '<details class="pvc"' + (k === String(i) ? ' open' : '') + '><summary>اختتام المحضر</summary><div class="pv">' + esc(closing(c)) + '</div><button type="button" class="small" data-copy-pv="' + id + ':' + i + '">نسخ النص</button></details>' : (c.type === 'forfait' ? '<div class="extra">تُسوّى بغرامة جزافية: لا محضر يُرسل إلى العدالة إلا إذا لم تُدفع الغرامة في أجلها.</div>' : '')) + '</div>';
+        }).join('');
+        return '<div class="doc' + (bad ? ' missing' : '') + '">' +
+          '<div class="doc-h"><div style="min-width:0"><span class="name">' + esc(d.name) + '</span>' + tags + '<div class="fr">' + esc(d.fr || '') + '</div></div>' +
+          '<select data-sel="' + id + '" aria-label="حالة: ' + esc(d.name) + '">' + opts + '</select></div>' +
+          '<details' + (bad ? ' open' : '') + '><summary>المخالفات والإجراءات (' + d.cases.length + ')</summary><div class="body">' + rows + '</div></details></div>';
+}
+function render(){
+  document.querySelectorAll('[data-role]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-role') === state.role)); });
+  document.querySelectorAll('[data-veh]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-veh') === state.veh)); });
+  var profs = matchProfiles(state.q);
+  var ctx = {role: state.role, veh: state.veh, zone: state.zone, profiles: profs};
+  $('zoneChip').setAttribute('aria-pressed', String(state.zone));
+  var zoneHint = !state.zone && profs.some(function(p){ return p.docs.some(function(id){ return DOCS[id] && DOCS[id].zone; }); });
+  var ids = buildList(ctx);
+  if (!state.q.trim()) $('match').innerHTML = 'اكتب السلعة لتظهر وثائقها الخاصة. تظهر الآن الوثائق العامة فقط.';
+  else if (profs.length) $('match').innerHTML = 'تم التعرف على: ' + profs.map(function(p){ return '<b>' + esc(p.label) + '</b>'; }).join('، ') + (profs.some(function(p){ return p.note; }) ? '<br>' + profs.filter(function(p){ return p.note; }).map(function(p){ return esc(p.note); }).join('<br>') : '') + (zoneHint ? '<br>' + esc(CUSTOMS_NOTE) : '');
+  else $('match').innerHTML = 'لم أجد «' + esc(state.q) + '» في القائمة. تظهر الوثائق العامة لأي سلعة تجارية.';
+  var goodsRole = GOODS_ROLES.indexOf(state.role) >= 0;
+  $('vehLbl').hidden = $('vehChips').hidden = !goodsRole;
+
+  $('needed').innerHTML = GROUPS.filter(function(g){ return ['veh', 'act', 'goods'].indexOf(g[0]) >= 0; }).map(function(g){
+    var mine = ids.filter(function(id){ return DOCS[id].g === g[0]; });
+    if (!mine.length) return '';
+    return '<div><div class="lbl">' + g[1] + '</div><ol>' + mine.map(function(id){ return '<li>' + esc(DOCS[id].name) + (DOCS[id].rec ? ' <span class="tag rec">موصى به</span>' : '') + '</li>'; }).join('') + '</ol></div>';
+  }).join('') + '<p class="foot" style="margin:0">المجموع: ' + ids.filter(function(id){ return ['veh', 'act', 'goods'].indexOf(DOCS[id].g) >= 0; }).length + ' وثائق.</p>';
+  var gHtml = {};
+  GROUPS.forEach(function(g){ gHtml[g[0]] = ''; });
+  GROUPS.forEach(function(g){ gHtml[g[0]] = (function(g){
+    var mine = ids.filter(function(id){ return DOCS[id].g === g[0]; });
+    if (g[0] === 'road' || g[0] === 'tech') {
+      var qk = g[0] + 'Q';
+      var f = normAr(state[qk] || '');
+      var hit = mine.filter(function(id){ var d = DOCS[id]; return !f || normAr(d.name + ' ' + d.cases[0].act).indexOf(f) >= 0 || (state.sel[id] && state.sel[id] !== ''); });
+      return '<section class="card hc-' + g[0] + '"><div class="group-h"><h2>' + g[1] + '</h2><span class="count">' + mine.length + ' مخالفة</span></div>' +
+        '<input type="text" id="' + qk + '" placeholder="' + (g[0] === 'tech' ? 'ابحث: أضواء، غماز، فرامل، إطارات، مرايا…' : 'ابحث: سرعة، هاتف، طفل، خوذة، سكر…') + '" value="' + esc(state[qk] || '') + '" autocomplete="off">' +
+        hit.map(function(id){ return docHtml(id); }).join('') + (hit.length ? '' : '<p class="foot">لا نتيجة. جرّب كلمة أخرى، أو ابحث في الوثائق أعلاه.</p>') + '</section>';
+    }
+    if (!mine.length) return '';
+    var bad = mine.filter(function(id){ var k = state.sel[id]; return k != null && k !== '' && DOCS[id].cases[+k].type !== 'none'; }).length;
+    return '<section class="card hc-' + g[0] + '"><div class="group-h"><h2>' + g[1] + '</h2><span class="count">' + mine.length + ' وثائق' + (bad ? ' · <b style="color:var(--bad)">' + bad + ' مخالفات</b>' : '') + '</span></div>' +
+      mine.map(docHtml).join('') + '</section>';
+  })(g); });
+  $('groups').innerHTML = gHtml.veh + gHtml.act + gHtml.goods + gHtml.gen;
+  $('groupsRoad').innerHTML = gHtml.tech + gHtml.road;
+
+  // register comparison
+  var rcr = rcCheck(state.rcCodes, state.rcAct, profs, state.rcOwner === 'carrier' ? 'carrier' : (state.role === 'carrier' && state.rcOwner === 'carrier' ? 'carrier' : ''));
+  var rcBad = false, out = '';
+  if (rcr.empty) out = '<p class="foot" style="margin:0">لم يُدخل بعد أي رمز أو نشاط.</p>';
+  else {
+    out += rcr.rows.map(function(r){
+      return '<div class="rcrow"><div><span class="code">' + r.code + '</span> · ' + esc(r.sector) + (r.status ? ' <span class="tag part">' + STATUS_AR[r.status] + '</span>' : '') + '</div>' +
+        '<div class="fr" style="direction:ltr;text-align:left">' + esc(r.known ? r.fr : '') + '</div>' + (r.known ? '' : '<div class="extra">هذا الرمز غير موجود في قائمتي المختصرة. تحقق من معناه في سجلكم أو دليل الرموز.</div>') + '</div>';
+    }).join('');
+    if (!profs.length && state.rcOwner !== 'carrier') out += '<div class="verd unknown">اكتب السلعة في خانة «النشاط أو السلعة» أعلاه لتتم المقارنة.</div>';
+    if (state.rcOwner !== 'carrier') rcr.goods.forEach(function(g){
+      if (g.verdict === 'ok') out += '<div class="verd ok"><b>«' + esc(g.p.label) + '» يغطيها السجل</b>' + (g.byCode.length ? '<span>بالرمز ' + g.byCode.map(function(r){ return r.code; }).join('، ') + '</span>' : '<span>حسب نص النشاط</span>') + (g.onlyProd ? '<span>رمز إنتاج: يغطي بيع ما ينتجه صاحب السجل فقط، لا الشراء لإعادة البيع.</span>' : '') + '</div>';
+      else if (g.verdict === 'unknown') out += '<div class="verd unknown"><b>«' + esc(g.p.label) + '»: لم أستطع الحكم</b><span>بعض الرموز غير موجودة في قائمتي ونص النشاط لا يذكر هذه السلعة. تحقق يدوياً.</span></div>';
+      else { rcBad = true; var c = DOCS.rc_copy.cases[2];
+        out += '<div class="verd bad"><b>«' + esc(g.p.label) + '» خارج نشاط السجل</b><span>' + esc(qualOf(c)) + '. المادة الناصة: ' + esc(c.nass) + '، المادة المعاقبة: ' + esc(c.iqab) + ' من القانون 04-08. الجزاء: من 20.000 إلى 200.000 دج، وغلق إداري لشهر.</span>' +
+          '<details class="pvc"><summary>اختتام المحضر</summary><div class="pv">' + esc(closing(c)) + '</div><button type="button" class="small" data-copy-pv="rc_copy:2">نسخ النص</button></details></div>'; }
+    });
+    if (state.rcOwner === 'carrier') {
+      var tr = rcr.rows.some(function(r){ return r.transport; }) || /نقل البضائع|transport de marchandises/.test(normAr(state.rcAct));
+      if (tr) out += '<div class="verd ok"><b>السجل يتضمن نشاط نقل البضائع</b><span>يبقى لازماً حمل رخصة ممارسة النشاط (القانون 01-13).</span></div>';
+      else { rcBad = true; out += '<div class="verd bad"><b>السجل لا يتضمن نشاط نقل البضائع (الرمز 604105)</b><span>النقل لحساب الغير نشاط منظم: ممارسته خارج السجل تُكيَّف ممارسة نشاط خارج موضوع السجل (المادة 41 من القانون 04-08)، وممارسته دون رخصة تخضع للمادتين 62 و64 من القانون 01-13.</span>' +
+        '<details class="pvc"><summary>اختتام المحضر</summary><div class="pv">' + esc(closing(DOCS.rc_copy.cases[2])) + '</div><button type="button" class="small" data-copy-pv="rc_copy:2">نسخ النص</button></details></div>'; }
+    }
+  }
+  $('rcOut').innerHTML = out;
+  var offRes = searchOffences(state.offQ || '');
+  $('offOut').innerHTML = !(state.offQ || '').trim() ? '' : (offRes.length ? offRes.map(function(r){
+    var T = TYPES[r.c.type], c = r.c;
+    var amt = c.pct ? (c.pct === 2 ? 'ضعف قيمة البضاعة' : Math.round(c.pct * 100) + '% من قيمة البضاعة') : (c.amount ? (c.amount[0] === c.amount[1] ? '<span class="num">' + fmt0(c.amount[0]) + '</span> دج' : 'من <span class="num">' + fmt0(c.amount[0]) + '</span> إلى <span class="num">' + fmt0(c.amount[1]) + '</span> دج') : 'غير محدد');
+    var added = state.extra[r.id] === String(r.i) || state.sel[r.id] === String(r.i);
+    var vt = {ok: '<span class="v ok">مؤكد</span>', one: '<span class="v one">مصدر واحد</span>', no: '<span class="v no">غير مؤكد</span>'}[c.v];
+    return '<div class="case' + (added ? ' on' : '') + '"><div class="case-h"><span class="when">' + esc(r.d.name) + ' — ' + esc(c.when) + '</span>' + vt + '</div>' +
+      '<div class="qual"><b>صيغة المخالفة:</b> ' + esc(qualOf(c)) + '</div>' +
+      '<div class="arts"><div><b>المادة الناصة:</b> ' + esc(c.nass || '—') + '</div><div><b>المادة المعاقبة:</b> ' + esc(c.iqab || '—') + '</div>' + (LAWS[c.law] ? '<div class="lawname">' + esc(LAWS[c.law]) + '</div>' : '') + '</div>' +
+      '<div class="meta"><span class="type ' + T.cls + '">' + T.label + '</span><span class="amt">' + amt + '</span></div>' +
+      (c.extra ? '<div class="extra">' + esc(c.extra) + '</div>' : '') +
+      '<details class="pvc"><summary style="color:var(--accent)">إجراءات رجل الأمن</summary><ol class="steps">' + (PROCS[c.type] || []).map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ol></details>' +
+      (closing(c) ? '<details class="pvc"><summary>اختتام المحضر</summary><div class="pv">' + esc(closing(c)) + '</div><button type="button" class="small" data-copy-pv="' + r.id + ':' + r.i + '">نسخ النص</button></details>' : '') +
+      '<div><button type="button" class="small" data-add="' + r.id + ':' + r.i + '">' + (added ? 'إزالة من الملخص' : 'أضف إلى الملخص') + '</button></div></div>';
+  }).join('') : '<p class="foot" style="margin:0">لم أجد مخالفة مطابقة. جرّب كلمات أخرى (مثال: سرعة، رخصة، تأمين، حمولة، فاتورة، سكر، خوذة).</p>');
+
+  var ids2 = ids.slice(), sel2 = Object.assign({}, state.sel);
+  Object.keys(state.extra).forEach(function(k){ if (ids2.indexOf(k) < 0) ids2.push(k); if (!sel2[k]) sel2[k] = state.extra[k]; });
+  if (rcBad && !(sel2.rc_copy)) { if (ids2.indexOf('rc_copy') < 0) ids2.push('rc_copy'); sel2.rc_copy = '2'; }
+
+  var hasPct = ids.some(function(id){ var k = state.sel[id]; return k != null && k !== '' && DOCS[id].cases[+k] && DOCS[id].cases[+k].pct; });
+  var val = parseFloat(String(state.value).replace(/[\s ]/g, '').replace(',', '.')) || 0;
+  var ex = exposure(ids2, sel2, val);
+  var sum = '';
+  if (!ex.items.length) sum = '<div class="sum ok"><strong>لا مخالفة</strong><span>اختر «الحالة» أمام أي وثيقة ناقصة أو منتهية لترى المخالفة والإجراء.</span></div>';
+  else {
+    sum = '<div class="sum bad"><strong>' + ex.items.length + ' مخالفات</strong>' +
+      (ex.forfait ? '<span>غرامات جزافية: <b class="num">' + fmt0(ex.forfait) + '</b> دج، تُدفع خلال 45 يوماً.</span>' : '') +
+      (ex.courtMax ? '<span>غرامات بمحضر (تحددها المحكمة أو المصالحة): من <b class="num">' + fmt0(ex.courtMin) + '</b> إلى <b class="num">' + fmt0(ex.courtMax) + '</b> دج.</span>' : '') +
+      (ex.unknown ? '<span>' + ex.unknown + ' مخالفات مبلغها غير محدد' + (hasPct && !val ? ' (أدخل قيمة البضاعة للنسب)' : '') + '.</span>' : '') +
+      (ex.pound ? '<span>توقيف المركبة أو وضعها في المحشر وارد.</span>' : '') +
+      (ex.seize ? '<span>حجز البضاعة أو مصادرتها وارد.</span>' : '') +
+      '<ul>' + ex.items.map(function(x){ return '<li>' + esc(qualOf(x.c)) + ' — <i>' + TYPES[x.c.type].label + '</i></li>'; }).join('') + '</ul>' +
+      procsHtml(ex.items) +
+      (hasPct ? '<label class="lbl" for="val" style="color:var(--ink)">قيمة البضاعة بالدينار لحساب الغرامات النسبية<input type="text" id="val" inputmode="decimal" class="num" style="margin-top:4px" value="' + esc(state.value) + '"></label>' : '') +
+      '</div>';
+  }
+  $('summary').innerHTML = sum;
+  $('barTxt').innerHTML = ex.items.length ? '<b style="color:var(--bad)">' + ex.items.length + ' مخالفات</b>' + (ex.forfait ? ' · ' + fmt0(ex.forfait) + ' دج' : '') : '<b style="color:var(--ok)">لا مخالفة</b>';
+  $('badge').hidden = !ex.items.length; $('badge').textContent = ex.items.length;
+  var v = $('val'); if (v && document.activeElement !== v && state.focusVal) { v.focus(); v.setSelectionRange(v.value.length, v.value.length); }
+}
+
+document.addEventListener('click', function(e){
+  if (e.target.closest('#zoneChip')) { state.zone = !state.zone; save(); render(); return; }
+  var ad = e.target.closest('[data-add]');
+  if (ad) { var p2 = ad.getAttribute('data-add').split(':'); if (state.extra[p2[0]] === p2[1]) delete state.extra[p2[0]]; else state.extra[p2[0]] = p2[1]; render(); return; }
+  var cp = e.target.closest('[data-copy-pv]');
+  if (cp) {
+    var parts = cp.getAttribute('data-copy-pv').split(':'), t = closing(DOCS[parts[0]].cases[+parts[1]]);
+    try { navigator.clipboard.writeText(t).then(function(){ cp.textContent = 'تم النسخ'; setTimeout(function(){ cp.textContent = 'نسخ النص'; }, 1500); }, function(){ selectText(cp.previousElementSibling); }); }
+    catch (err) { selectText(cp.previousElementSibling); }
+    return;
+  }
+  var r = e.target.closest('[data-role]'); if (r) { state.role = r.getAttribute('data-role'); save(); render(); return; }
+  var v = e.target.closest('[data-veh]'); if (v) { state.veh = v.getAttribute('data-veh'); save(); render(); return; }
+});
+document.addEventListener('change', function(e){
+  if (e.target.id === 'rcOwner') { state.rcOwner = e.target.value; save(); render(); return; }
+  var id = e.target.getAttribute && e.target.getAttribute('data-sel');
+  if (id) { state.sel[id] = e.target.value; render(); }
+});
+document.addEventListener('input', function(e){
+  if (e.target.id === 'q') { state.q = e.target.value; save(); render(); }
+  if (e.target.id === 'offQ') { state.offQ = e.target.value; render(); }
+  if (e.target.id === 'roadQ' || e.target.id === 'techQ') { var tid = e.target.id; state[tid] = e.target.value; render(); var r = $(tid); if (r) { r.focus(); r.setSelectionRange(r.value.length, r.value.length); } }
+  if (e.target.id === 'rcCodes' || e.target.id === 'rcAct') { state[e.target.id] = e.target.value; save(); render(); }
+  if (e.target.id === 'val') { state.value = e.target.value; state.focusVal = true; render(); state.focusVal = false; }
+});
+function showTab(t){
+  state.tab = t;
+  document.querySelectorAll('[data-tab]').forEach(function(el){ el.classList.toggle('on', el.getAttribute('data-tab') === t); });
+  document.querySelectorAll('[data-go]').forEach(function(b){ if (b.getAttribute('data-go') === t) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  window.scrollTo(0, 0);
+  try { localStorage.setItem('rbtab', t); } catch (e) {}
+}
+document.querySelectorAll('[data-go]').forEach(function(b){ b.addEventListener('click', function(){ showTab(b.getAttribute('data-go')); }); });
+document.addEventListener('click', function(e){ var g = e.target.closest('[data-go2]'); if (g) showTab(g.getAttribute('data-go2')); });
+var startTab = 'who'; try { startTab = localStorage.getItem('rbtab') || 'who'; } catch (e) {}
+if (['who', 'search', 'docs', 'list', 'sum'].indexOf(startTab) < 0) startTab = 'who';
+
+
+function applyTheme(t){
+  document.documentElement.classList.toggle('dark', t === 'dark');
+  $('themeBtn').textContent = t === 'dark' ? 'وضع فاتح' : 'وضع مظلم';
+  try { localStorage.setItem('rbtheme', t); } catch (e) {}
+}
+var theme = 'dark'; try { theme = localStorage.getItem('rbtheme') || 'dark'; } catch (e) {}
+applyTheme(theme);
+$('themeBtn').addEventListener('click', function(){ theme = theme === 'dark' ? 'light' : 'dark'; applyTheme(theme); });
+render();
+showTab(startTab);
+</script>
+</body></html>

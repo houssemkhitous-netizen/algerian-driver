@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shield with a document and a check mark, white on green. 108dp canvas, art inside the 66dp safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M54,24 L78,32 L78,52 C78,68 67,79 54,84 C41,79 30,68 30,52 L30,32 Z"/>
+    <path android:fillColor="#1F6B4F"
+        android:pathData="M42,40 L62,40 L66,44 L66,68 L42,68 Z"/>
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M46,46 L60,46 L60,48.5 L46,48.5 Z M46,52 L62,52 L62,54.5 L46,54.5 Z"/>
+    <path android:fillColor="#4FD39A"
+        android:pathData="M47,60 L50.5,63.5 L58,56 L60,58 L50.5,67.5 L45,62 Z"/>
+</vector>
