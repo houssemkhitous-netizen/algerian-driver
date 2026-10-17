@@ -102,7 +102,7 @@ textarea { resize: vertical; }
 .sum ul { margin: 0; padding-inline-start: 18px; color: var(--ink); font-size: 0.9rem; }
 .ai { white-space: pre-wrap; background: var(--bg); border-radius: 8px; padding: 12px; font-size: 0.9rem; }
 .foot { font-size: 0.8rem; color: var(--muted); }
-.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--surface); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--surface); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(6, 1fr); padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
 .tabs button { border: 0; border-radius: 0; background: transparent; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px 6px; min-height: 58px; font-size: 0.74rem; position: relative; }
 .tabs svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .tabs button[aria-current="page"] { color: var(--accent); font-weight: 600; }
@@ -153,6 +153,7 @@ h2, .group-h h2 { color: var(--hc); border-inline-start-color: var(--hc); font-s
 [data-tab="who"] { --hc: #1f6b4f; --hc-soft: #e1f1e8; }
 [data-tab="search"] { --hc: #1d5fa8; --hc-soft: #e3edf9; }
 [data-tab="docs"] { --hc: #1d5fa8; --hc-soft: #e3edf9; }
+[data-tab="rc"] { --hc: #9a6a00; --hc-soft: #fbf1d9; }
 [data-tab="list"] { --hc: #c2410c; --hc-soft: #fdeee4; }
 [data-tab="sum"] { --hc: #8f2d56; --hc-soft: #f8e7ee; }
 .hc-veh { --hc: #1d5fa8; --hc-soft: #e3edf9; }
@@ -241,6 +242,11 @@ html.dark [data-tab="sum"] { --hc: oklch(0.78 0.16 355); --hc-soft: oklch(0.29 0
 .card, [data-tab], .card[class*="hc-"] { --hc: #1f6b4f; --hc-soft: #e1f1e8; }
 html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: oklch(0.80 0.17 155); --hc-soft: oklch(0.29 0.07 155); }
 #needH, html.dark #needH { color: var(--hc); }
+.tabs button { font-size: 0.68rem; padding-inline: 0; }
+.br-row { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; font-size: 0.86rem; }
+.br-row .code { font-family: var(--f-data); font-weight: 600; color: var(--hc); direction: ltr; unicode-bidi: isolate; }
+.br-act { display: flex; gap: 6px; flex-wrap: wrap; }
+.chips.small .chip { min-height: 34px; padding: 4px 10px; font-size: 0.8rem; }
 .pick { display: flex; align-items: baseline; gap: 8px; text-align: start; width: 100%; min-height: 44px; padding: 8px 10px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
 .pick .code { font-weight: 600; color: var(--hc); flex: none; }
 .pick-t { flex: 1; min-width: 0; font-size: 0.86rem; line-height: 1.5; }
@@ -301,8 +307,14 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
 
 
   <div id="groups" data-tab="docs" style="display:flex;flex-direction:column;gap:16px"></div>
-  <section class="card" data-tab="docs" aria-labelledby="rcH">
-    <h2 id="rcH">وثائق النشاط: المسجل في السجل التجاري والممارس فعلاً</h2>
+  <section class="card" data-tab="docs" aria-labelledby="rcLinkH">
+    <h2 id="rcLinkH">السجل التجاري</h2>
+    <p class="foot" style="margin:0">مقارنة النشاط المسجل في السجل الذي يحمله السائق بالنشاط الممارس، ومدونة كل الأنشطة، في تبويب «السجل».</p>
+    <div id="rcMini"></div>
+    <button type="button" class="primary" data-go2="rc">افتح «السجل»</button>
+  </section>
+  <section class="card" data-tab="rc" aria-labelledby="rcH">
+    <h2 id="rcH">السجل المحمول والنشاط الممارس: هل يتوافقان؟</h2>
     <label class="lbl" for="rcOwner">السجل المقدَّم يخص</label>
     <select id="rcOwner" class="sel">
       <option value="owner">مالك السلعة (البائع أو المشتري)</option>
@@ -321,6 +333,15 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
     <div id="prPick" class="rcout"></div>
     <label class="lbl">3. المقارنة</label>
     <div id="rcOut" class="rcout"></div>
+  </section>
+  <section class="card" data-tab="rc" aria-labelledby="brH">
+    <h2 id="brH">مدونة أنشطة السجل التجاري (2.136 نشاطاً)</h2>
+    <p class="foot" style="margin:0">كل الميادين: الإنتاج، الحرف، الجملة، الاستيراد، التجزئة، الخدمات، التصدير. اختر نشاطاً لتضيفه إلى السجل المحمول أو لتجعله النشاط الممارس.</p>
+    <input type="text" id="brQ" placeholder="ابحث بالرمز أو الكلمة: 604105، نقل، مقاولة، قطع غيار…" autocomplete="off">
+    <div class="chips small" id="brSec" role="group" aria-label="الميدان"></div>
+    <div class="chips small" id="brSt" role="group" aria-label="الحالة"></div>
+    <p class="match" id="brCount" style="margin:0"></p>
+    <div id="brList" class="rcout"></div>
   </section>
   <div id="groupsRest" data-tab="docs" style="display:flex;flex-direction:column;gap:16px"></div>
   <div id="groupsRoad" data-tab="list" style="display:flex;flex-direction:column;gap:16px"></div>
@@ -347,6 +368,7 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
   <button type="button" data-go="who" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></svg><span>من أنت</span></button>
   <button type="button" data-go="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span>بحث</span></button>
   <button type="button" data-go="docs"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4"/></svg><span>وثائقي</span></button>
+  <button type="button" data-go="rc"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7" width="17" height="12.5" rx="2"/><path d="M9 7V5.5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 5.5V7M3.5 12.5h17"/></svg><span>السجل</span></button>
   <button type="button" data-go="list"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l8-14 8 14z"/><path d="M12 10v3.5M12 16.2v.3"/></svg><span>المخالفات</span></button>
   <button type="button" data-go="sum"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span>الملخص</span><b class="badge" id="badge" hidden></b></button>
 </nav>
@@ -822,7 +844,7 @@ var NOMEN = {"101101":["مؤسسة حماية و إ ستصلاح الأراضي"
 var NOMEN_STATUS = {r: 'regulated', b: 'blocked'};
 var NOMEN_HAY = {};
 Object.keys(NOMEN).forEach(function(c){ NOMEN_HAY[c] = normAr(NOMEN[c][0] + ' ' + NOMEN[c][1]); });
-var CODE_SYN = {'بياس': 'قطع غيار', 'بياسات': 'قطع غيار', 'pieces': 'pieces detachees', 'هواتف': 'هاتف', 'تيليفونات': 'هاتف', 'ادوية': 'ادويه', 'اكسسوارات': 'لواحق', 'accessoires': 'لواحق', 'طوموبيل': 'سيارات', 'سياره': 'سيارات', 'لوطو': 'سيارات', 'auto': 'automobiles', 'موطو': 'دراجات ناريه', 'تيليفون': 'هاتف', 'تلفون': 'هاتف', 'portable': 'هاتف', 'لافيراي': 'خرده', 'فيراي': 'خرده', 'دواء': 'ادويه', 'سيمه': 'اسمنت', 'رمله': 'رمل', 'بلاستيك': 'بلاستيكيه', 'قش': 'البسه', 'حوايج': 'البسه', 'ملابس': 'البسه', 'سباط': 'احذيه', 'صباط': 'احذيه', 'ماكله': 'غذائيه', 'خضره': 'خضر', 'فاكيه': 'فواكه'};
+var CODE_SYN = {'مقاولة': 'مؤسسه', 'مقاولات': 'مؤسسه', 'شركات': 'شركه', 'شركة': 'شركه', 'بياس': 'قطع غيار', 'بياسات': 'قطع غيار', 'pieces': 'pieces detachees', 'هواتف': 'هاتف', 'تيليفونات': 'هاتف', 'ادوية': 'ادويه', 'اكسسوارات': 'لواحق', 'accessoires': 'لواحق', 'طوموبيل': 'سيارات', 'سياره': 'سيارات', 'لوطو': 'سيارات', 'auto': 'automobiles', 'موطو': 'دراجات ناريه', 'تيليفون': 'هاتف', 'تلفون': 'هاتف', 'portable': 'هاتف', 'لافيراي': 'خرده', 'فيراي': 'خرده', 'دواء': 'ادويه', 'سيمه': 'اسمنت', 'رمله': 'رمل', 'بلاستيك': 'بلاستيكيه', 'قش': 'البسه', 'حوايج': 'البسه', 'ملابس': 'البسه', 'سباط': 'احذيه', 'صباط': 'احذيه', 'ماكله': 'غذائيه', 'خضره': 'خضر', 'فاكيه': 'فواكه'};
 var CODE_STOP = {'في': 1, 'من': 1, 'على': 1, 'الى': 1, 'او': 1, 'و': 1, 'مع': 1, 'de': 1, 'des': 1, 'du': 1, 'la': 1, 'le': 1, 'les': 1, 'et': 1, 'en': 1, 'pour': 1, 'تجاره': 1, 'commerce': 1, 'نشاط': 1, 'سلعه': 1, 'بضائع': 1, 'مواد': 1};
 var CODE_MAP = {};
 Object.keys(CODE_SYN).forEach(function(k){ CODE_MAP[normAr(k)] = normAr(CODE_SYN[k]); });
@@ -1215,6 +1237,29 @@ function render(){
     else { rcBad = true; out += badBlock('«' + esc(g.p.label) + '» خارج نشاط السجل'); }
   });
   $('rcOut').innerHTML = out;
+  $('rcMini').innerHTML = rcr.empty ? '' : (rcBad ? '<div class="verd bad"><b>السجل المحمول لا يطابق النشاط الممارس</b></div>' : (/verd ok/.test(out) ? '<div class="verd ok"><b>السجل المحمول يطابق النشاط الممارس</b></div>' : (/verd unknown/.test(out) ? '<div class="verd unknown"><b>المقارنة تحتاج تحققاً</b></div>' : '')));
+
+  // nomenclature browser
+  var secs = [['', 'الكل']].concat(Object.keys(SECTORS).map(function(k){ return [k, k + ' ' + SECTORS[k]]; }));
+  $('brSec').innerHTML = secs.map(function(s){ return '<button type="button" class="chip" data-brsec="' + s[0] + '" aria-pressed="' + ((state.brSec || '') === s[0]) + '">' + esc(s[1]) + '</button>'; }).join('');
+  $('brSt').innerHTML = [['', 'كل الحالات'], ['f', 'حر'], ['r', 'منظم'], ['b', 'مجمّد']].map(function(s){ return '<button type="button" class="chip" data-brst="' + s[0] + '" aria-pressed="' + ((state.brSt || '') === s[0]) + '">' + s[1] + '</button>'; }).join('');
+  var brAll = (state.brQ || '').trim() ? searchCodes(state.brQ) : Object.keys(NOMEN).sort();
+  var brCodes = brAll.filter(function(c){
+    if (state.brSec && c[0] !== state.brSec) return false;
+    var st = NOMEN[c][2] || '';
+    if (state.brSt === 'f') return !st;
+    if (state.brSt) return st === state.brSt;
+    return true;
+  });
+  var brN = state.brN || 30;
+  $('brCount').innerHTML = brCodes.length ? '<b>' + brCodes.length + '</b> نشاطاً' + (brCodes.length > brN ? '، يظهر أول ' + brN : '') : 'لا نشاط مطابق. جرّب كلمة أخرى أو ميداناً آخر.';
+  $('brList').innerHTML = brCodes.slice(0, brN).map(function(c){
+    var i = codeInfo(c), inReg = regs.indexOf(c) >= 0, isAct = state.actCode === c;
+    return '<div class="br-row"' + (inReg || isAct ? ' style="border-color:var(--hc)"' : '') + '><div><span class="code">' + c + '</span> · ' + esc(i.sector) + ' ' + statusHtml(i) + '</div><div><b>' + esc(i.ar) + '</b></div><div class="fr" style="direction:ltr;text-align:left;font-size:0.74rem;color:var(--muted)">' + esc(i.fr) + '</div>' +
+      (i.status && (i.auth || i.tutelle) ? '<div class="extra" style="direction:ltr;text-align:left">' + esc([i.auth, i.tutelle].filter(Boolean).join(' — ')) + '</div>' : '') +
+      '<div class="br-act">' + (inReg ? '<button type="button" class="small primary" data-rcdel="' + c + '">✓ في السجل المحمول</button>' : '<button type="button" class="small" data-rcadd="' + c + '">أضف إلى السجل المحمول</button>') +
+      (isAct ? '<button type="button" class="small primary" data-pick="">✓ النشاط الممارس</button>' : '<button type="button" class="small" data-pick="' + c + '">النشاط الممارس</button>') + '</div></div>';
+  }).join('') + (brCodes.length > brN ? '<button type="button" class="small" data-brmore>عرض 30 أخرى</button>' : '');
   var offRes = searchOffences(state.offQ || '');
   $('offOut').innerHTML = !(state.offQ || '').trim() ? '' : (offRes.length ? offRes.map(function(r){
     var T = TYPES[r.c.type], c = r.c;
@@ -1261,7 +1306,12 @@ function render(){
 document.addEventListener('click', function(e){
   if (e.target.closest('#zoneChip')) { state.zone = !state.zone; save(); render(); return; }
   var pk = e.target.closest('[data-pick]');
-  if (pk) { state.prQ = ''; if ($('prQ')) $('prQ').value = ''; state.actCode = pk.getAttribute('data-pick'); if (state.actCode) { state.q = state.actCode + ' ' + NOMEN[state.actCode][0]; $('q').value = state.q; } delete state.sel.act_lic; delete state.sel.rc_copy; state.codesAll = false; save(); render(); return; }
+  if (pk) { state.prQ = ''; if ($('prQ')) $('prQ').value = ''; state.actCode = pk.getAttribute('data-pick'); if (state.actCode) { state.q = state.actCode + ' ' + NOMEN[state.actCode][0]; $('q').value = state.q; } else if (pk.closest && pk.closest('.br-act')) { state.q = ''; $('q').value = ''; } delete state.sel.act_lic; delete state.sel.rc_copy; state.codesAll = false; save(); render(); return; }
+  var bs = e.target.closest('[data-brsec]');
+  if (bs) { state.brSec = bs.getAttribute('data-brsec'); state.brN = 30; render(); return; }
+  var bt = e.target.closest('[data-brst]');
+  if (bt) { state.brSt = bt.getAttribute('data-brst'); state.brN = 30; render(); return; }
+  if (e.target.closest('[data-brmore]')) { state.brN = (state.brN || 30) + 30; render(); return; }
   var ra = e.target.closest('[data-rcadd]');
   if (ra) { var rc = regCodes(); rc.push(ra.getAttribute('data-rcadd')); state.rcCodes = rc.join(' '); state.rcQ = ''; $('rcQ').value = ''; save(); render(); return; }
   var rd = e.target.closest('[data-rcdel]');
@@ -1289,6 +1339,7 @@ document.addEventListener('input', function(e){
   if (e.target.id === 'offQ') { state.offQ = e.target.value; render(); }
   if (e.target.id === 'roadQ' || e.target.id === 'techQ') { var tid = e.target.id; state[tid] = e.target.value; render(); var r = $(tid); if (r) { r.focus(); r.setSelectionRange(r.value.length, r.value.length); } }
   if (e.target.id === 'rcAct') { state.rcAct = e.target.value; save(); render(); }
+  if (e.target.id === 'brQ') { state.brQ = e.target.value; state.brN = 30; render(); }
   if (e.target.id === 'rcQ' || e.target.id === 'prQ') { state[e.target.id] = e.target.value; render(); }
   if (e.target.id === 'val') { state.value = e.target.value; state.focusVal = true; render(); state.focusVal = false; }
 });
@@ -1302,7 +1353,7 @@ function showTab(t){
 document.querySelectorAll('[data-go]').forEach(function(b){ b.addEventListener('click', function(){ showTab(b.getAttribute('data-go')); }); });
 document.addEventListener('click', function(e){ var g = e.target.closest('[data-go2]'); if (g) showTab(g.getAttribute('data-go2')); });
 var startTab = 'who'; try { startTab = localStorage.getItem('rbtab') || 'who'; } catch (e) {}
-if (['who', 'search', 'docs', 'list', 'sum'].indexOf(startTab) < 0) startTab = 'who';
+if (['who', 'search', 'docs', 'rc', 'list', 'sum'].indexOf(startTab) < 0) startTab = 'who';
 
 
 function applyTheme(t){
