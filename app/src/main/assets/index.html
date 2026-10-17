@@ -314,34 +314,12 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
     <button type="button" class="primary" data-go2="rc">افتح «السجل»</button>
   </section>
   <section class="card" data-tab="rc" aria-labelledby="rcH">
-    <h2 id="rcH">السجل المحمول والنشاط الممارس: هل يتوافقان؟</h2>
-    <label class="lbl" for="rcOwner">السجل المقدَّم يخص</label>
-    <select id="rcOwner" class="sel">
-      <option value="owner">مالك السلعة (البائع أو المشتري)</option>
-      <option value="carrier">الناقل</option>
-    </select>
-    <label class="lbl" for="rcQ">1. النشاط المسجل في مستخرج السجل التجاري</label>
-    <input type="text" id="rcQ" placeholder="اكتب الرمز أو النشاط كما في المستخرج، مثال: 306001 أو قطع غيار" autocomplete="off">
-    <div id="rcPick" class="rcout"></div>
-    <div id="rcChips" class="rcout"></div>
-    <details id="rcActBox"><summary class="foot" style="cursor:pointer">لم تجد الرمز؟ اكتب النشاط كما هو مكتوب في المستخرج</summary>
-      <textarea id="rcAct" rows="2" style="margin-top:6px" placeholder="مثال: RECUPERATION DES DECHETS FERREUX ET NON FERREUX"></textarea>
-    </details>
-    <label class="lbl" for="prQ">2. السلعة المنقولة (النشاط الممارس)</label>
-    <input type="text" id="prQ" placeholder="اكتب أي سلعة: سبائك، ملابس، خضر، حجر…" autocomplete="off">
-    <div id="prBox" class="rcout"></div>
-    <div id="prPick" class="rcout"></div>
-    <label class="lbl">3. المقارنة</label>
+    <h2 id="rcH">هل تتوافق السلعة مع السجل؟</h2>
+    <label class="lbl" for="rcIn">السجل المحمول: الرمز أو النشاط المكتوب فيه</label>
+    <input type="text" id="rcIn" placeholder="مثال: 310004، أو: تجارة بالجملة للمعادن" autocomplete="off">
+    <label class="lbl" for="prQ">السلعة المنقولة</label>
+    <input type="text" id="prQ" placeholder="مثال: سبائك، ملابس، خضر، حجر" autocomplete="off">
     <div id="rcOut" class="rcout"></div>
-  </section>
-  <section class="card" data-tab="rc" aria-labelledby="brH">
-    <h2 id="brH">مدونة أنشطة السجل التجاري (2.136 نشاطاً)</h2>
-    <p class="foot" style="margin:0">كل الميادين: الإنتاج، الحرف، الجملة، الاستيراد، التجزئة، الخدمات، التصدير. اختر نشاطاً لتضيفه إلى السجل المحمول أو لتجعله النشاط الممارس.</p>
-    <input type="text" id="brQ" placeholder="ابحث بالرمز أو الكلمة: 604105، نقل، مقاولة، قطع غيار…" autocomplete="off">
-    <div class="chips small" id="brSec" role="group" aria-label="الميدان"></div>
-    <div class="chips small" id="brSt" role="group" aria-label="الحالة"></div>
-    <p class="match" id="brCount" style="margin:0"></p>
-    <div id="brList" class="rcout"></div>
   </section>
   <div id="groupsRest" data-tab="docs" style="display:flex;flex-direction:column;gap:16px"></div>
   <div id="groupsRoad" data-tab="list" style="display:flex;flex-direction:column;gap:16px"></div>
@@ -1170,12 +1148,12 @@ function searchOffences(q){
 function selectText(el){ try { var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); } catch (e) {} }
 var $ = function(id){ return document.getElementById(id); };
 var state = {role: 'carrier', veh: 'heavy', zone: false, q: 'سبائك ألمنيوم', sel: {}, extra: {}, offQ: '', value: '', rcCodes: '', rcAct: '', rcOwner: 'owner'};
-try { var saved = JSON.parse(localStorage.getItem('rbdocs') || 'null'); if (saved) { state.role = saved.role || state.role; state.veh = saved.veh || state.veh; state.q = saved.q != null ? saved.q : state.q; state.zone = !!saved.zone; state.rcCodes = saved.rcCodes || ''; state.rcAct = saved.rcAct || ''; state.rcOwner = saved.rcOwner || 'owner'; state.actCode = saved.actCode && NOMEN[saved.actCode] ? saved.actCode : ''; } } catch (e) {}
-function save(){ try { localStorage.setItem('rbdocs', JSON.stringify({role: state.role, veh: state.veh, q: state.q, zone: state.zone, rcCodes: state.rcCodes, rcAct: state.rcAct, rcOwner: state.rcOwner, actCode: state.actCode})); } catch (e) {} }
+try { var saved = JSON.parse(localStorage.getItem('rbdocs') || 'null'); if (saved) { state.role = saved.role || state.role; state.veh = saved.veh || state.veh; state.q = saved.q != null ? saved.q : state.q; state.zone = !!saved.zone; state.rcCodes = saved.rcCodes || ''; state.rcAct = saved.rcAct || ''; state.rcOwner = 'owner'; state.rcIn = saved.rcIn || ''; state.actCode = saved.actCode && NOMEN[saved.actCode] ? saved.actCode : ''; } } catch (e) {}
+function save(){ try { localStorage.setItem('rbdocs', JSON.stringify({role: state.role, veh: state.veh, q: state.q, zone: state.zone, rcCodes: state.rcCodes, rcAct: state.rcAct, rcIn: state.rcIn, actCode: state.actCode})); } catch (e) {} }
 
 var GROUPS = [['veh', 'وثائق السائق والمركبة'], ['act', 'وثائق النشاط'], ['goods', 'وثائق السلعة'], ['gen', 'مخالفات عامة أثناء التوقيف'], ['tech', 'حالة المركبة: المخالفات العينية (أضواء، إطارات، فرامل…)'], ['road', 'مخالفات السير (قانون المرور 26-09)']];
 $('sugg').innerHTML = PROFILES.map(function(p){ return '<option value="' + esc(p.label) + '">'; }).join('');
-$('q').value = state.q; $('rcAct').value = state.rcAct; $('rcOwner').value = state.rcOwner;
+$('q').value = state.q; $('rcIn').value = state.rcIn || '';
 
 function docHtml(id){
         var d = DOCS[id], k = state.sel[id] == null ? '' : String(state.sel[id]);
@@ -1262,76 +1240,42 @@ function render(){
   $('groupsRest').innerHTML = gHtml.goods + gHtml.gen;
   $('groupsRoad').innerHTML = gHtml.tech + gHtml.road;
 
-  // register comparison: registered activity (codes or text) vs practised activity
-  var regs = regCodes();
-  var rcHits = (state.rcQ || '').trim() ? searchCodes(state.rcQ).filter(function(c){ return regs.indexOf(c) < 0; }) : [];
-  $('rcPick').innerHTML = rcHits.slice(0, 5).map(function(c){ return pickRowHtml(codeInfo(c), 'data-rcadd'); }).join('') +
-    ((state.rcQ || '').trim() && !rcHits.length ? '<p class="foot" style="margin:0">لا رمز مطابق. جرّب كلمة أخرى، أو اكتب النشاط كما هو في المستخرج في الخانة أدناه.</p>' : '');
-  $('rcChips').innerHTML = regs.map(function(c){
-    var i = codeInfo(c);
-    return '<div class="rcrow"><div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><span><span class="code">' + c + '</span> · ' + esc(i ? i.sector : 'رمز غير موجود في مدونة 2026') + '</span><button type="button" class="small" data-rcdel="' + c + '" aria-label="حذف">✕</button></div>' +
-      (i ? '<div><b>' + esc(i.ar) + '</b></div><div class="fr" style="direction:ltr;text-align:left">' + esc(i.fr) + '</div>' : '<div class="extra">تحقق من كتابة الرمز.</div>') + '</div>';
-  }).join('');
+  // register (codes and/or activity text in one field) vs goods typed
+  var rcIn = state.rcIn || '';
+  var regs = (rcIn.replace(/[٠-٩]/g, function(c){ return c.charCodeAt(0) - 0x660; }).match(/\d{6}/g) || []).filter(function(c, i, a){ return a.indexOf(c) === i; });
+  state.rcCodes = regs.join(' ');
+  state.rcAct = rcIn.replace(/[\d٠-٩]{6}/g, ' ').trim();
+  // activity written as text: read it as the codes whose title it matches best
+  if (!regs.length && state.rcAct) regs = searchCodes(state.rcAct).filter(function(c){ return queryGroups(state.rcAct).every(function(alts){ return alts.some(function(a){ return altIn(NOMEN_PAD[c], a); }); }); }).sort(function(a, b){ return NOMEN[a][0].length - NOMEN[b][0].length; }).slice(0, 1);
   if (document.activeElement !== $('prQ')) $('prQ').value = state.q;
-  $('prBox').innerHTML = act ? '<div class="rcrow" style="border-color:var(--hc)"><div><span class="code">' + act.code + '</span> · ' + esc(act.sector) + '</div><div><b>' + esc(act.ar) + '</b></div><div class="fr" style="direction:ltr;text-align:left">' + esc(act.fr) + '</div></div>' : '';
-  $('prPick').innerHTML = '';
-  var rcTargets = act ? [{id: 'code', label: act.code + ' ' + act.ar, keys: [], hits: [act.code], textWords: goodsWords(act.code)}] : profs.length ? profs : (hits.length ? [{id: 'q', label: state.q.trim(), keys: [], hits: hits, textWords: codeWords(state.q)}] : []);
-  var rcr = rcCheck(regs.join(' '), state.rcAct, rcTargets, state.rcOwner === 'carrier' ? 'carrier' : '');
+  var gq = state.q.trim(), gl = '«' + esc(act ? act.ar : gq) + '»';
   var rcBad = false, out = '';
-  var badBlock = function(title){
+  var line = function(c){ return '<span><span class="num">' + c + '</span>: ' + esc(NOMEN[c] ? NOMEN[c][0] : 'رمز غير موجود في مدونة 2026') + '</span>'; };
+  var badShort = function(){
     var c = DOCS.rc_copy.cases[2];
-    return '<div class="verd bad"><b>' + title + '</b><span>' + esc(qualOf(c)) + '. المادة الناصة: ' + esc(c.nass) + '، المادة المعاقبة: ' + esc(c.iqab) + ' من القانون 04-08. الجزاء: من 20.000 إلى 200.000 دج، وغلق إداري لشهر.</span>' +
+    return '<div class="verd bad"><b>❌ غير متوافق: ' + gl + ' خارج نشاط السجل</b>' + regs.map(line).join('') +
+      '<span>جنحة ممارسة نشاط خارج موضوع السجل التجاري: المادتان 4 و41 من القانون 04-08، من 20.000 إلى 200.000 دج.</span>' +
       '<details class="pvc"><summary>اختتام المحضر</summary><div class="pv">' + esc(closing(c)) + '</div><button type="button" class="small" data-copy-pv="rc_copy:2">نسخ النص</button></details></div>';
   };
-  if (rcr.empty) out = '<p class="foot" style="margin:0">أدخل النشاط المسجل في الخانة 1.</p>';
-  else if (state.rcOwner === 'carrier') {
-    var tr = rcr.rows.some(function(r){ return r.transport; }) || /نقل البضائع|transport de marchandises/.test(normAr(state.rcAct));
-    if (tr) out += '<div class="verd ok"><b>السجل يتضمن نشاط نقل البضائع</b><span>يبقى لازماً حمل رخصة ممارسة النشاط (القانون 01-13).</span></div>';
-    else { rcBad = true; out += '<div class="verd bad"><b>السجل لا يتضمن نشاط نقل البضائع (الرمز 604105)</b><span>النقل لحساب الغير نشاط منظم: ممارسته خارج السجل تُكيَّف ممارسة نشاط خارج موضوع السجل (المادة 41 من القانون 04-08)، وممارسته دون رخصة تخضع للمادتين 62 و64 من القانون 01-13.</span>' +
-      '<details class="pvc"><summary>اختتام المحضر</summary><div class="pv">' + esc(closing(DOCS.rc_copy.cases[2])) + '</div><button type="button" class="small" data-copy-pv="rc_copy:2">نسخ النص</button></details></div>'; }
-  } else if (!act && !state.q.trim()) out = '<div class="verd unknown">اكتب السلعة المنقولة في الخانة 2 لتتم المقارنة.</div>';
+  if (!rcIn.trim() || !gq) out = '<p class="foot" style="margin:0">اكتب السجل والسلعة، فتظهر النتيجة هنا.</p>';
   else if (act) {
-    var near = regs.filter(function(c){ return NOMEN[c] && c !== act.code && (sameGoods(act.code, c) || sameGoods(c, act.code)); });
-    var g = rcr.goods[0];
-    if (regs.indexOf(act.code) >= 0) out = '<div class="verd ok"><b>مطابق: النشاط الممارس مسجل في السجل</b><span>الرمز ' + act.code + ' موجود في المستخرج.</span></div>';
-    else if (near.length) out = '<div class="verd unknown"><b>نفس السلعة لكن بصفة مختلفة</b><span>المسجل: ' + near.map(function(c){ return c + ' (' + esc(SECTORS[c[0]]) + ')'; }).join('، ') + '. الممارس: ' + act.code + ' (' + esc(act.sector) + ').</span><span>ممارسة نشاط غير مذكور في المستخرج ممارسةٌ خارج موضوع السجل (المادة 41 من القانون 04-08). تحقق: الشراء لإعادة البيع يتطلب رمز التوزيع (جملة أو تجزئة)، ورمز الإنتاج يغطي بيع ما ينتجه صاحب السجل فقط.</span></div>';
-    else if (textNames(act.code, state.rcAct)) out = '<div class="verd ok"><b>مطابق حسب نص النشاط في المستخرج</b><span>تحقق من أن النص يذكر هذه السلعة صراحة.</span></div>';
-    else if (rcr.rows.some(function(r){ return !r.known; }) && !regs.some(function(c){ return NOMEN[c]; })) out = '<div class="verd unknown"><b>لم أستطع الحكم</b><span>الرموز المدخلة غير موجودة في مدونة 2026. تحقق يدوياً.</span></div>';
-    else { rcBad = true; out = badBlock('غير مطابق: النشاط الممارس (' + act.code + ') خارج نشاط السجل'); }
+    if (regs.indexOf(act.code) >= 0) out = '<div class="verd ok"><b>✅ متوافق</b>' + line(act.code) + '</div>';
+    else if (regs.some(function(c){ return NOMEN[c] && (sameGoods(act.code, c) || sameGoods(c, act.code)); })) out = '<div class="verd unknown"><b>⚠️ نفس السلعة بصفة مختلفة (جملة، تجزئة، استيراد أو إنتاج)</b>' + regs.map(line).join('') + '<span>تحقق من المستخرج.</span></div>';
+    else if (textNames(act.code, state.rcAct)) out = '<div class="verd ok"><b>✅ متوافق حسب نص السجل</b></div>';
+    else if (regs.length && !regs.some(function(c){ return NOMEN[c]; })) out = '<div class="verd unknown"><b>⚠️ الرمز غير موجود في مدونة 2026</b><span>تحقق من كتابته.</span></div>';
+    else { rcBad = true; out = badShort(); }
   } else {
-    var gq = state.q.trim(), gl = '«' + esc(gq) + '»';
     var cov = regs.filter(function(c){ return codeCoversGoods(c, gq); });
-    var prodOnly = cov.length && cov.every(function(c){ return c[0] === '1' || c[0] === '2'; });
-    if (!searchCodes(gq).length) out = '<div class="verd unknown"><b>لم أتعرف على السلعة ' + gl + '</b><span>جرّب كلمة أخرى، أو قارن يدوياً.</span></div>';
-    else if (cov.length) out = '<div class="verd ok"><b>متوافق: السجل يغطي ' + gl + '</b><span>بالرمز ' + cov.map(function(c){ return c + ' (' + esc(NOMEN[c][0]) + ')'; }).join('، ') + '</span>' + (prodOnly ? '<span>رمز إنتاج: يغطي بيع ما ينتجه صاحب السجل فقط، لا الشراء لإعادة البيع.</span>' : '') + '</div>';
-    else if (textCoversGoods(state.rcAct, gq)) out = '<div class="verd ok"><b>متوافق حسب نص النشاط في المستخرج</b><span>النص يذكر ' + gl + '. تحقق أنه يذكرها صراحة.</span></div>';
-    else if (regs.length && !regs.some(function(c){ return NOMEN[c]; })) out = '<div class="verd unknown"><b>لم أستطع الحكم</b><span>الرموز المدخلة غير موجودة في مدونة 2026. تحقق يدوياً.</span></div>';
-    else { rcBad = true; out = badBlock('غير متوافق: ' + gl + ' خارج نشاط السجل المحمول'); }
+    if (!searchCodes(gq).length) out = '<div class="verd unknown"><b>⚠️ لم أتعرف على السلعة ' + gl + '</b><span>جرّب كلمة أخرى.</span></div>';
+    else if (cov.length) out = '<div class="verd ok"><b>✅ متوافق</b>' + cov.map(line).join('') + (cov.every(function(c){ return c[0] === '1' || c[0] === '2'; }) ? '<span>رمز إنتاج: يغطي بيع ما ينتجه صاحب السجل فقط.</span>' : '') + '</div>';
+    else if (textCoversGoods(state.rcAct, gq)) out = '<div class="verd ok"><b>✅ متوافق حسب نص السجل</b></div>';
+    else if (regs.length && !regs.some(function(c){ return NOMEN[c]; })) out = '<div class="verd unknown"><b>⚠️ الرمز غير موجود في مدونة 2026</b><span>تحقق من كتابته.</span></div>';
+    else { rcBad = true; out = badShort(); }
   }
   $('rcOut').innerHTML = out;
-  $('rcMini').innerHTML = rcr.empty ? '' : (rcBad ? '<div class="verd bad"><b>السجل المحمول لا يطابق النشاط الممارس</b></div>' : (/verd ok/.test(out) ? '<div class="verd ok"><b>السجل المحمول يطابق النشاط الممارس</b></div>' : (/verd unknown/.test(out) ? '<div class="verd unknown"><b>المقارنة تحتاج تحققاً</b></div>' : '')));
+  $('rcMini').innerHTML = !rcIn.trim() || !gq ? '' : (rcBad ? '<div class="verd bad"><b>السجل المحمول لا يطابق النشاط الممارس</b></div>' : (/verd ok/.test(out) ? '<div class="verd ok"><b>السجل المحمول يطابق النشاط الممارس</b></div>' : (/verd unknown/.test(out) ? '<div class="verd unknown"><b>المقارنة تحتاج تحققاً</b></div>' : '')));
 
-  // nomenclature browser
-  var secs = [['', 'الكل']].concat(Object.keys(SECTORS).map(function(k){ return [k, k + ' ' + SECTORS[k]]; }));
-  $('brSec').innerHTML = secs.map(function(s){ return '<button type="button" class="chip" data-brsec="' + s[0] + '" aria-pressed="' + ((state.brSec || '') === s[0]) + '">' + esc(s[1]) + '</button>'; }).join('');
-  $('brSt').innerHTML = [['', 'كل الحالات'], ['f', 'حر'], ['r', 'منظم'], ['b', 'مجمّد']].map(function(s){ return '<button type="button" class="chip" data-brst="' + s[0] + '" aria-pressed="' + ((state.brSt || '') === s[0]) + '">' + s[1] + '</button>'; }).join('');
-  var brAll = (state.brQ || '').trim() ? searchCodes(state.brQ) : Object.keys(NOMEN).sort();
-  var brCodes = brAll.filter(function(c){
-    if (state.brSec && c[0] !== state.brSec) return false;
-    var st = NOMEN[c][2] || '';
-    if (state.brSt === 'f') return !st;
-    if (state.brSt) return st === state.brSt;
-    return true;
-  });
-  var brN = state.brN || 30;
-  $('brCount').innerHTML = brCodes.length ? '<b>' + brCodes.length + '</b> نشاطاً' + (brCodes.length > brN ? '، يظهر أول ' + brN : '') : 'لا نشاط مطابق. جرّب كلمة أخرى أو ميداناً آخر.';
-  $('brList').innerHTML = brCodes.slice(0, brN).map(function(c){
-    var i = codeInfo(c), inReg = regs.indexOf(c) >= 0, isAct = state.actCode === c;
-    return '<div class="br-row"' + (inReg || isAct ? ' style="border-color:var(--hc)"' : '') + '><div><span class="code">' + c + '</span> · ' + esc(i.sector) + ' ' + statusHtml(i) + '</div><div><b>' + esc(i.ar) + '</b></div><div class="fr" style="direction:ltr;text-align:left;font-size:0.74rem;color:var(--muted)">' + esc(i.fr) + '</div>' +
-      (i.status && (i.auth || i.tutelle) ? '<div class="extra" style="direction:ltr;text-align:left">' + esc([i.auth, i.tutelle].filter(Boolean).join(' — ')) + '</div>' : '') +
-      '<div class="br-act">' + (inReg ? '<button type="button" class="small primary" data-rcdel="' + c + '">✓ في السجل المحمول</button>' : '<button type="button" class="small" data-rcadd="' + c + '">أضف إلى السجل المحمول</button>') +
-      (isAct ? '<button type="button" class="small primary" data-pick="">✓ النشاط الممارس</button>' : '<button type="button" class="small" data-pick="' + c + '">النشاط الممارس</button>') + '</div></div>';
-  }).join('') + (brCodes.length > brN ? '<button type="button" class="small" data-brmore>عرض 30 أخرى</button>' : '');
+
   var offRes = searchOffences(state.offQ || '');
   $('offOut').innerHTML = !(state.offQ || '').trim() ? '' : (offRes.length ? offRes.map(function(r){
     var T = TYPES[r.c.type], c = r.c;
@@ -1412,7 +1356,7 @@ document.addEventListener('input', function(e){
   if (e.target.id === 'roadQ' || e.target.id === 'techQ') { var tid = e.target.id; state[tid] = e.target.value; render(); var r = $(tid); if (r) { r.focus(); r.setSelectionRange(r.value.length, r.value.length); } }
   if (e.target.id === 'rcAct') { state.rcAct = e.target.value; save(); render(); }
   if (e.target.id === 'brQ') { state.brQ = e.target.value; state.brN = 30; render(); }
-  if (e.target.id === 'rcQ') { state.rcQ = e.target.value; render(); }
+  if (e.target.id === 'rcIn') { state.rcIn = e.target.value; save(); render(); }
   if (e.target.id === 'prQ') { state.q = e.target.value; $('q').value = state.q; if (state.actCode && searchCodes(state.q).indexOf(state.actCode) < 0) { state.actCode = ''; delete state.sel.act_lic; } save(); render(); }
   if (e.target.id === 'val') { state.value = e.target.value; state.focusVal = true; render(); state.focusVal = false; }
 });
