@@ -373,6 +373,8 @@ var LAWS = {
   vet: 'القانون رقم 88-08 المؤرخ في 26 جانفي 1988 المتعلق بنشاطات الطب البيطري وحماية الصحة الحيوانية، المعدل والمتمم',
   faux: 'القانون رقم 24-02 المؤرخ في 26 فيفري 2024 المتعلق بمكافحة التزوير واستعمال المزور',
   penal: 'الأمر رقم 66-156 المؤرخ في 8 جوان 1966 المتضمن قانون العقوبات، المعدل والمتمم',
+  cidta: 'قانون الضرائب المباشرة والرسوم المماثلة',
+  social: 'القانون رقم 83-14 المؤرخ في 2 جويلية 1983 المتعلق بالتزامات المكلفين في مجال الضمان الاجتماعي، المعدل والمتمم',
   env: 'القانون رقم 03-10 المؤرخ في 19 جويلية 2003 المتعلق بحماية البيئة في إطار التنمية المستدامة',
   conso: 'القانون رقم 09-03 المؤرخ في 25 فيفري 2009 المتعلق بحماية المستهلك وقمع الغش، المعدل والمتمم',
   danger: 'المرسوم التنفيذي رقم 03-452 المؤرخ في 1 ديسمبر 2003 المحدد للشروط الخاصة المتعلقة بنقل المواد الخطرة عبر الطرق'
@@ -500,7 +502,7 @@ Object.assign(DOCS, {
 
 // Closing paragraph of a report ("اختتام المحضر") for a case that leads to one.
 function closing(c){
-  if (!c || c.type === 'none' || c.type === 'forfait') return '';
+  if (!c || c.type === 'none' || c.type === 'forfait' || c.type === 'tax') return '';
   var law = LAWS[c.law] || '';
   var known = function(x){ return x && x !== NA; };
   var ref = function(x){
@@ -559,6 +561,7 @@ var PROCS = {
   court: ['يعاين الجنحة ويطلب الوثائق، ويحتفظ برخصة السياقة ويسلّم للسائق فوراً وثيقة تثبت ذلك (المادة 120).', 'يوقف المركبة عند الاقتضاء (المادة 173) ويأمر ضابط الشرطة القضائية بوضعها في المحشر في الحالات المحددة (المادة 177)، لمدة أقصاها 10 أيام (المادة 178).', 'يسمع المعني في محضر سماع ويدوّن تصريحه ويسأله إن كانت لديه إضافات، ثم يقرأ عليه التصريح فيوقعه أو يُدوَّن رفضه.', 'يختم المحضر بتكييف الوقائع (المادة الناصة والمعاقبة) ويُعلم المعني بأنه سيُرسل إلى العدالة.', 'يرسل محضر المعاينة بغير تمهل إلى وكيل الجمهورية المختص إقليمياً مرفقاً برخصة السياقة، وتطبق أحكام قانون الإجراءات الجزائية 25-14 (المادتان 119 و120).', 'يملك المعني الاعتراض على الوضع في المحشر أمام وكيل الجمهورية الذي يفصل في أجل 5 أيام (المادة 180). ولا تُسترجع المركبة إلا بعد دفع المصاريف (المادة 181).'],
   admin: ['يعاين المخالفة ويحرر محضراً.', 'يضع المركبة في المحشر فوراً على نفقة المخالف (المادة 62 من القانون 01-13).', 'يرسل المحضر إلى الوالي أو المحكمة المختصة خلال شهر (المادة 59 من القانون 01-13).', 'قد يقترح الوالي على الوزير سحب الرخصة مؤقتاً، أو نهائياً في العود.'],
   settle: ['يطلب الفاتورة، ويجب تقديمها عند أول طلب (المادة 13 من القانون 04-02).', 'يفتح الطرود بحضور الناقل ويقارن البضاعة بالفاتورة (المادة 52).', 'يحجز الوثائق والبضاعة عند الاقتضاء، ويحرر محضر جرد ويضع الأختام ويعيّن حارساً (المواد 39 إلى 41).', 'يحرر المحضر خلال 8 أيام موقعاً من الأعوان، ويوقعه المعني أو يُدوَّن رفضه (المادتان 56 و57).', 'يرسل المحضر إلى المدير الولائي للتجارة، الذي يقترح المصالحة أو يحيله إلى وكيل الجمهورية حسب المبلغ (المادتان 55 و60).'],
+  tax: ['يُبلَّغ الأمر إلى الهيئة المختصة إقليمياً (مفتشية أو مركز الضرائب، أو وكالة CASNOS)، وهي التي تفرض الغرامة وتحصّلها.'],
   customs: ['يحجز البضاعة ووسيلة النقل.', 'يحرر محضر حجز ويُعلم مصالح الجمارك المختصة.', 'يُخطر وكيل الجمهورية، وتُفتح متابعة بتهمة التهريب.']
 };
 
@@ -1085,6 +1088,7 @@ function buildList(ctx){
     profs.forEach(function(p){ p.docs.forEach(function(id){ if (ids.indexOf(id) < 0 && DOCS[id] && (!DOCS[id].zone || ctx.zone)) ids.push(id); }); });
   }
   sectorPermits(ctx).forEach(function(id){ ids.push(id); });
+  if (biz || r === 'owner') ids.push('tax_exist', 'casnos', 'books');
   if (biz) ids.push('fake_doc', 'respect');
   else {
     ids.push('obey', 'fake_doc', 'respect');
@@ -1093,7 +1097,7 @@ function buildList(ctx){
   return ids.filter(function(id, i){ return DOCS[id] && ids.indexOf(id) === i; });
 }
 function procsHtml(items){
-  var order = ['forfait', 'admin', 'settle', 'customs', 'court'], out = '';
+  var order = ['forfait', 'tax', 'admin', 'settle', 'customs', 'court'], out = '';
   order.forEach(function(t){
     var mine = items.filter(function(x){ return x.c.type === t; });
     if (!mine.length) return;
@@ -1109,6 +1113,7 @@ var TYPES = {
   court: {label: 'محضر يُحال إلى وكيل الجمهورية', cls: 'court', how: 'جنحة: يحرر ضابط الشرطة القضائية محضراً ويُحال الملف على المحكمة التي تحدد العقوبة بين الحدين.'},
   admin: {label: 'محضر وإجراء إداري', cls: 'admin', how: 'يحرر العون محضراً ويُتخذ إجراء إداري فوري (المحشر)، ثم يُرسل المحضر إلى الوالي أو المحكمة.'},
   settle: {label: 'محضر إلى مديرية التجارة', cls: 'settle', how: 'يُرسل المحضر إلى المدير الولائي للتجارة الذي يقترح المصالحة إن كانت الغرامة ≤ 1.000.000 دج، أو يُحال إلى المحكمة.'},
+  tax: {label: 'غرامة إدارية تفرضها الهيئة المختصة', cls: 'admin', how: ''},
   customs: {label: 'محضر جمركي ومتابعة جزائية', cls: 'court', how: 'حجز جمركي ومتابعة أمام المحكمة بتهمة التهريب.'},
   none: {label: 'لا مخالفة', cls: 'none', how: ''}
 };
@@ -1207,6 +1212,17 @@ Object.assign(DOCS, {
     {when: 'وسيلة نقل الحيوانات أو المنتجات الحيوانية غير معرَّفة لدى السلطة البيطرية', nature: 'مخالفة', act: 'نقل حيوانات أو منتجات حيوانية بوسيلة غير معرَّفة لدى السلطة البيطرية', law: 'vet', nass: 'المادة 16 من المرسوم التنفيذي 04-82', iqab: NA, type: 'court', amount: null, extra: 'السلطة البيطرية تعرِّف وسيلة النقل وتسلم وثيقة بمراجع التعريف (المادة 16)، والمركبة مهيأة لحماية الحيوانات (المادة 15). والمؤسسات (المزارع، أسواق الماشية، المفاقس، مخازن المنتجات الحيوانية، مصانع الأعلاف، الصيد البحري) تحتاج اعتماداً صحياً قبل الاستغلال (المادتان 2 و10). العقوبة لم أتحقق منها', v: 'no'}
   ]}
 });
+Object.assign(DOCS, {
+  tax_exist: {g: 'fisc', name: 'شهادة الوجود الجبائية (C20) ورقم التعريف الجبائي NIF', fr: 'Déclaration d’existence (G n°8) et certificat d’existence (C n°20) — centre ou inspection des impôts', cases: [
+    {when: 'لم يصرّح بوجوده لدى الضرائب خلال 30 يوماً من بداية النشاط', nature: 'مخالفة', act: 'عدم إيداع التصريح بالوجود لدى مصالح الضرائب في الأجل', law: 'cidta', nass: 'المادة 183', iqab: 'المادة 194', type: 'tax', amount: [30000, 30000], extra: 'غرامة جبائية دون الإخلال بالعقوبات الأخرى. يُحسب الأجل من تاريخ القيد في السجل التجاري. تُسلّم بعد التصريح شهادة الوجود وعليها المادة الجبائية، ويُحدد رقم التعريف الجبائي', v: 'one'}
+  ]},
+  casnos: {g: 'fisc', name: 'الانتساب إلى الضمان الاجتماعي لغير الأجراء (CASNOS) لصاحب النشاط، وتصريح العمال لدى CNAS', fr: 'Affiliation CASNOS (non-salariés) / CNAS (salariés)', cases: [
+    {when: 'لم يصرّح بنشاطه لدى CASNOS خلال 10 أيام من بدايته', nature: 'مخالفة', act: 'عدم التصريح بالنشاط لدى صندوق الضمان الاجتماعي لغير الأجراء', law: 'social', nass: 'المادة 6', iqab: 'المادة 7', type: 'tax', amount: [5000, 5000], extra: 'تزاد 20% عن كل شهر تأخير. القيد في السجل التجاري يُعد تصريحاً (المادة 97 من قانون المالية لسنة 2018 والمرسوم التنفيذي 18-313). تصريح العمال الأجراء لدى CNAS لم أتحقق من أجله وعقوبته', v: 'one'}
+  ]},
+  books: {g: 'fisc', name: 'الدفاتر التجارية: الدفتر اليومي ودفتر الجرد', fr: 'Livre-journal et livre d’inventaire — Code de commerce, art. 9 et 10', cases: [
+    {when: 'غير ممسوكة', nature: '', act: 'مسك الدفتر اليومي ودفتر الجرد إلزامي لكل تاجر (المادتان 9 و10 من القانون التجاري). لم أُدرج عقوبة مستقلة لعدم مسكها', type: 'none', amount: null, v: 'one'}
+  ]}
+});
 // Which sector permits apply, from the chosen activity and the goods recognised.
 function sectorPermits(ctx){
   var ids = [], a = ctx.act, pids = (ctx.profiles || []).map(function(p){ return p.id; });
@@ -1216,7 +1232,7 @@ function sectorPermits(ctx){
   if (['livestock', 'meat'].some(function(x){ return pids.indexOf(x) >= 0; }) || (a && /animaux|viande|volaille|poisson|abattage|oeuf|betail|aviculture|elevage/.test(txt))) ids.push('vet_doc');
   return ids;
 }
-var GROUPS = [['veh', 'وثائق السائق والمركبة'], ['act', 'وثائق النشاط'], ['goods', 'وثائق السلعة'], ['other', 'الوثائق الأخرى: الرخص القطاعية (البيئة، التجارة، البيطرة…)'], ['gen', 'مخالفات عامة أثناء التوقيف'], ['tech', 'حالة المركبة: المخالفات العينية (أضواء، إطارات، فرامل…)'], ['road', 'مخالفات السير (قانون المرور 26-09)']];
+var GROUPS = [['veh', 'وثائق السائق والمركبة'], ['act', 'وثائق النشاط'], ['goods', 'وثائق السلعة'], ['other', 'الوثائق الأخرى: الرخص القطاعية (البيئة، التجارة، البيطرة…)'], ['fisc', 'الوثائق الجبائية والاجتماعية والتجارية لصاحب النشاط'], ['gen', 'مخالفات عامة أثناء التوقيف'], ['tech', 'حالة المركبة: المخالفات العينية (أضواء، إطارات، فرامل…)'], ['road', 'مخالفات السير (قانون المرور 26-09)']];
 $('sugg').innerHTML = PROFILES.map(function(p){ return '<option value="' + esc(p.label) + '">'; }).join('');
 $('q').value = state.q; $('rcIn').value = state.rcIn || '';
 
@@ -1279,11 +1295,12 @@ function render(){
   var goodsRole = GOODS_ROLES.indexOf(state.role) >= 0;
   $('vehLbl').hidden = $('vehChips').hidden = !goodsRole;
 
-  $('needed').innerHTML = GROUPS.filter(function(g){ return ['veh', 'act', 'goods'].indexOf(g[0]) >= 0; }).map(function(g){
+  var groupList = function(keys){ return GROUPS.filter(function(g){ return keys.indexOf(g[0]) >= 0; }).map(function(g){
     var mine = ids.filter(function(id){ return DOCS[id].g === g[0]; });
     if (!mine.length) return '';
     return '<div><div class="lbl">' + g[1] + '</div><ol>' + mine.map(function(id){ return '<li>' + esc(DOCS[id].name) + (DOCS[id].rec ? ' <span class="tag rec">موصى به</span>' : '') + '</li>'; }).join('') + '</ol></div>';
-  }).join('') + otherDocsHtml(act, hits, ids) + '<p class="foot" style="margin:0">المجموع: ' + ids.filter(function(id){ return ['veh', 'act', 'goods', 'other'].indexOf(DOCS[id].g) >= 0; }).length + ' وثائق.</p>';
+  }).join(''); };
+  $('needed').innerHTML = groupList(['veh', 'act', 'goods']) + otherDocsHtml(act, hits, ids) + groupList(['fisc']) + '<p class="foot" style="margin:0">المجموع: ' + ids.filter(function(id){ return ['veh', 'act', 'goods', 'other', 'fisc'].indexOf(DOCS[id].g) >= 0; }).length + ' وثائق.</p>';
   var gHtml = {};
   GROUPS.forEach(function(g){ gHtml[g[0]] = ''; });
   GROUPS.forEach(function(g){ gHtml[g[0]] = (function(g){
@@ -1303,7 +1320,7 @@ function render(){
       mine.map(docHtml).join('') + '</section>';
   })(g); });
   $('groups').innerHTML = gHtml.veh + gHtml.act;
-  $('groupsRest').innerHTML = gHtml.goods + gHtml.other + gHtml.gen;
+  $('groupsRest').innerHTML = gHtml.goods + gHtml.other + gHtml.fisc + gHtml.gen;
   $('groupsRoad').innerHTML = (gHtml.tech + gHtml.road) || '<section class="card"><h2>المخالفات</h2><p class="foot" style="margin:0">مخالفات السير وحالة المركبة تخص السائق. مخالفات صاحب النشاط (السجل التجاري، الفاتورة، الرخص) في «وثائقي» و«السجل».</p></section>';
 
   // register (codes and/or activity text in one field) vs goods typed

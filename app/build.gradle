@@ -6,8 +6,8 @@ android {
         applicationId 'dz.wathaiq.alhajiz'
         minSdk 26
         targetSdk 34
-        versionCode 14
-        versionName '2.3'
+        versionCode 15
+        versionName '2.4'
     }
     buildTypes { release { minifyEnabled false } }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
