@@ -312,12 +312,6 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
 
 
   <div id="groups" data-tab="docs" style="display:flex;flex-direction:column;gap:16px"></div>
-  <section class="card" data-tab="docs" aria-labelledby="rcLinkH">
-    <h2 id="rcLinkH">السجل التجاري</h2>
-    <p class="foot" style="margin:0">مقارنة النشاط المسجل في السجل الذي يحمله السائق بالنشاط الممارس، ومدونة كل الأنشطة، في تبويب «السجل».</p>
-    <div id="rcMini"></div>
-    <button type="button" class="primary" data-go2="rc">افتح «السجل»</button>
-  </section>
   <section class="card" data-tab="rc" aria-labelledby="rcH">
     <h2 id="rcH">هل تتوافق السلعة مع السجل؟</h2>
     <label class="lbl" for="rcIn">السجل المحمول: الرمز أو النشاط المكتوب فيه</label>
@@ -1356,7 +1350,7 @@ function render(){
     else { rcBad = true; out = badShort(); }
   }
   $('rcOut').innerHTML = out;
-  $('rcMini').innerHTML = !rcIn.trim() || !gq ? '' : (rcBad ? '<div class="verd bad"><b>السجل المحمول لا يطابق النشاط الممارس</b></div>' : (/verd ok/.test(out) ? '<div class="verd ok"><b>السجل المحمول يطابق النشاط الممارس</b></div>' : (/verd unknown/.test(out) ? '<div class="verd unknown"><b>المقارنة تحتاج تحققاً</b></div>' : '')));
+  // the register check lives only in the «السجل» tab
 
 
   var offRes = searchOffences(state.offQ || '');
