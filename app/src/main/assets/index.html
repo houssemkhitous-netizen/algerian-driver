@@ -368,6 +368,8 @@ var LAWS = {
   vet: 'القانون رقم 88-08 المؤرخ في 26 جانفي 1988 المتعلق بنشاطات الطب البيطري وحماية الصحة الحيوانية، المعدل والمتمم',
   faux: 'القانون رقم 24-02 المؤرخ في 26 فيفري 2024 المتعلق بمكافحة التزوير واستعمال المزور',
   penal: 'الأمر رقم 66-156 المؤرخ في 8 جوان 1966 المتضمن قانون العقوبات، المعدل والمتمم',
+  env: 'القانون رقم 03-10 المؤرخ في 19 جويلية 2003 المتعلق بحماية البيئة في إطار التنمية المستدامة',
+  conso: 'القانون رقم 09-03 المؤرخ في 25 فيفري 2009 المتعلق بحماية المستهلك وقمع الغش، المعدل والمتمم',
   danger: 'المرسوم التنفيذي رقم 03-452 المؤرخ في 1 ديسمبر 2003 المحدد للشروط الخاصة المتعلقة بنقل المواد الخطرة عبر الطرق'
 };
 var NA = 'رقم المادة غير متوفر لدي';
@@ -966,7 +968,8 @@ function textCoversGoods(txt, q){
 }
 function regCodes(){ return (String(state.rcCodes || '').replace(/[٠-٩]/g, function(c){ return c.charCodeAt(0) - 0x660; }).match(/\d{6}/g) || []).filter(function(c, i, a){ return a.indexOf(c) === i; }); }
 // Other documents to exercise the activity: authorisation, issuing authority and legal text, from the CNRC nomenclature.
-function otherDocsHtml(act, hits){
+function otherDocsHtml(act, hits, ids){
+  var sect = (ids || []).filter(function(id){ return DOCS[id].g === 'other'; }).map(function(id){ return '<li>' + esc(DOCS[id].name) + '<div class="fr" style="direction:ltr;text-align:left;font-size:0.72rem;color:var(--muted)">' + esc(DOCS[id].fr) + '</div></li>'; }).join('');
   var li = function(i, pre){
     return '<li>' + (pre || '') + '<b>' + esc(i.auth || 'رخصة أو اعتماد') + '</b>' + (i.tutelle ? ' — ' + esc(i.tutelle) : '') +
       (i.ref ? '<div class="fr" style="direction:ltr;text-align:left;font-size:0.72rem;color:var(--muted)">' + esc(i.ref) + '</div>' : '') + '</li>';
@@ -975,20 +978,23 @@ function otherDocsHtml(act, hits){
   if (act) {
     if (act.status === 'regulated') body = '<ol>' + li(act) + '</ol>';
     else if (act.status === 'blocked') body = '<ol><li>نشاط مجمّد: لا يُقبل فيه تسجيل جديد في السجل التجاري.' + (act.ref ? '<div class="fr" style="direction:ltr;text-align:left;font-size:0.72rem;color:var(--muted)">' + esc(act.ref) + '</div>' : '') + '</li></ol>';
-    else body = '<p class="foot" style="margin:4px 0 0">نشاط حر: لا تشترط المدونة رخصة أو اعتماداً خاصاً به غير التسجيل في السجل التجاري.</p>';
+    else body = sect ? '' : '<p class="foot" style="margin:4px 0 0">نشاط حر: لا تشترط مدونة السجل التجاري رخصة أو اعتماداً خاصاً به.</p>';
   } else if (hits.length) {
     var seen = {}, rows = [];
-    hits.slice(0, 40).forEach(function(c){
+    var gr = queryGroups(state.q);
+    hits.filter(function(c){ return gr.every(function(alts){ return alts.some(function(x){ return altIn(NOMEN_PAD[c], x); }); }); }).slice(0, 40).forEach(function(c){
       var i = codeInfo(c);
       if (i.status !== 'regulated') return;
       var k = i.auth + '|' + i.tutelle + '|' + i.ref;
       if (seen[k]) { seen[k].push(c); return; }
       seen[k] = [c]; rows.push([k, i]);
     });
-    if (!rows.length) return '';
-    body = '<p class="foot" style="margin:4px 0 0">إن كان النشاط من الأنشطة المنظمة التالية، فهذه وثيقته:</p><ol>' +
+    if (!rows.length) body = '';
+    else body = '<p class="foot" style="margin:4px 0 0">إن كان النشاط من الأنشطة المنظمة التالية، فهذه وثيقته:</p><ol>' +
       rows.slice(0, 5).map(function(r){ var c0 = seen[r[0]][0]; return li(r[1], '<span class="num">' + seen[r[0]].slice(0, 4).join('، ') + '</span> (' + esc(NOMEN[c0][0].length > 45 ? NOMEN[c0][0].slice(0, 45) + '…' : NOMEN[c0][0]) + '): '); }).join('') + '</ol>';
-  } else return '';
+  }
+  if (sect) body = '<ol>' + sect + '</ol>' + body;
+  if (!body) return '';
   return '<div><div class="lbl">الوثائق الأخرى</div>' + body + '</div>';
 }
 function pickRowHtml(i, attr){
@@ -1071,6 +1077,7 @@ function buildList(ctx){
     if (commercial) ids.push('invoice');
     profs.forEach(function(p){ p.docs.forEach(function(id){ if (ids.indexOf(id) < 0 && DOCS[id] && (!DOCS[id].zone || ctx.zone)) ids.push(id); }); });
   }
+  sectorPermits(ctx).forEach(function(id){ ids.push(id); });
   ids.push('obey', 'fake_doc', 'respect');
   Object.keys(DOCS).forEach(function(k){ if (DOCS[k].g === 'road' || DOCS[k].g === 'tech') ids.push(k); });
   return ids.filter(function(id, i){ return DOCS[id] && ids.indexOf(id) === i; });
@@ -1177,7 +1184,29 @@ var state = {role: 'carrier', veh: 'heavy', zone: false, q: 'سبائك ألمن
 try { var saved = JSON.parse(localStorage.getItem('rbdocs') || 'null'); if (saved) { state.role = saved.role || state.role; state.veh = saved.veh || state.veh; state.q = saved.q != null ? saved.q : state.q; state.zone = !!saved.zone; state.rcCodes = saved.rcCodes || ''; state.rcAct = saved.rcAct || ''; state.rcOwner = 'owner'; state.rcIn = saved.rcIn || ''; state.actCode = saved.actCode && NOMEN[saved.actCode] ? saved.actCode : ''; } } catch (e) {}
 function save(){ try { localStorage.setItem('rbdocs', JSON.stringify({role: state.role, veh: state.veh, q: state.q, zone: state.zone, rcCodes: state.rcCodes, rcAct: state.rcAct, rcIn: state.rcIn, actCode: state.actCode})); } catch (e) {} }
 
-var GROUPS = [['veh', 'وثائق السائق والمركبة'], ['act', 'وثائق النشاط'], ['goods', 'وثائق السلعة'], ['gen', 'مخالفات عامة أثناء التوقيف'], ['tech', 'حالة المركبة: المخالفات العينية (أضواء، إطارات، فرامل…)'], ['road', 'مخالفات السير (قانون المرور 26-09)']];
+// Sector permits (environment, commerce/food hygiene, veterinary), from the texts named in each case.
+Object.assign(DOCS, {
+  env_permit: {g: 'other', name: 'رخصة استغلال المنشأة المصنفة أو وصل التصريح بها (للمؤسسة المنتجة: مصنع، ورشة، مقلع، مخزن…)', fr: 'Autorisation d’exploitation ou déclaration — Direction de l’environnement de la wilaya', cases: [
+    {when: 'المنشأة تُستغل دون الرخصة المطلوبة', nature: 'جنحة', act: 'استغلال منشأة مصنفة دون الترخيص المطلوب', law: 'env', nass: 'المادة 19', iqab: 'المادة 102', type: 'court', amount: [500000, 500000], extra: 'حبس سنة واحدة. يجوز للمحكمة منع استعمال المنشأة حتى الحصول على الرخصة والأمر بإعادة الأماكن إلى حالتها. الرخصة يمنحها حسب أهمية المنشأة: الوزير المكلف بالبيئة مع الوزير المعني، أو الوالي، أو رئيس المجلس الشعبي البلدي؛ والمنشآت التي لا تحتاج دراسة ولا موجز تأثير تخضع لتصريح لدى رئيس البلدية (المادة 19). التطبيق: المرسوم التنفيذي 06-198، وقائمة المنشآت المصنفة في المرسوم التنفيذي 07-144', v: 'ok'}
+  ]},
+  food_hyg: {g: 'other', name: 'شروط النظافة في نقل المواد الغذائية والفحوص الطبية للمستخدمين', fr: 'Hygiène du transport des denrées alimentaires — Direction du commerce', cases: [
+    {when: 'مركبة غير مخصصة للمواد الغذائية، أو متسخة، أو لا تحترم درجة الحرارة، أو مواد مختلفة دون فصل', nature: 'مخالفة', act: 'مخالفة إلزامية النظافة والنظافة الصحية للمواد الغذائية أثناء نقلها', law: 'conso', nass: 'المادة 6، والمواد 34 إلى 38 من المرسوم التنفيذي 17-140', iqab: 'المادة 72', type: 'court', amount: [50000, 1000000], extra: 'وسيلة النقل مخصصة للمواد الغذائية وحدها، قابلة للتنظيف والتطهير، تحافظ على درجة الحرارة (التبريد والتجميد دون انقطاع السلسلة)، والمواد المختلفة مفصولة؛ والصهاريج والحاويات بالجملة موسومة «للمواد الغذائية فقط» (المرسوم التنفيذي 17-140). حجز المواد غير المطابقة جائز', v: 'one'},
+    {when: 'العمال الذين يتداولون المواد الغذائية دون فحوص طبية دورية', nature: 'مخالفة', act: 'عدم إخضاع المستخدمين المتداولين للمواد الغذائية للفحوص الطبية الدورية', law: 'conso', nass: 'المادة 6، والمادة 55 من المرسوم التنفيذي 17-140', iqab: 'المادة 72', type: 'court', amount: [50000, 1000000], extra: 'فحوص طبية دورية وتكميلية كل 6 أشهر على الأقل، مع التلقيحات الإجبارية (المادة 55 من المرسوم 17-140)', v: 'one'}
+  ]},
+  vet_doc: {g: 'other', name: 'الاعتماد الصحي البيطري للمؤسسة ووثيقة تعريف وسيلة النقل', fr: 'Agrément sanitaire et identification du moyen de transport — Services vétérinaires', cases: [
+    {when: 'وسيلة نقل الحيوانات أو المنتجات الحيوانية غير معرَّفة لدى السلطة البيطرية', nature: 'مخالفة', act: 'نقل حيوانات أو منتجات حيوانية بوسيلة غير معرَّفة لدى السلطة البيطرية', law: 'vet', nass: 'المادة 16 من المرسوم التنفيذي 04-82', iqab: NA, type: 'court', amount: null, extra: 'السلطة البيطرية تعرِّف وسيلة النقل وتسلم وثيقة بمراجع التعريف (المادة 16)، والمركبة مهيأة لحماية الحيوانات (المادة 15). والمؤسسات (المزارع، أسواق الماشية، المفاقس، مخازن المنتجات الحيوانية، مصانع الأعلاف، الصيد البحري) تحتاج اعتماداً صحياً قبل الاستغلال (المادتان 2 و10). العقوبة لم أتحقق منها', v: 'no'}
+  ]}
+});
+// Which sector permits apply, from the chosen activity and the goods recognised.
+function sectorPermits(ctx){
+  var ids = [], a = ctx.act, pids = (ctx.profiles || []).map(function(p){ return p.id; });
+  var txt = a ? NOMEN_HAY[a.code] + ' ' + NOMEN_TXT[a.code] : '';
+  if ((a && (a.code[0] === '1' || a.code[0] === '2')) || ['sand', 'scrap', 'hazwaste'].some(function(x){ return pids.indexOf(x) >= 0; })) ids.push('env_permit');
+  if (['food', 'veg', 'meat'].some(function(x){ return pids.indexOf(x) >= 0; }) || (a && /aliment|denree|غذايي|غذاييه/.test(txt))) ids.push('food_hyg');
+  if (['livestock', 'meat'].some(function(x){ return pids.indexOf(x) >= 0; }) || (a && /animaux|viande|volaille|poisson|abattage|oeuf|betail|aviculture|elevage/.test(txt))) ids.push('vet_doc');
+  return ids;
+}
+var GROUPS = [['veh', 'وثائق السائق والمركبة'], ['act', 'وثائق النشاط'], ['goods', 'وثائق السلعة'], ['other', 'الوثائق الأخرى: الرخص القطاعية (البيئة، التجارة، البيطرة…)'], ['gen', 'مخالفات عامة أثناء التوقيف'], ['tech', 'حالة المركبة: المخالفات العينية (أضواء، إطارات، فرامل…)'], ['road', 'مخالفات السير (قانون المرور 26-09)']];
 $('sugg').innerHTML = PROFILES.map(function(p){ return '<option value="' + esc(p.label) + '">'; }).join('');
 $('q').value = state.q; $('rcIn').value = state.rcIn || '';
 
@@ -1244,7 +1273,7 @@ function render(){
     var mine = ids.filter(function(id){ return DOCS[id].g === g[0]; });
     if (!mine.length) return '';
     return '<div><div class="lbl">' + g[1] + '</div><ol>' + mine.map(function(id){ return '<li>' + esc(DOCS[id].name) + (DOCS[id].rec ? ' <span class="tag rec">موصى به</span>' : '') + '</li>'; }).join('') + '</ol></div>';
-  }).join('') + otherDocsHtml(act, hits) + '<p class="foot" style="margin:0">المجموع: ' + ids.filter(function(id){ return ['veh', 'act', 'goods'].indexOf(DOCS[id].g) >= 0; }).length + ' وثائق.</p>';
+  }).join('') + otherDocsHtml(act, hits, ids) + '<p class="foot" style="margin:0">المجموع: ' + ids.filter(function(id){ return ['veh', 'act', 'goods', 'other'].indexOf(DOCS[id].g) >= 0; }).length + ' وثائق.</p>';
   var gHtml = {};
   GROUPS.forEach(function(g){ gHtml[g[0]] = ''; });
   GROUPS.forEach(function(g){ gHtml[g[0]] = (function(g){
@@ -1263,7 +1292,7 @@ function render(){
       mine.map(docHtml).join('') + '</section>';
   })(g); });
   $('groups').innerHTML = gHtml.veh + gHtml.act;
-  $('groupsRest').innerHTML = gHtml.goods + gHtml.gen;
+  $('groupsRest').innerHTML = gHtml.goods + gHtml.other + gHtml.gen;
   $('groupsRoad').innerHTML = gHtml.tech + gHtml.road;
 
   // register (codes and/or activity text in one field) vs goods typed
