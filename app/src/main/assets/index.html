@@ -1095,16 +1095,17 @@ function render(){
   var ids = buildList(ctx);
   if (!state.q.trim()) $('match').innerHTML = 'اكتب السلعة لتظهر وثائقها الخاصة. تظهر الآن الوثائق العامة فقط.';
   else if (profs.length) $('match').innerHTML = 'تم التعرف على: ' + profs.map(function(p){ return '<b>' + esc(p.label) + '</b>'; }).join('، ') + (profs.some(function(p){ return p.note; }) ? '<br>' + profs.filter(function(p){ return p.note; }).map(function(p){ return esc(p.note); }).join('<br>') : '') + (zoneHint ? '<br>' + esc(CUSTOMS_NOTE) : '');
+  else if (act) $('match').innerHTML = 'تظهر الوثائق اللازمة لهذا النشاط أدناه. لاختيار نشاط آخر امسح الخانة واكتب السلعة من جديد.';
   else $('match').innerHTML = 'لا وثيقة خاصة بـ«' + esc(state.q) + '» في قائمة السلع المنظمة. تظهر الوثائق العامة لأي سلعة تجارية (الفاتورة أولاً).';
   // Activity picker: the goods typed lead to CNRC codes; choosing one sets the documents and offences.
   var hits = state.q.trim() ? searchCodes(state.q) : [];
   var pick = '';
   if (act) {
-    pick = '<div class="picked"><div class="picked-h"><span class="lbl" style="margin:0;color:var(--hc)">النشاط في السجل التجاري</span><button type="button" class="small" data-pick="">تغيير</button></div>' +
-      '<div><span class="code">' + act.code + '</span> · ' + esc(act.ar) + '</div><div style="direction:ltr;text-align:left;font-size:0.74rem;color:var(--muted)">' + esc(act.fr) + '</div>' +
-      (act.status === 'regulated' ? '<span class="extra">نشاط منظم: أُضيفت رخصته أو اعتماده إلى «وثائق النشاط».</span><span style="direction:ltr;text-align:left;font-size:0.74rem;color:var(--muted)">' + esc([act.auth, act.tutelle].filter(Boolean).join(' — ')) + '</span>' : '') +
-      (act.status === 'blocked' ? '<span class="extra">نشاط مجمّد حالياً: لا يُقبل فيه تسجيل جديد في السجل التجاري.</span>' : '') +
-      (act.code[0] === '1' || act.code[0] === '2' ? '<span class="extra">رمز إنتاج: يغطي بيع ما ينتجه صاحب السجل فقط، لا الشراء لإعادة البيع.</span>' : '') + '</div>';
+    var notes = [];
+    if (act.status === 'regulated') notes.push('<span class="extra">نشاط منظم: أُضيفت رخصته أو اعتماده إلى «وثائق النشاط».</span><span style="direction:ltr;text-align:left;font-size:0.74rem;color:var(--muted)">' + esc([act.auth, act.tutelle].filter(Boolean).join(' — ')) + '</span>');
+    if (act.status === 'blocked') notes.push('<span class="extra">نشاط مجمّد حالياً: لا يُقبل فيه تسجيل جديد في السجل التجاري.</span>');
+    if (act.code[0] === '1' || act.code[0] === '2') notes.push('<span class="extra">رمز إنتاج: يغطي بيع ما ينتجه صاحب السجل فقط، لا الشراء لإعادة البيع.</span>');
+    pick = notes.join('');
   } else if (hits.length) {
     var shown = state.codesAll ? hits : hits.slice(0, 5);
     pick = '<span class="lbl" style="margin:0;color:var(--hc)">اختر نشاط السلعة لتظهر وثائقه ومخالفاته (' + hits.length + ')</span>' +
@@ -1213,7 +1214,7 @@ function render(){
 document.addEventListener('click', function(e){
   if (e.target.closest('#zoneChip')) { state.zone = !state.zone; save(); render(); return; }
   var pk = e.target.closest('[data-pick]');
-  if (pk) { state.actCode = pk.getAttribute('data-pick'); delete state.sel.act_lic; delete state.sel.rc_copy; state.codesAll = false; save(); render(); return; }
+  if (pk) { state.actCode = pk.getAttribute('data-pick'); if (state.actCode) { state.q = state.actCode + ' ' + NOMEN[state.actCode][0]; $('q').value = state.q; } delete state.sel.act_lic; delete state.sel.rc_copy; state.codesAll = false; save(); render(); return; }
   if (e.target.closest('[data-codes-all]')) { state.codesAll = !state.codesAll; render(); return; }
   var ad = e.target.closest('[data-add]');
   if (ad) { var p2 = ad.getAttribute('data-add').split(':'); if (state.extra[p2[0]] === p2[1]) delete state.extra[p2[0]]; else state.extra[p2[0]] = p2[1]; render(); return; }
