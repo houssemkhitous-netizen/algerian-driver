@@ -264,6 +264,7 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
 
   <section class="card" data-tab="who" aria-labelledby="whoH">
     <h2 id="whoH">من أنت؟</h2>
+    <span class="lbl" style="margin:0">السائق</span>
     <div class="chips" id="roleChips" role="group" aria-label="صفتك">
       <button type="button" class="chip" data-role="private">سائق سيارتي الخاصة</button>
       <button type="button" class="chip" data-role="moto">سائق دراجة نارية</button>
@@ -273,6 +274,10 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
       <button type="button" class="chip" data-role="driver">سائق شاحنة أجير</button>
       <button type="button" class="chip" data-role="carrier">ناقل بضائع لحساب الغير</button>
       <button type="button" class="chip" data-role="owner">مالك السلعة ينقلها بنفسه</button>
+    </div>
+    <span class="lbl" style="margin:0">صاحب النشاط</span>
+    <div class="chips" role="group" aria-label="صاحب النشاط">
+      <button type="button" class="chip" data-role="business">صاحب شركة أو محل (صاحب النشاط)</button>
     </div>
     <span class="lbl" id="vehLbl">المركبة</span>
     <div class="chips" id="vehChips" role="group" aria-label="نوع المركبة">
@@ -1058,8 +1063,10 @@ function matchProfiles(q){
 var GOODS_ROLES = ['driver', 'carrier', 'owner'];
 function buildList(ctx){
   var r = ctx.role, ids = ['permis', 'carte_grise', 'assurance'];
+  var biz = r === 'business';
+  if (biz) ids = [];
   var goodsRole = GOODS_ROLES.indexOf(r) >= 0;
-  if (r !== 'moto') ids.push('ct');
+  if (r !== 'moto' && !biz) ids.push('ct');
   if (r === 'moto') ids.push('helmet');
   if (r === 'private' || r === 'taxi') ids.push('belt');
   if (r === 'taxi') ids.push('brevet', 'taxi_lic', 'passengers');
@@ -1068,18 +1075,21 @@ function buildList(ctx){
   if (goodsRole && ctx.veh === 'exceptional') ids.push('transport_ex');
   if (r === 'driver') ids.push('mission');
   if (r === 'carrier') ids = ids.concat(CARRIER_DOCS);
-  if (r === 'owner' || (ctx.act && GOODS_ROLES.indexOf(r) >= 0)) ids.push('rc_copy');
+  if (r === 'owner' || biz || (ctx.act && GOODS_ROLES.indexOf(r) >= 0)) ids.push('rc_copy');
   if (ctx.act && DOCS.act_lic) ids.push('act_lic');
   var profs = ctx.profiles;
-  var hasGoods = goodsRole || profs.length || ctx.act;
+  var hasGoods = goodsRole || biz || profs.length || ctx.act;
   if (hasGoods) {
     var commercial = !profs.length || profs.some(function(p){ return p.commercial !== false; });
     if (commercial) ids.push('invoice');
     profs.forEach(function(p){ p.docs.forEach(function(id){ if (ids.indexOf(id) < 0 && DOCS[id] && (!DOCS[id].zone || ctx.zone)) ids.push(id); }); });
   }
   sectorPermits(ctx).forEach(function(id){ ids.push(id); });
-  ids.push('obey', 'fake_doc', 'respect');
-  Object.keys(DOCS).forEach(function(k){ if (DOCS[k].g === 'road' || DOCS[k].g === 'tech') ids.push(k); });
+  if (biz) ids.push('fake_doc', 'respect');
+  else {
+    ids.push('obey', 'fake_doc', 'respect');
+    Object.keys(DOCS).forEach(function(k){ if (DOCS[k].g === 'road' || DOCS[k].g === 'tech') ids.push(k); });
+  }
   return ids.filter(function(id, i){ return DOCS[id] && ids.indexOf(id) === i; });
 }
 function procsHtml(items){
@@ -1278,6 +1288,7 @@ function render(){
   GROUPS.forEach(function(g){ gHtml[g[0]] = ''; });
   GROUPS.forEach(function(g){ gHtml[g[0]] = (function(g){
     var mine = ids.filter(function(id){ return DOCS[id].g === g[0]; });
+    if ((g[0] === 'road' || g[0] === 'tech') && !mine.length) return '';
     if (g[0] === 'road' || g[0] === 'tech') {
       var qk = g[0] + 'Q';
       var f = normAr(state[qk] || '');
@@ -1293,7 +1304,7 @@ function render(){
   })(g); });
   $('groups').innerHTML = gHtml.veh + gHtml.act;
   $('groupsRest').innerHTML = gHtml.goods + gHtml.other + gHtml.gen;
-  $('groupsRoad').innerHTML = gHtml.tech + gHtml.road;
+  $('groupsRoad').innerHTML = (gHtml.tech + gHtml.road) || '<section class="card"><h2>المخالفات</h2><p class="foot" style="margin:0">مخالفات السير وحالة المركبة تخص السائق. مخالفات صاحب النشاط (السجل التجاري، الفاتورة، الرخص) في «وثائقي» و«السجل».</p></section>';
 
   // register (codes and/or activity text in one field) vs goods typed
   var rcIn = state.rcIn || '';
