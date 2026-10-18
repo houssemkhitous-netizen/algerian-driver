@@ -10,7 +10,18 @@ android {
         versionCode 3
         versionName '1.2'
     }
-    buildTypes { release { minifyEnabled false } }
+    signingConfigs {
+        fixed {
+            storeFile rootProject.file('signing.keystore')
+            storePassword 'alsaiq2026'
+            keyAlias 'app'
+            keyPassword 'alsaiq2026'
+        }
+    }
+    buildTypes {
+        debug { signingConfig signingConfigs.fixed }
+        release { minifyEnabled false; signingConfig signingConfigs.fixed }
+    }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
 }
 dependencies {
