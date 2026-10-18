@@ -254,6 +254,14 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
 .picked { display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--hc); background: var(--hc-soft); border-radius: 8px; padding: 10px; }
 .picked-h { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .picked .code { font-family: var(--f-data); font-weight: 600; color: var(--hc); direction: ltr; unicode-bidi: isolate; }
+
+.ico { flex: none; width: 64px; height: 64px; border-radius: 10px; background: #f4f6f5; border: 1px solid var(--line); display: grid; place-items: center; }
+.ico svg { width: 58px; height: 58px; }
+.dh-l { display: flex; gap: 10px; align-items: center; min-width: 0; flex: 1 1 220px; }
+.needed li .ico-s { display: inline-block; width: 28px; height: 28px; vertical-align: -9px; margin-inline-end: 6px; }
+.needed li .ico-s svg { width: 28px; height: 28px; }
+.ref { display: inline-block; margin-top: 4px; font-size: 0.78rem; color: var(--hc); text-decoration: underline; }
+.ico-note { font-size: 0.72rem; color: var(--muted); margin: 0; }
 </style>
 
 <div class="app" dir="rtl" lang="ar">
@@ -304,9 +312,10 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
   </section>
 
   <section class="card" data-tab="who" aria-labelledby="needH">
-    <h2 id="needH">الوثائق اللازمة</h2>
+    <h2 id="needH">الوثائق والتجهيزات اللازمة</h2>
     <div id="needed" class="needed"></div>
-    <button type="button" class="primary" data-go2="docs">حدد حالة كل وثيقة</button>
+    <p class="ico-note">الصور رسوم توضيحية للتعرف على كل عنصر. رسوم الوثائق تبيّن نوعها فقط وليست نسخاً من النماذج الرسمية.</p>
+    <button type="button" class="primary" data-go2="docs">حدد حالة كل وثيقة وتجهيز</button>
   </section>
 
 
@@ -338,7 +347,7 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
     <p class="foot" style="margin:0">الإجراءات الجزائية يحكمها القانون 25-14 المؤرخ في 3 أوت 2025 المتضمن قانون الإجراءات الجزائية (الجريدة الرسمية 54 لسنة 2025): الجنحة المتلبس بها (المادة 72)، المثول الفوري (المادة 477 وما بعدها)، غرامة الصلح في المخالفات (المادة 489 وما بعدها)، الوساطة (المادة 59 وما بعدها). أرقام هذه المواد من مصدر واحد.<br><br>في «وثائقي» اختر حالة كل وثيقة، وفي «بحث» أضف أي مخالفة، فتظهر هنا مجتمعة مع الإجراءات.</p>
   </section>
 
-  <p class="foot" data-tab="sum">مراجعة أولية وليست استشارة قانونية. مواد قانون المرور مأخوذة من نص القانون 26-09 المؤرخ في 12 ماي 2026 (الجريدة الرسمية رقم 36 بتاريخ 17 ماي 2026). النصوص الأخرى مذكورة تحت كل مخالفة، والموسوم منها «مصدر واحد» أو «غير مؤكد» يحتاج تحققاً. رموز النشاط (2.136 رمزاً): مدونة السجل التجاري 2026 كما نشرتها UpGrowth (رخصة CC BY 4.0) عن المدونة الرسمية للمركز الوطني للسجل التجاري.</p>
+  <p class="foot" data-tab="sum">مراجعة أولية وليست استشارة قانونية. مواد قانون المرور مطابقة سطراً بسطر لنص القانون 26-09 المؤرخ في 12 ماي 2026 كما نُشر في الجريدة الرسمية رقم 36 بتاريخ 17 ماي 2026 (مراجعة 18 أكتوبر 2026). «لا مادة ناصة خاصة» تعني أن القانون يعاقب على الفعل في المادة 121 دون أن يفصّل القاعدة في مادة مستقلة. النصوص الأخرى مذكورة تحت كل مخالفة، والموسوم منها «مصدر واحد» أو «غير مؤكد» يحتاج تحققاً. رموز النشاط (2.136 رمزاً): مدونة السجل التجاري 2026 كما نشرتها UpGrowth (رخصة CC BY 4.0) عن المدونة الرسمية للمركز الوطني للسجل التجاري.</p>
 </div>
 
 <nav class="tabs" aria-label="الأقسام">
@@ -359,7 +368,7 @@ var LAWS = {
   pc: 'القانون رقم 04-02 المؤرخ في 23 جوان 2004 المحدد للقواعد المطبقة على الممارسات التجارية، المعدل والمتمم',
   rc: 'القانون رقم 04-08 المؤرخ في 14 أوت 2004 المتعلق بشروط ممارسة الأنشطة التجارية، المعدل والمتمم',
   tr: 'القانون رقم 01-13 المؤرخ في 7 أوت 2001 المتضمن توجيه النقل البري وتنظيمه',
-  forest: 'القانون رقم 23-21 المؤرخ في 23 ديسمبر 2023 المتعلق بالغابات والثروات الغابية',
+  forest: 'القانون رقم 23-21 المؤرخ في 23 ديسمبر 2023 المتعلق بالغابات والثروات الغابية (الجريدة الرسمية 83 لسنة 2023)',
   smug: 'الأمر رقم 05-06 المؤرخ في 23 أوت 2005 المتعلق بمكافحة التهريب',
   douane: 'قانون الجمارك',
   waste: 'القانون رقم 01-19 المؤرخ في 12 ديسمبر 2001 المتعلق بتسيير النفايات ومراقبتها وإزالتها، المعدل والمتمم بالقانون 25-02',
@@ -551,7 +560,7 @@ Object.assign(DOCS, {
 
 // What the officer does, by procedure type.
 var PROCS = {
-  forfait: ['يطلب وثائق السائق والمركبة (المادة 121، الدرجة الأولى، البند 2).', 'يسلّم للمخالف إخطاراً بالمخالفة يحدد طبيعتها ومبلغ الغرامة الجزافية الواجب دفعه في أجل 45 يوماً. إن تعددت المخالفات يجمعها في إخطار واحد (المادة 110).', 'ما عدا الدفع الإلكتروني الفوري، يحتفظ برخصة السياقة ويسلّم وثيقة تثبت ذلك. لا يوقف الاحتفاظ القدرة على السياقة خلال 10 أيام (المادة 111).', 'تُرد الرخصة بعد دفع الغرامة لدى مصالح المالية أو بريد الجزائر أو إلكترونياً (المادتان 112 و123).', 'إن لم تُدفع في الأجل يُرسل محضر عدم الدفع إلى الجهة القضائية التي تأمر بمضاعفة الغرامة بأمر جزائي (المادة 113).', 'يجوز توقيف المركبة إن لم تُقدَّم الوثائق المطلوبة (المادة 173)، ووضعها في المحشر إن لم تُسوَّ الوضعية خلال 48 ساعة (المادة 177).'],
+  forfait: ['يطلب وثائق السائق والمركبة (المادة 121، الدرجة الأولى، البند 2).', 'يسلّم للمخالف إخطاراً بالمخالفة يحدد طبيعتها ومبلغ الغرامة الجزافية الواجب دفعه في أجل 45 يوماً. إن تعددت المخالفات يجمعها في إخطار واحد (المادة 110).', 'ما عدا الدفع الإلكتروني الفوري، يحتفظ برخصة السياقة ويسلّم وثيقة تثبت ذلك. لا يوقف الاحتفاظ القدرة على السياقة خلال 10 أيام (المادة 111).', 'تُرد الرخصة بعد دفع الغرامة لدى مصالح المالية أو بريد الجزائر أو إلكترونياً (المادتان 112 و123).', 'إن لم تُدفع في الأجل يُرسل محضر عدم الدفع خلال 8 أيام إلى وكيل الجمهورية، وتأمر الجهة القضائية بمضاعفة الغرامة بأمر جزائي (المادة 112).', 'يجوز توقيف المركبة إن لم تُقدَّم الوثائق المطلوبة (المادة 173)، ووضعها في المحشر إن لم تُسوَّ الوضعية خلال 48 ساعة (المادة 177).'],
   court: ['يعاين الجنحة ويطلب الوثائق، ويحتفظ برخصة السياقة ويسلّم للسائق فوراً وثيقة تثبت ذلك (المادة 120).', 'يوقف المركبة عند الاقتضاء (المادة 173) ويأمر ضابط الشرطة القضائية بوضعها في المحشر في الحالات المحددة (المادة 177)، لمدة أقصاها 10 أيام (المادة 178).', 'يسمع المعني في محضر سماع ويدوّن تصريحه ويسأله إن كانت لديه إضافات، ثم يقرأ عليه التصريح فيوقعه أو يُدوَّن رفضه.', 'يختم المحضر بتكييف الوقائع (المادة الناصة والمعاقبة) ويُعلم المعني بأنه سيُرسل إلى العدالة.', 'يرسل محضر المعاينة بغير تمهل إلى وكيل الجمهورية المختص إقليمياً مرفقاً برخصة السياقة، وتطبق أحكام قانون الإجراءات الجزائية 25-14 (المادتان 119 و120).', 'يملك المعني الاعتراض على الوضع في المحشر أمام وكيل الجمهورية الذي يفصل في أجل 5 أيام (المادة 180). ولا تُسترجع المركبة إلا بعد دفع المصاريف (المادة 181).'],
   admin: ['يعاين المخالفة ويحرر محضراً.', 'يضع المركبة في المحشر فوراً على نفقة المخالف (المادة 62 من القانون 01-13).', 'يرسل المحضر إلى الوالي أو المحكمة المختصة خلال شهر (المادة 59 من القانون 01-13).', 'قد يقترح الوالي على الوزير سحب الرخصة مؤقتاً، أو نهائياً في العود.'],
   settle: ['يطلب الفاتورة، ويجب تقديمها عند أول طلب (المادة 13 من القانون 04-02).', 'يفتح الطرود بحضور الناقل ويقارن البضاعة بالفاتورة (المادة 52).', 'يحجز الوثائق والبضاعة عند الاقتضاء، ويحرر محضر جرد ويضع الأختام ويعيّن حارساً (المواد 39 إلى 41).', 'يحرر المحضر خلال 8 أيام موقعاً من الأعوان، ويوقعه المعني أو يُدوَّن رفضه (المادتان 56 و57).', 'يرسل المحضر إلى المدير الولائي للتجارة، الذي يقترح المصالحة أو يحيله إلى وكيل الجمهورية حسب المبلغ (المادتان 55 و60).'],
@@ -721,7 +730,7 @@ TC('wipers', 'ماسحات الزجاج معطلة', 'مخالفة تزويد ا
 TC('windscreen', 'الزجاج الأمامي مكسور أو مشقق يحجب الرؤية', 'مخالفة تزويد المركبات بالتجهيزات التي تسمح للسائق بأن يكون له مجال رؤية كاف، من الدرجة الثالثة (الفئة الأولى)', 'المادة 84', 'المادة 121 (ج، الفئة الأولى، البند 9)', [6000, 6000]);
 TC('tint', 'زجاج معتم أو شريط بلاستيكي على الزجاج', 'مخالفة منع وضع شريط بلاستيكي أو أية مادة معتمة أخرى على زجاج المركبة، من الدرجة الثالثة (الفئة الأولى)', 'المادة 84', 'المادة 121 (ج، الفئة الأولى، البند 10)', [6000, 6000]);
 TC('dirty', 'زجاج متسخ لا يسمح بسياقة آمنة', 'مخالفة إلزامية نظافة زجاج المركبات بما يسمح بسياقة آمنة، من الدرجة الأولى', 'المادة 84', 'المادة 121 (أ، البند 4)', [3000, 3000]);
-TC('safety_kit', 'التجهيزات الإجبارية للسلامة ناقصة (المثلث العاكس، مطفأة الحريق، العجلة الاحتياطية… حسب التنظيم)', 'مخالفة إلزامية توفر المركبة على التجهيزات الإجبارية للسلامة المرورية، من الدرجة الثانية', 'المادة 93', 'المادة 121 (ب، البند 7)', [4000, 4000], 'قائمة التجهيزات الإجبارية يحددها التنظيم', 'one');
+TC('safety_kit', 'التجهيزات الإجبارية للسلامة ناقصة (المثلث العاكس، مطفأة الحريق، العجلة الاحتياطية… حسب التنظيم)', 'مخالفة إلزامية توفر المركبة على التجهيزات الإجبارية للسلامة المرورية، من الدرجة الثانية', 'المادة 93', 'المادة 121 (ب، البند 7)', [4000, 4000], 'التفصيل في «وثائقي» ← التجهيزات الواجب حملها في المركبة', 'one');
 TC('horn_bad', 'منبه صوتي معطل أو غير مطابق (منبهات موسيقية أو مزعجة)', 'مخالفة منع استخدام آلة أو جهاز مركبة غير مطابق، من الدرجة الثانية', 'المادة 82', 'المادة 121 (ب، البند 2)', [4000, 4000]);
 TC('exhaust', 'عادم مثقوب أو دخان كثيف أو ضجيج مفرط', 'مخالفة مستويات انبعاث الدخان والغازات السامة والضجيج المحددة في التنظيم، من الدرجة الرابعة', 'المادة 83', 'المادة 121 (د، البند 21)', [10000, 10000], 'يجوز توقيف المركبة (المادة 173)');
 TC('seat', 'وضعية جلوس السائق أو الركاب غير مطابقة', 'مخالفة وضعية جلوس السائق وركاب المركبة، من الدرجة الثالثة (الفئة الأولى)', NA, 'المادة 121 (ج، الفئة الأولى، البند 16)', [6000, 6000]);
@@ -731,6 +740,128 @@ TC('signal_mod', 'تغييرات على المركبة غير مصرح بها ل
 DOCS.tech_unfit = {g: 'tech', name: 'مركبة غير صالحة للسير (أضرار جسيمة بعد حادث)', fr: '', cases: [{when: 'موجودة', nature: 'مخالفة', act: 'وضع مركبة في السير بعد تعرضها لأضرار جسيمة دون تقرير خبرة أو محضر مراقبة تقنية يثبت قبولها للسير', law: 'route', nass: 'المادة 99', iqab: NA, type: 'court', amount: null, extra: 'توقيف المركبة (المادتان 99 و173). وإذا وقع حادث أدى إلى وفاة تُعد إعادة مركبة غير صالحة للسير ظرفاً مشدداً (المادة 125)', v: 'one'}]};
 ['tyres', 'films', 'windows', 'equip', 'brakes', 'smoke'].forEach(function(k){ delete DOCS['road_' + k]; });
 
+// Equipment to carry on board (Law 26-09: art. 121, 2nd degree, item 7). Fines for the extinguisher postponed in Sept. 2026.
+var EQ_F = 'مخالفة إلزامية توفر المركبة على التجهيزات الإجبارية للسلامة المرورية، من الدرجة الثانية';
+var EQ_I = 'المادة 121 (ب، البند 7)';
+var EQ_DELAY = 'أعلنت السلطات في سبتمبر 2026 تأجيل تحرير المخالفات الخاصة بالمطفأة إلى أن يتوفر العرض الكافي منها في السوق. تحقق من الوضع قبل الاعتماد عليه';
+Object.assign(DOCS, {
+  eq_ext: {g: 'equip', name: 'مطفأة حريق صالحة وجاهزة للاستعمال', fr: 'Extincteur', cases: [
+    {when: 'غير موجودة أو منتهية الصلاحية', nature: 'مخالفة', act: EQ_F, law: 'route', nass: NA, iqab: EQ_I, type: 'forfait', amount: [4000, 4000], extra: EQ_DELAY + '. في سيارات الأجرة والنقل الجماعي والمدرسي ونقل البضائع لحساب الغير يُكتب رقم المطفأة على الباب الأمامي', v: 'one'},
+    {when: 'مركبة تسير بالغاز المميّع (GPL) دون مطفأة بودرة لا تقل عن 2 كغ', nature: 'مخالفة', act: 'عدم تجهيز مركبة تسير بالغاز المميّع بمطفأة مطابقة', law: 'penal', nass: NA, iqab: 'المادة 459 من قانون العقوبات', type: 'court', amount: [10000, 20000], extra: 'وقد يصل إلى الحبس 3 أيام. مصدر واحد (صحافة نقلاً عن الدرك الوطني، سبتمبر 2026)', v: 'one'}
+  ]},
+  eq_tri: {g: 'equip', name: 'المثلث العاكس للإشارة المسبقة', fr: 'Triangle de présignalisation', cases: [
+    {when: 'غير موجود', nature: 'مخالفة', act: EQ_F, law: 'route', nass: NA, iqab: EQ_I, type: 'forfait', amount: [4000, 4000], v: 'one'},
+    {when: 'توقف اضطراري على الطريق دون وضعه', nature: 'مخالفة', act: 'التوقف والوقوف الخطيرين، من الدرجة الثالثة', law: 'route', nass: NA, iqab: 'المادة 121 (ج، الفئة الأولى، البند 6)', type: 'forfait', amount: [6000, 6000], extra: 'تكييف مقترح: إن تُركت المركبة المتوقفة دون إشارة بشكل يشكّل خطراً', v: 'no'}
+  ]},
+  eq_vest: {g: 'equip', name: 'السترة العاكسة (الصدرية الفوسفورية) للسائق', fr: 'Gilet de haute visibilité', cases: [
+    {when: 'غير موجودة', nature: 'مخالفة', act: EQ_F, law: 'route', nass: NA, iqab: EQ_I, type: 'forfait', amount: [4000, 4000], extra: 'تُلبس عند النزول من المركبة على الطريق، خاصة ليلاً أو عند ضعف الرؤية', v: 'one'}
+  ]},
+  eq_aid: {g: 'equip', rec: true, name: 'علبة الإسعافات الأولية', fr: 'Trousse de premiers secours', cases: [
+    {when: 'غير موجودة', nature: '', act: 'حسب الدرك الوطني (حملة «طريقي»، أكتوبر 2026) ليست ضمن التجهيزات الإجبارية للسيارات السياحية، وبعض الصحف تذكرها ضمنها. لم أتحقق من إلزاميتها في النقل الجماعي والمدرسي', type: 'none', amount: null, v: 'no'}
+  ]},
+  eq_spare: {g: 'equip', rec: true, name: 'العجلة الاحتياطية وأدوات تغييرها (الرافعة والمفتاح)', fr: 'Roue de secours, cric, clé', cases: [
+    {when: 'غير موجودة', nature: '', act: 'لم أجد نصاً يجعل غيابها وحده مخالفة. ويغطيها نص «التجهيزات الإجبارية» إن ذكرها التنظيم', type: 'none', amount: null, v: 'no'}
+  ]},
+  eq_taxi: {g: 'equip', name: 'شارة «طاكسي» ولون سيارة الأجرة والعداد وتعريفة الأسعار (حسب نوع الأجرة)', fr: 'Signe TAXI, taximètre, tarifs', cases: [
+    {when: 'ناقصة أو غير مطابقة', nature: 'مخالفة', act: 'عدم احترام قواعد الاستغلال', law: 'tr', nass: 'المادة 61 (البند 3)', iqab: 'المادتان 62 و63', type: 'admin', amount: [4000, 8000], extra: 'تكييف مقترح. التجهيزات المطلوبة يحددها دفتر شروط سيارات الأجرة وقرارات الولاية، لم أتحقق منها', v: 'no'}
+  ]},
+  eq_school: {g: 'equip', name: 'إشارة «نقل مدرسي» الظاهرة على المركبة', fr: 'Signalisation « transport scolaire »', cases: [
+    {when: 'غير موجودة', nature: 'مخالفة', act: 'عدم احترام قواعد الاستغلال', law: 'tr', nass: 'المادة 61 (البند 3)', iqab: 'المادتان 62 و63', type: 'admin', amount: [4000, 8000], extra: 'تكييف مقترح، لم أتحقق من النص المحدد للإشارة', v: 'no'}
+  ]},
+  eq_danger: {g: 'equip', name: 'تجهيزات مركبة نقل المواد الخطرة (مطافئ إضافية، أدوات الطوارئ، إشارات الخطر)', fr: 'Équipements ADR', cases: [
+    {when: 'ناقصة', nature: 'مخالفة', act: 'نقل مواد خطرة في مركبة غير مطابقة للشروط التنظيمية', law: 'danger', nass: 'المرسوم 03-452', iqab: NA, type: 'court', amount: null, extra: 'لا عقوبة في المرسوم نفسه. المادة 173 من قانون المرور تجيز توقيف المركبة. القائمة الدقيقة لم أتحقق منها', v: 'no'}
+  ]}
+});
+
+// ===== Checked line by line against the official Arabic text of Law 26-09 (JO 36, 17 May 2026), 18 Oct. 2026. =====
+var NO_NASS = 'لا مادة ناصة خاصة في القانون 26-09؛ القاعدة التفصيلية في النصوص التطبيقية للقانون 01-14 السارية مؤقتاً (المادة 188)';
+(function(){
+  var set = function(id, i, o){ if (DOCS[id] && DOCS[id].cases[i]) Object.assign(DOCS[id].cases[i], o); };
+  // Nass articles now read from the text
+  set('road_speed10', 0, {nass: 'المادتان 26 و27'}); set('road_speed20', 0, {nass: 'المادتان 26 و27'}); set('road_speed30', 0, {nass: 'المادتان 26 و27'}); set('road_speed30p', 0, {nass: 'المادتان 26 و27'});
+  set('road_phone', 0, {nass: 'المادة 24 (الفقرة 1)'}); set('road_av', 0, {nass: 'المادة 24 (الفقرة 2)'});
+  set('road_stop', 0, {nass: 'المادة 25 (الفقرة 2)'});
+  set('road_prio', 0, {nass: 'المادة 16، و' + NO_NASS});
+  set('road_overtake', 0, {nass: 'المادة 32 (التجاوز قرب ممر الراجلين)، و' + NO_NASS});
+  ['road_line', 'road_lineride', 'road_direction', 'road_accel', 'road_leftlane', 'road_litter', 'road_owner_change'].forEach(function(k){ set(k, 0, {nass: NO_NASS}); });
+  set('road_lights', 0, {nass: 'المادتان 26 و93'});
+  set('road_distance', 0, {nass: 'المادة 33 (الفقرة 2)'});
+  set('road_priority_veh', 0, {nass: 'المادة 27'});
+  set('road_horn', 0, {nass: 'المادة 14'});
+  set('road_parking', 0, {nass: 'المادتان 13 و32'});
+  set('road_danger_park', 0, {nass: 'المادة 13'});
+  set('road_emerg', 0, {nass: 'المادة 18'});
+  set('road_mods_decl', 0, {nass: 'المادة 94 (الفقرة 2)'});
+  set('road_mods', 0, {nass: 'المادتان 94 و96'});
+  set('road_endanger', 0, {nass: 'المادتان 3 (تعريف المناورة الخطيرة) و7'});
+  set('road_drunk', 0, {nass: 'المادة 23 (الفقرة 2)، والمادة 3 (تعريف حالة السكر)'});
+  set('road_detector', 0, {nass: 'المادة 157 (الفقرة 1)'}); set('road_sirens', 0, {nass: 'المادة 157 (الفقرة 2)'});
+  set('road_race', 0, {nass: 'المادة 21'});
+  set('road_hide_driver', 0, {nass: 'المادتان 115 و116', extra: 'تضاعف الغرامة (المادة 58). ويلزم المالك بإعلام السلطة بهوية السائق خلال 10 أيام (المادة 116)، وإن رفض تحمّل المالك المخالفة (المادة 115)'});
+  set('road_flee', 0, {nass: 'المادة 50'});
+  set('road_injury', 0, {nass: 'المادة 33'}); set('road_homicide', 0, {nass: 'المادة 33',
+    extra: 'حبس من سنة إلى 5 سنوات؛ ومن 3 إلى 7 سنوات مع ظرف مشدد (المادة 125)؛ ومن 10 إلى 20 سنة لسائقي الوزن الثقيل والنقل الجماعي والمدرسي والأجرة والبضائع والمواد الخطرة إذا توفي شخصان أو أكثر (المادة 129). يجوز مصادرة المركبة (المادة 163)'});
+  set('helmet', 1, {nass: 'المادة 36 (الفقرة 2)'}); set('helmet', 2, {nass: 'المادة 36 (الفقرة 2)'});
+  set('helmet', 3, {nass: 'المادة 23'});
+  set('tech_seat', 0, {nass: 'المادة 23'});
+  set('tech_no_signal', 0, {nass: NO_NASS});
+  set('tech_tyres_worn', 0, {nass: 'المادتان 23 و82'}); set('tech_tyres_mixed', 0, {nass: 'المادتان 23 و82'}); set('tech_tyres_damaged', 0, {nass: 'المادتان 23 و82'});
+  set('tech_signal_mod', 0, {nass: 'المادة 94 (الفقرة 2)'});
+  set('tech_mudflaps', 0, {extra: 'لا بند صريح لها في المادة 121. قد يكيّفها العون تحت البند 20 من الدرجة الرابعة (الأحكام التي ينجم عنها خطر أو ضرر للغير)، وهذا تكييف لا نص صريح'});
+  set('tech_unfit', 0, {extra: 'توقيف المركبة (المادتان 99 و173). لا عقوبة مستقلة في القانون؛ وإعادة مركبة غير صالحة للسير ظرف مشدد في القتل الخطأ والجرح الخطأ (المادتان 125 و131)'});
+  set('assurance', 0, {nass: 'المادتان 94 و173'});
+  set('load', 4, {nass: 'المادتان 11 و12'});
+  set('permis', 3, {when: 'يقود بعد سحب رخصته إثر متابعة جزائية، أو بعد انقضاء مدة القدرة على السياقة، أو بعد انتهاء مدة الاعتراف برخصة أجنبية', act: 'الاستمرار في قيادة المركبة بعد سحب رخصة السياقة أو انقضاء مدة القدرة على السياقة أو مدة الاعتراف بالرخصة الأجنبية'});
+  set('carte_grise', 3, {extra: 'حبس من 3 إلى 5 سنوات، ومصادرة المركبة والعتاد المستعمل، وتضاعف العقوبة في العود'});
+  set('carte_grise', 2, {extra: 'حبس من 3 أشهر إلى سنتين، ومصادرة المركبة والعتاد المستعمل، وتضاعف العقوبة في العود'});
+  set('dangerous', 0, {extra: 'تكييف: المادة 158 تعاقب على مخالفة «تنظيم النقل الخاضع للرخصة»، ونقل المواد الخطرة خاضع لرخصة مسبقة (المادة 5 من المرسوم 03-452). زيادة على التوقيف الفوري للمركبة، والمادة 173 تجيز توقيف كل مركبة تسير بصفة مخالفة لأحكام نقل المواد الخطرة'});
+  // Equipment: art. 3 defines it (triangle, vest, extinguisher), art. 93 requires it, art. 121 b-7 punishes it
+  var EQN = 'المادة 93، والمادة 3 (تعريف التجهيزات الإجبارية: مثلث الطوارئ والصدرية العاكسة ومطفأة الحريق)';
+  set('tech_safety_kit', 0, {name: undefined, nass: EQN, v: 'ok'});
+  DOCS.tech_safety_kit.name = 'التجهيزات الإجبارية للسلامة ناقصة (مثلث الطوارئ، الصدرية العاكسة، مطفأة الحريق)';
+  set('eq_ext', 0, {nass: EQN, v: 'ok'}); set('eq_tri', 0, {nass: EQN, v: 'ok'}); set('eq_vest', 0, {nass: EQN, v: 'ok'});
+  set('eq_aid', 0, {act: 'ليست ضمن التجهيزات الإجبارية التي تذكرها المادة 3 من القانون 26-09 (مثلث الطوارئ والصدرية العاكسة ومطفأة الحريق)، والقائمة فيها «لا سيما» أي غير حصرية؛ والنص التنظيمي هو الذي يحددها', v: 'one'});
+  set('eq_spare', 0, {act: 'ليست ضمن التجهيزات التي تذكرها المادة 3 من القانون 26-09، والقائمة فيها غير حصرية؛ لم أجد نصاً يجعل غيابها وحده مخالفة', v: 'one'});
+})();
+
+// ===== Checked against official texts: Law 24-02 (JO 15/2024), Law 04-02 (JO 41/2004, original text), Decree 03-452 (JO 75/2003), Law 01-13 (JO 44/2001). =====
+(function(){
+  var set = function(id, i, o){ if (DOCS[id] && DOCS[id].cases[i]) Object.assign(DOCS[id].cases[i], o); };
+  var N0402 = 'مطابق لنص القانون 04-02 (الجريدة الرسمية 41 لسنة 2004) مع تعديله بالقانون 10-06 (الجريدة الرسمية 46 لسنة 2010): المواد 33 و34 و37 و53 لم تُعدّل، والمادة 10 أصبحت تقبل «الفاتورة أو الوثيقة التي تقوم مقامها»، والغلق الإداري صار حتى 60 يوماً (المادة 46)';
+  // Forgery: Law 24-02
+  DOCS.fake_doc.cases = [
+    {when: 'وثيقة إدارية مزورة أو مقلدة (رخصة سياقة، بطاقة رمادية، شهادة، بطاقة…)', nature: 'جنحة', act: 'تقليد أو تزوير أو تزييف رخص أو شهادات أو بطاقات أو غيرها من الوثائق التي تصدرها الإدارات أو المؤسسات العمومية', law: 'faux', nass: 'المادة 22', iqab: 'المادة 22', type: 'court', amount: [500000, 700000], extra: 'حبس من 5 إلى 7 سنوات. حجز الوثيقة واجب (المادة 18). لم أجد في القانون 24-02 مادة مستقلة لمجرد «استعمال» وثائق المادة 22 المزورة، عدا الحالة التالية (المادة 23)', v: 'ok'},
+    {when: 'وثيقة إدارية صادرة باسم شخص آخر، أو متحصل عليها بتصريح كاذب أو صفة كاذبة', nature: 'جنحة', act: 'الحصول بغير حق على وثيقة إدارية أو استعمال وثيقة صادرة باسم غير اسمه', law: 'faux', nass: 'المادة 23', iqab: 'المادة 23', type: 'court', amount: [300000, 500000], extra: 'حبس من 3 إلى 5 سنوات', v: 'ok'},
+    {when: 'وثيقة غير صادرة عن الإدارة مزورة (أمر بمهمة، شهادة أو بطاقة من شركة خاصة…)', nature: 'جنحة', act: 'تقليد أو تزوير أو تزييف شهادات أو بطاقات أو أوامر بمهمة أو غيرها من الوثائق غير الصادرة عن الإدارات العمومية', law: 'faux', nass: 'المادة 30', iqab: 'المادة 30', type: 'court', amount: [100000, 300000], extra: 'حبس من سنة إلى 3 سنوات', v: 'ok'},
+    {when: 'فاتورة وهمية أو مزيفة', nature: 'مخالفة', act: 'تحرير فواتير وهمية أو مزيفة (ممارسة تجارية تدليسية)', law: 'pc', nass: 'المادة 24', iqab: 'المادة 37', type: 'settle', amount: [300000, 10000000], extra: 'حجز البضائع جائز (المادة 39). وقد يُتابع أيضاً بالمادة 35 من القانون 24-02 (من أصدر فاتورة تثبت وقائع غير صحيحة ماديا): حبس من 5 إلى 10 سنوات وغرامة من 500.000 إلى 1.000.000 دج. ' + N0402, v: 'ok'}
+  ];
+  // Invoicing: Law 04-02
+  set('invoice', 0, {nass: 'المواد 10 و11 و13، والمادة 34 (الفقرة الأخيرة)', extra: 'غرامة 80% من المبلغ الواجب فوترته. حجز البضائع أينما وُجدت والعتاد والتجهيزات المستعملة جائز (المادة 39 المعدلة) ومصادرتها بحكم (المادة 44). ' + N0402, v: 'ok'});
+  set('invoice', 1, {extra: N0402, v: 'ok'});
+  set('invoice', 2, {act: 'معارضة المراقبة (ومنها رفض تقديم الوثائق)', extra: 'حبس من 6 أشهر إلى سنتين، أو إحدى العقوبتين. ' + N0402, v: 'ok'});
+  // Dangerous goods: Decree 03-452 has no penalties (checked)
+  set('danger_docs', 0, {extra: 'المرسوم 03-452 لا يتضمن عقوبات (تحققت من نصه). التكييف المقترح: عدم مطابقة وثائق الاستغلال في القانون 01-13: غرامة من 4.000 إلى 8.000 دج (المادة 63) ووضع المركبة في المحشر من 3 إلى 45 يوماً (المادة 62)'});
+  set('danger_driver', 0, {extra: 'المادة 18 من المرسوم 03-452 تشترط الشهادة المهنية وإثبات تكوين خاص، والمادة 79 من القانون 26-09 تشترط شهادة الكفاءة المهنية لنقل المواد الخطرة. وتضاعف عقوبة جنحة تعريض حياة الغير للخطر على السائق غير الحائز لها (المادة 136). المادة 173 تجيز توقيف المركبة'});
+  if (DOCS.eq_danger) { DOCS.eq_danger.name = 'إشارات مركبة نقل المواد الخطرة وتجهيزاتها حسب صنف المادة'; set('eq_danger', 0, {act: 'نقل مواد خطرة في مركبة لا تحمل الإشارة الخاصة بصنف الخطر', nass: 'المادة 15 من المرسوم 03-452', extra: 'المرسوم 03-452 لا يذكر قائمة تجهيزات (مطافئ إضافية وغيرها) ويحيل التفاصيل إلى قرار وزاري مشترك (المادة 23) لم أطّلع عليه. لا عقوبة في المرسوم؛ والمادة 173 من قانون المرور تجيز توقيف المركبة'}); }
+  // Transport law 01-13 (JO 44/2001, read): fines 4.000–8.000 (art. 63) and 8.000–80.000 DA (art. 64), fourrière 3–45 / 15–45 days (art. 62)
+  var N0408 = 'مطابق لنص القانون 04-08 (الجريدة الرسمية 52 لسنة 2004). تعديل 18-08 (الجريدة الرسمية 35 لسنة 2018) لم يمس هذه المادة؛ وتعديل 13-06 لم أطّلع عليه';
+  set('rc_copy', 1, {extra: 'حجز السلعة ووسيلة النقل عند الاقتضاء (المادة 32). ' + N0408});
+  set('rc_copy', 2, {extra: 'غلق إداري مؤقت لشهر، والشطب من السجل بحكم إن لم تُسوَّ الوضعية خلال شهرين (المادة 41). ' + N0408});
+  // Forests: Law 23-21 (JO 83 of 24 Dec. 2023), read
+  DOCS.forest_permit.name = 'رخصة النقل بالتجول للمنتجات الغابية (صادرة عن إدارة الغابات)';
+  set('forest_permit', 0, {when: 'نقل منتج غابي (خشب، حطب، فحم، فلين…) دون رخصة نقل بالتجول، مهما كان مصدره', act: 'نقل منتج غابي دون رخصة نقل بالتجول', nass: 'المادة 108', iqab: 'المادة 150', extra: 'غرامة تساوي ضعف قيمة المنتج المنقول (المادة 150). مصادرة المنتجات والوسائل المستعملة في ارتكاب الجريمة، دون الإخلال بحقوق الغير حسن النية (المادة 159). القانون 23-21، الجريدة الرسمية 83 لسنة 2023', v: 'ok'});
+  set('plants_permit', 0, {when: 'قطف أو نقل فواكه غابية أو نباتات طبية أو عطرية دون رخصة', act: 'قطف أو نقل فواكه غابية أو نباتات طبية أو عطرية دون رخصة من الإدارة المكلفة بالغابات', nass: 'المادة 153', iqab: 'المادة 153', extra: 'عن كل قنطار، باستثناء المنتجات القابلة للاستهلاك بكميات غير قابلة للتسويق. مصادرة المنتجات والوسائل المستعملة (المادة 159). القانون 23-21، الجريدة الرسمية 83 لسنة 2023', v: 'ok'});
+  // Smuggling: Ordinance 05-06 (JO 59 of 28 Aug. 2005), art. 12 read; amendment 06-09 (JO 47/2006) does not touch arts. 10-13
+  set('customs_circ', 0, {iqab: 'المادة 12 من الأمر 05-06', extra: 'حبس من 10 إلى 20 سنة وغرامة تساوي 10 مرات القيمة المجمعة للبضاعة المصادرة ووسيلة النقل (المادة 12 من الأمر 05-06، الجريدة الرسمية 59 لسنة 2005؛ تعديل 06-09 لم يمس هذه المادة). بدون وسيلة نقل: حبس من سنة إلى 5 سنوات وغرامة 5 مرات قيمة البضاعة (المادة 10). المصادرة ولو كانت المركبة لناقل عمومي (المادة 303 من قانون الجمارك، لم أتحقق من نصها). مواد قانون الجمارك 220 إلى 223 لم أتحقق من نصها', v: 'one'});
+  // Insurance: Ordinance 95-07 (JO 13 of 8 March 1995), art. 190 read
+  set('assurance', 1, {extra: 'حبس من 8 أيام إلى 3 أشهر وغرامة من 500 إلى 4.000 دج، أو إحدى العقوبتين (المادة 190 من الأمر 95-07، الجريدة الرسمية 13 لسنة 1995). ويلزم المسؤول عن حادث غير مؤمَّن بدفع مساهمة لصندوق التعويضات تساوي 10% من مبلغ التعويضات (المادة 191). القانون 06-04 (الجريدة الرسمية 15 لسنة 2006) الذي عدّل الأمر 95-07 لم يمس المادتين 190 و191. ' + IMMO, v: 'ok'});
+  // Consumer protection: Law 09-03 (JO 15 of 8 March 2009), arts. 6, 72, 88 read
+  // Waste: Law 01-19 (JO 77 of 15 Dec. 2001), arts. 19, 24, 62 read
+  set('waste_auth', 0, {nass: 'المادتان 19 و24 من القانون 01-19', iqab: 'المادة 62 من القانون 01-19', amount: [400000, 800000], extra: 'حبس من 6 أشهر إلى سنتين وغرامة من 400.000 إلى 800.000 دج، أو إحدى العقوبتين، على من سلّم النفايات الخاصة الخطرة لشخص غير مرخص له (المادة 62)، وتضاعف في العود. نقلها يخضع لترخيص من الوزير المكلف بالبيئة (المادة 24). هذه أرقام نص 2001 (الجريدة الرسمية 77 لسنة 2001)؛ صدر سنة 2025 نص جديد لتسيير النفايات قد يكون غيّرها ولم أطّلع عليه', v: 'one'});
+  set('contrat_tr', 0, {v: 'one', extra: 'جواز وضع المركبة في المحشر من 3 إلى 45 يوماً (المادة 62). الغرامة من 4.000 إلى 8.000 دج وتضاعف في العود خلال 12 شهراً (المادة 63)، حسب نص القانون 01-13 في الجريدة الرسمية 44 لسنة 2001. لم أطّلع على تعديلاته اللاحقة إن وُجدت'});
+})();
+
+DOCS.helmet.g = 'equip';
 delete DOCS.id_card;
 
 
@@ -1071,6 +1202,9 @@ function buildList(ctx){
   if (goodsRole && ctx.veh !== 'light') ids.push('brevet', 'chrono', 'load');
   if (goodsRole && ctx.veh === 'exceptional') ids.push('transport_ex');
   if (r === 'driver') ids.push('mission');
+  if (!biz && r !== 'moto') ids.push('eq_ext', 'eq_tri', 'eq_vest', 'eq_aid', 'eq_spare');
+  if (r === 'taxi') ids.push('eq_taxi');
+  if (r === 'school') ids.push('eq_school');
   if (r === 'carrier') ids = ids.concat(CARRIER_DOCS);
   if (r === 'owner' || biz || (ctx.act && GOODS_ROLES.indexOf(r) >= 0)) ids.push('rc_copy');
   if (ctx.act && DOCS.act_lic) ids.push('act_lic');
@@ -1080,6 +1214,7 @@ function buildList(ctx){
     var commercial = !profs.length || profs.some(function(p){ return p.commercial !== false; });
     if (commercial) ids.push('invoice');
     profs.forEach(function(p){ p.docs.forEach(function(id){ if (ids.indexOf(id) < 0 && DOCS[id] && (!DOCS[id].zone || ctx.zone)) ids.push(id); }); });
+    if (!biz && ids.indexOf('dangerous') >= 0) ids.push('eq_danger');
   }
   sectorPermits(ctx).forEach(function(id){ ids.push(id); });
   if (biz || r === 'owner') ids.push('tax_exist', 'casnos', 'books');
@@ -1218,6 +1353,8 @@ Object.assign(DOCS, {
   ]}
 });
 // Which sector permits apply, from the chosen activity and the goods recognised.
+// Consumer protection: Law 09-03 (JO 15 of 8 March 2009), arts. 6, 72, 88 read
+[0, 1].forEach(function(i){ Object.assign(DOCS.food_hyg.cases[i], {iqab: 'المادة 72 من القانون 09-03', type: 'settle', extra: (DOCS.food_hyg.cases[i].extra || '') + '. غرامة من 50.000 إلى 1.000.000 دج (المادة 72). يمكن للأعوان فرض غرامة صلح قدرها 200.000 دج (المادتان 86 و88)، وإن لم تُدفع في 30 يوماً يُرسل المحضر إلى القضاء وترفع الغرامة إلى حدها الأقصى. القانون 09-03، الجريدة الرسمية 15 لسنة 2009؛ تعديل 18-09 (الجريدة الرسمية 35 لسنة 2018) لم يمس المادتين 72 و88، وأضاف إمكانية الغلق الإداري أو التوقيف المؤقت للنشاط لمدة أقصاها 15 يوماً قابلة للتجديد (المادة 65). المرسوم التنفيذي 17-140 (الجريدة الرسمية 24 لسنة 2017): المواد 34 إلى 38 (النقل) والمادة 55 (المستخدمون) مطابقة', v: 'ok'}); });
 function sectorPermits(ctx){
   var ids = [], a = ctx.act, pids = (ctx.profiles || []).map(function(p){ return p.id; });
   var txt = a ? NOMEN_HAY[a.code] + ' ' + NOMEN_TXT[a.code] : '';
@@ -1226,9 +1363,102 @@ function sectorPermits(ctx){
   if (['livestock', 'meat'].some(function(x){ return pids.indexOf(x) >= 0; }) || (a && /animaux|viande|volaille|poisson|abattage|oeuf|betail|aviculture|elevage/.test(txt))) ids.push('vet_doc');
   return ids;
 }
-var GROUPS = [['veh', 'وثائق السائق والمركبة'], ['act', 'وثائق النشاط'], ['goods', 'وثائق السلعة'], ['other', 'الوثائق الأخرى: الرخص القطاعية (البيئة، التجارة، البيطرة…)'], ['fisc', 'الوثائق الجبائية والاجتماعية والتجارية لصاحب النشاط'], ['gen', 'مخالفات عامة أثناء التوقيف'], ['tech', 'حالة المركبة: المخالفات العينية (أضواء، إطارات، فرامل…)'], ['road', 'مخالفات السير (قانون المرور 26-09)']];
+var GROUPS = [['veh', 'وثائق السائق والمركبة'], ['equip', 'التجهيزات الواجب حملها في المركبة'], ['act', 'وثائق النشاط'], ['goods', 'وثائق السلعة'], ['other', 'الوثائق الأخرى: الرخص القطاعية (البيئة، التجارة، البيطرة…)'], ['fisc', 'الوثائق الجبائية والاجتماعية والتجارية لصاحب النشاط'], ['gen', 'مخالفات عامة أثناء التوقيف'], ['tech', 'حالة المركبة: المخالفات العينية (أضواء، إطارات، فرامل…)'], ['road', 'مخالفات السير (قانون المرور 26-09)']];
 $('sugg').innerHTML = PROFILES.map(function(p){ return '<option value="' + esc(p.label) + '">'; }).join('');
 $('q').value = state.q; $('rcIn').value = state.rcIn || '';
+
+
+// Illustrations close to the real look (examples only; documents are never drawn as replicas of the official forms).
+function svgw(body){ return '<svg viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round">' + body + '</svg>'; }
+var WM = '<text x="32" y="62" text-anchor="middle" font-size="6" font-family="sans-serif" fill="#8a8f94">مثال</text>';
+function docCard(bg, band, label, extra){
+  return svgw('<rect x="3" y="12" width="58" height="38" rx="5" fill="' + bg + '" stroke="#5a6b62" stroke-width="1"/>' +
+    '<rect x="3" y="12" width="58" height="9" rx="5" fill="' + band + '"/><rect x="3" y="17" width="58" height="4" fill="' + band + '"/>' +
+    '<text x="32" y="19" text-anchor="middle" font-size="5.5" font-family="sans-serif" font-weight="700" fill="#fff">' + label + '</text>' +
+    '<rect x="8" y="25" width="13" height="17" rx="1.5" fill="#d7dde0" stroke="#9aa3a8" stroke-width=".8"/><circle cx="14.5" cy="31" r="3.4" fill="#9aa3a8"/><path d="M9.5 41c1-3.6 2.8-5.2 5-5.2s4 1.6 5 5.2" fill="#9aa3a8"/>' +
+    '<path d="M25 27h30M25 32h24M25 37h28M25 42h18" stroke="#7b868c" stroke-width="1.6"/>' + (extra || '') + WM);
+}
+function docPaper(band, label, extra){
+  return svgw('<path d="M14 4h28l10 10v44H14z" fill="#fff" stroke="#8a948f" stroke-width="1.2"/><path d="M42 4v10h10" fill="#eef1ef" stroke="#8a948f" stroke-width="1.2"/>' +
+    '<rect x="14" y="16" width="38" height="7" fill="' + band + '"/><text x="33" y="21.2" text-anchor="middle" font-size="4.2" font-family="sans-serif" font-weight="700" fill="#fff">' + label + '</text>' +
+    '<path d="M19 29h28M19 34h28M19 39h20M19 44h24" stroke="#9aa3a8" stroke-width="1.5"/>' + (extra || '') + WM);
+}
+var STAMP = function(c){ return '<circle cx="44" cy="47" r="6" fill="none" stroke="' + c + '" stroke-width="1.6"/><circle cx="44" cy="47" r="3.6" fill="none" stroke="' + c + '" stroke-width=".9"/>'; };
+var ICONS = {
+  id_card: docCard('#eef4f7', '#2f6f9f', 'بطاقة التعريف'),
+  permis: docCard('#f6eef2', '#9c3b62', 'رخصة السياقة', '<path d="M41 44l2.5-4.5h8L54 44v3H41z" fill="#9c3b62"/><circle cx="44" cy="47.5" r="1.5" fill="#333"/><circle cx="51" cy="47.5" r="1.5" fill="#333"/>'),
+  carte_grise: docCard('#f1f2ee', '#5b6b55', 'بطاقة الترقيم', '<rect x="38" y="43" width="18" height="6" rx="1" fill="#fff" stroke="#222" stroke-width="1"/><path d="M40.5 46h13" stroke="#222" stroke-width="1.1"/>'),
+  brevet: docCard('#f5f1e6', '#a8780c', 'الكفاءة المهنية', '<circle cx="49" cy="44" r="4.5" fill="#d9a400"/><path d="M46 48l-1 6 4-2.4 4 2.4-1-6" fill="#d9a400"/>'),
+  danger_driver: docCard('#fbefe6', '#d9480f', 'مواد خطرة', '<path d="M49 39l6 6-6 6-6-6z" fill="#e8590c"/>'),
+  assurance: docPaper('#2e7d4f', 'شهادة التأمين', '<path d="M44 40l7 2.6v4.6c0 4-3 6.6-7 8-4-1.4-7-4-7-8v-4.6z" fill="#2e7d4f" opacity=".85"/><path d="M41 47l2.2 2.2 4-4" stroke="#fff" stroke-width="1.6"/>'),
+  ct: docPaper('#1d6fa8', 'المراقبة التقنية', '<circle cx="44" cy="48" r="6.5" fill="#2e9d5b"/><path d="M40.8 48l2.3 2.3 4.2-4.3" stroke="#fff" stroke-width="2"/>'),
+  invoice: docPaper('#444b52', 'فاتورة', '<path d="M19 49h28" stroke="#444b52" stroke-width="1.2"/><text x="33" y="55" text-anchor="middle" font-size="5.5" font-family="sans-serif" font-weight="700" fill="#444b52" direction="ltr">0.000 DA</text>'),
+  sand_bon: docPaper('#8a6d3b', 'وصل خروج', STAMP('#8a6d3b')),
+  rc_copy: docPaper('#5b4a8b', 'السجل التجاري', STAMP('#5b4a8b')),
+  licence_tr: docPaper('#1d6fa8', 'رخصة النقل', STAMP('#1d6fa8')), taxi_lic: docPaper('#a8780c', 'رخصة الاستغلال', STAMP('#a8780c')),
+  bus_lic: docPaper('#1d6fa8', 'رخصة الخط', STAMP('#1d6fa8')), school_lic: docPaper('#a8780c', 'النقل المدرسي', STAMP('#a8780c')),
+  contrat_tr: docPaper('#1d6fa8', 'رسالة النقل', STAMP('#1d6fa8')), mission: docPaper('#5a6b62', 'أمر بمهمة', STAMP('#5a6b62')),
+  forest_permit: docPaper('#3f8f2f', 'النقل بالتجول', '<path d="M38 54c0-9 6-14 14-14 0 9-6 14-14 14z" fill="#3f8f2f"/>'),
+  plants_permit: docPaper('#3f8f2f', 'الجمع والنقل', '<path d="M38 54c0-9 6-14 14-14 0 9-6 14-14 14z" fill="#3f8f2f"/>'),
+  vet_cert: docPaper('#8a5a00', 'شهادة بيطرية', STAMP('#8a5a00')), vet_doc: docPaper('#8a5a00', 'اعتماد صحي', STAMP('#8a5a00')),
+  meat_cert: docPaper('#1d6fa8', 'شهادة صحية', '<path d="M44 40v14M37.5 43.5l13 7M37.5 50.5l13-7" stroke="#1d6fa8" stroke-width="2"/>'),
+  food_hyg: docPaper('#1d6fa8', 'شهادة طبية', '<path d="M44 41v12M38 47h12" stroke="#d0312d" stroke-width="3.2"/>'),
+  dangerous: docPaper('#d9480f', 'رخصة مسبقة', '<path d="M44 40l7 7-7 7-7-7z" fill="#e8590c"/>'),
+  danger_docs: docPaper('#d9480f', 'المادة الخطرة', '<path d="M44 40l7 7-7 7-7-7z" fill="#e8590c"/>'),
+  waste_auth: docPaper('#d9480f', 'نقل النفايات', '<path d="M44 40l7 7-7 7-7-7z" fill="#e8590c"/>'),
+  customs_circ: docPaper('#2f6f9f', 'رخصة التنقل', STAMP('#2f6f9f')),
+  tobacco: docPaper('#6b4f2a', 'وثيقة الحركة', STAMP('#6b4f2a')), pharma: docPaper('#2e9d5b', 'اعتماد', STAMP('#2e9d5b')),
+  eq_ext: svgw('<ellipse cx="32" cy="60" rx="13" ry="2.5" fill="#000" opacity=".15"/>' +
+    '<rect x="21" y="18" width="20" height="41" rx="9" fill="#c62828"/><rect x="24" y="20" width="4" height="36" rx="2" fill="#fff" opacity=".28"/>' +
+    '<rect x="23" y="30" width="16" height="15" rx="1.5" fill="#fff"/><path d="M26 34h10M26 37.5h10M26 41h7" stroke="#c62828" stroke-width="1.3"/>' +
+    '<rect x="27" y="11" width="8" height="8" rx="1" fill="#2b2b2b"/><path d="M27 12l-6-4h14l6 3" fill="#3a3a3a" stroke="#2b2b2b" stroke-width="1.5"/>' +
+    '<circle cx="38" cy="14" r="3.2" fill="#e8e8e8" stroke="#555" stroke-width="1"/><path d="M38 14l1.6-1.6" stroke="#2e9d5b" stroke-width="1.2"/>' +
+    '<path d="M35 11c8 0 12 4 12 12v8" stroke="#1f1f1f" stroke-width="3"/><path d="M45 31h4l-1 5h-2z" fill="#1f1f1f"/>'),
+  eq_tri: svgw('<ellipse cx="32" cy="58" rx="22" ry="3" fill="#000" opacity=".15"/>' +
+    '<path d="M32 6l25 43H7z" fill="#d32f2f"/><path d="M32 17l15.5 26.5h-31z" fill="#fff"/><path d="M32 22l11 19H21z" fill="#ff6f61" opacity=".35"/>' +
+    '<path d="M18 49l-6 9M46 49l6 9M18 55h28" stroke="#444" stroke-width="2.2"/>'),
+  eq_vest: svgw('<path d="M22 6l-12 8 3 44h38l3-44-12-8-6 11h-8z" fill="#d7ec1f" stroke="#8e9c00" stroke-width="1.4"/>' +
+    '<path d="M22 6l4 11h-2l-3-10zM42 6l-4 11h2l3-10z" fill="#b6c800"/>' +
+    '<path d="M11.2 33h41.6" stroke="#c9ced3" stroke-width="5"/><path d="M11.8 44h40.4" stroke="#c9ced3" stroke-width="5"/>' +
+    '<path d="M11.2 33h41.6M11.8 44h40.4" stroke="#fff" stroke-width="1.3" opacity=".8"/><path d="M32 17v41" stroke="#8e9c00" stroke-width="1.4" stroke-dasharray="2 1.5"/>'),
+  eq_aid: svgw('<ellipse cx="32" cy="58" rx="24" ry="3" fill="#000" opacity=".15"/>' +
+    '<path d="M24 16v-5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5" stroke="#1b5e20" stroke-width="3"/>' +
+    '<rect x="6" y="16" width="52" height="38" rx="6" fill="#2e7d32"/><rect x="6" y="16" width="52" height="8" rx="6" fill="#388e3c"/>' +
+    '<rect x="24" y="26" width="16" height="22" rx="2" fill="#fff"/><rect x="21" y="31" width="22" height="12" rx="2" fill="#fff"/><path d="M32 29v16M24 37h16" stroke="#2e7d32" stroke-width="0"/>'),
+  eq_spare: svgw('<circle cx="28" cy="32" r="22" fill="#262626"/><circle cx="28" cy="32" r="22" fill="none" stroke="#3d3d3d" stroke-width="3" stroke-dasharray="3 2.5"/>' +
+    '<circle cx="28" cy="32" r="13" fill="#b0b6bb"/><circle cx="28" cy="32" r="10" fill="#cfd4d8"/><circle cx="28" cy="32" r="3.5" fill="#6b7277"/>' +
+    '<circle cx="28" cy="24.5" r="1.5" fill="#6b7277"/><circle cx="35" cy="34.5" r="1.5" fill="#6b7277"/><circle cx="21" cy="34.5" r="1.5" fill="#6b7277"/><circle cx="32.5" cy="39" r="1.5" fill="#6b7277"/><circle cx="23.5" cy="39" r="1.5" fill="#6b7277"/>' +
+    '<path d="M48 58l6-14h4l-2 14z" fill="#e53935"/><path d="M52 44v-6M49 38h6" stroke="#555" stroke-width="2"/>'),
+  helmet: svgw('<path d="M8 40c0-16 11-28 26-28 13 0 23 10 23 23v5H8z" fill="#263238"/><path d="M14 26c4-7 11-11 19-11" stroke="#fff" stroke-width="2.4" opacity=".25"/>' +
+    '<path d="M33 27h24v11H33z" fill="#5fa8d3" opacity=".9"/><path d="M36 29h17" stroke="#fff" stroke-width="1.5" opacity=".6"/>' +
+    '<path d="M6 41h52v4H6z" fill="#111"/><path d="M14 45v6c0 3 3 4 6 4h4" stroke="#111" stroke-width="2"/>' +
+    '<path d="M42 50h12v8H42z" fill="#455a64" rx="2"/><path d="M42 50v-4h3v4M45 50v-5h3v5M48 50v-5h3v5M51 50v-4h3v4" fill="#546e7a"/>'),
+  eq_taxi: svgw('<path d="M16 6h32l3 12H13z" fill="#ffcf00" stroke="#222" stroke-width="1.4"/><text x="32" y="15.5" text-anchor="middle" font-size="8" font-family="sans-serif" font-weight="900" fill="#222">TAXI</text>' +
+    '<path d="M6 44l6-14c1-2 3-3 5-3h30c2 0 4 1 5 3l6 14v8H6z" fill="#ffcf00" stroke="#222" stroke-width="1.4"/><path d="M14 31h36l4 10H10z" fill="#9bc4e2"/><path d="M32 31v10" stroke="#222" stroke-width="1.4"/>' +
+    '<rect x="4" y="40" width="5" height="3" fill="#fff59d"/><rect x="55" y="40" width="5" height="3" fill="#fff59d"/>' +
+    '<circle cx="17" cy="52" r="5.5" fill="#222"/><circle cx="17" cy="52" r="2.2" fill="#aaa"/><circle cx="47" cy="52" r="5.5" fill="#222"/><circle cx="47" cy="52" r="2.2" fill="#aaa"/>' +
+    '<rect x="24" y="46" width="16" height="4" fill="#fff" stroke="#222" stroke-width="1"/>'),
+  eq_school: svgw('<rect x="6" y="10" width="52" height="34" rx="4" fill="#ffcf00" stroke="#222" stroke-width="1.6"/><rect x="10" y="14" width="44" height="26" rx="2" fill="none" stroke="#222" stroke-width="1"/>' +
+    '<circle cx="24" cy="21" r="3.5" fill="#222"/><path d="M18 34c1-5 3-8 6-8s5 3 6 8" fill="#222"/><circle cx="40" cy="22" r="3" fill="#222"/><path d="M35 34c1-4 2.5-7 5-7s4 3 5 7" fill="#222"/><path d="M30 31l4-3" stroke="#222" stroke-width="1.6"/>' +
+    '<path d="M32 44v16" stroke="#555" stroke-width="2.4"/>'),
+  eq_danger: svgw('<rect x="6" y="6" width="26" height="20" rx="1.5" fill="#f57c00" stroke="#222" stroke-width="1.6"/><path d="M6 16h26" stroke="#222" stroke-width="1.6"/><text x="19" y="14.3" text-anchor="middle" font-size="6.5" font-family="monospace" font-weight="700" fill="#222">33</text><text x="19" y="24" text-anchor="middle" font-size="6.5" font-family="monospace" font-weight="700" fill="#222">1203</text>' +
+    '<path d="M46 26l14 14-14 14-14-14z" fill="#e53935" stroke="#fff" stroke-width="1.2"/><path d="M46 33c-3 4-3 7 0 9 3-2 3-5 0-9z" fill="#fff"/><text x="46" y="51" text-anchor="middle" font-size="5" font-family="sans-serif" font-weight="700" fill="#fff">3</text>' +
+    '<path d="M8 40l14-0v14H8z" fill="#fff" stroke="#c62828" stroke-width="1.4"/><path d="M11 50l4-6 4 6" fill="#c62828"/>'),
+  chrono: svgw('<rect x="6" y="14" width="52" height="36" rx="4" fill="#263238"/><rect x="10" y="18" width="44" height="12" rx="1.5" fill="#9ccc65"/><text x="32" y="26.5" text-anchor="middle" font-size="7" font-family="monospace" font-weight="700" fill="#1b3a10" direction="ltr" unicode-bidi="embed">04:30</text>' +
+    '<rect x="10" y="34" width="20" height="12" rx="1.5" fill="#37474f"/><rect x="12" y="38" width="16" height="3" fill="#90a4ae"/><circle cx="38" cy="40" r="3" fill="#90a4ae"/><circle cx="48" cy="40" r="3" fill="#90a4ae"/>'),
+  load: svgw('<rect x="3" y="18" width="36" height="24" rx="1.5" fill="#b0bec5" stroke="#455a64" stroke-width="1.4"/><path d="M39 26h11l9 9v7H39z" fill="#1d6fa8" stroke="#123c5c" stroke-width="1.4"/><path d="M42 28h7l6 6H42z" fill="#bbdefb"/>' +
+    '<circle cx="12" cy="46" r="5" fill="#222"/><circle cx="24" cy="46" r="5" fill="#222"/><circle cx="50" cy="46" r="5" fill="#222"/>' +
+    '<path d="M12 6h18l-3 8H15z" fill="#d32f2f"/><text x="21" y="12.5" text-anchor="middle" font-size="5" font-family="sans-serif" font-weight="700" fill="#fff">+%</text><text x="21" y="34" text-anchor="middle" font-size="7" font-family="sans-serif" font-weight="800" fill="#37474f">طن</text>'),
+  transport_ex: svgw('<rect x="2" y="26" width="44" height="12" fill="#90a4ae" stroke="#455a64" stroke-width="1.2"/><path d="M46 28h8l7 7v3H46z" fill="#1d6fa8"/><rect x="6" y="14" width="34" height="12" rx="2" fill="#78909c"/>' +
+    '<circle cx="9" cy="42" r="4" fill="#222"/><circle cx="18" cy="42" r="4" fill="#222"/><circle cx="27" cy="42" r="4" fill="#222"/><circle cx="54" cy="42" r="4" fill="#222"/>' +
+    '<rect x="10" y="50" width="40" height="8" fill="#ffcf00" stroke="#222" stroke-width="1"/><text x="30" y="56.3" text-anchor="middle" font-size="5" font-family="sans-serif" font-weight="800" fill="#222">نقل استثنائي</text>'),
+  passengers: svgw('<path d="M8 20h48v26H8z" fill="#eceff1" stroke="#607d8b" stroke-width="1.4"/>' +
+    '<circle cx="19" cy="27" r="3.5" fill="#1d6fa8"/><path d="M13 42c.5-6 3-9 6-9s5.5 3 6 9" fill="#1d6fa8"/><circle cx="32" cy="27" r="3.5" fill="#1d6fa8"/><path d="M26 42c.5-6 3-9 6-9s5.5 3 6 9" fill="#1d6fa8"/><circle cx="45" cy="27" r="3.5" fill="#d32f2f"/><path d="M39 42c.5-6 3-9 6-9s5.5 3 6 9" fill="#d32f2f"/>' +
+    '<path d="M40 50l10 0M45 46v8" stroke="#d32f2f" stroke-width="2.4"/>'),
+  belt: svgw('<path d="M14 58V24c0-9 6-16 15-16h4c6 0 10 5 10 11v39z" fill="#455a64"/><path d="M18 58V26c0-7 4-12 11-12" stroke="#607d8b" stroke-width="2" fill="none"/>' +
+    '<path d="M40 10L18 52" stroke="#212121" stroke-width="6"/><path d="M40 10L18 52" stroke="#d32f2f" stroke-width="2"/><rect x="12" y="48" width="12" height="9" rx="2" fill="#bdbdbd" stroke="#616161" stroke-width="1"/>')
+};
+function iconFor(id){ var d = DOCS[id]; if (!d) return ''; if (ICONS[id]) return ICONS[id]; if (['road', 'tech', 'gen'].indexOf(d.g) >= 0) return ''; return docPaper('#5a6b62', '', STAMP('#5a6b62')); }
 
 function docHtml(id){
         var d = DOCS[id], k = state.sel[id] == null ? '' : String(state.sel[id]);
@@ -1249,7 +1479,7 @@ function docHtml(id){
             (closing(c) ? '<details class="pvc"' + (k === String(i) ? ' open' : '') + '><summary>اختتام المحضر</summary><div class="pv">' + esc(closing(c)) + '</div><button type="button" class="small" data-copy-pv="' + id + ':' + i + '">نسخ النص</button></details>' : (c.type === 'forfait' ? '<div class="extra">تُسوّى بغرامة جزافية: لا محضر يُرسل إلى العدالة إلا إذا لم تُدفع الغرامة في أجلها.</div>' : '')) + '</div>';
         }).join('');
         return '<div class="doc' + (bad ? ' missing' : '') + '">' +
-          '<div class="doc-h"><div style="min-width:0"><span class="name">' + esc(d.name) + '</span>' + tags + '<div class="fr">' + esc(d.fr || '') + '</div></div>' +
+          '<div class="doc-h"><div class="dh-l">' + (iconFor(id) ? '<span class="ico" title="مثال توضيحي">' + iconFor(id) + '</span>' : '') + '<div style="min-width:0"><span class="name">' + esc(d.name) + '</span>' + tags + '<div class="fr">' + esc(d.fr || '') + '</div>' + (d.ref ? '<a class="ref" href="' + esc(d.ref.url) + '" target="_blank" rel="noopener">' + esc(d.ref.label) + ' ↗</a>' : '') + '</div></div>' +
           '<select data-sel="' + id + '" aria-label="حالة: ' + esc(d.name) + '">' + opts + '</select></div>' +
           '<details' + (bad ? ' open' : '') + '><summary>المخالفات والإجراءات (' + d.cases.length + ')</summary><div class="body">' + rows + '</div></details></div>';
 }
@@ -1292,9 +1522,9 @@ function render(){
   var groupList = function(keys){ return GROUPS.filter(function(g){ return keys.indexOf(g[0]) >= 0; }).map(function(g){
     var mine = ids.filter(function(id){ return DOCS[id].g === g[0]; });
     if (!mine.length) return '';
-    return '<div><div class="lbl">' + g[1] + '</div><ol>' + mine.map(function(id){ return '<li>' + esc(DOCS[id].name) + (DOCS[id].rec ? ' <span class="tag rec">موصى به</span>' : '') + '</li>'; }).join('') + '</ol></div>';
+    return '<div><div class="lbl">' + g[1] + '</div><ol>' + mine.map(function(id){ return '<li>' + (iconFor(id) ? '<span class="ico-s">' + iconFor(id) + '</span>' : '') + esc(DOCS[id].name) + (DOCS[id].rec ? ' <span class="tag rec">موصى به</span>' : '') + '</li>'; }).join('') + '</ol></div>';
   }).join(''); };
-  $('needed').innerHTML = groupList(['veh', 'act', 'goods']) + otherDocsHtml(act, hits, ids) + groupList(['fisc']) + '<p class="foot" style="margin:0">المجموع: ' + ids.filter(function(id){ return ['veh', 'act', 'goods', 'other', 'fisc'].indexOf(DOCS[id].g) >= 0; }).length + ' وثائق.</p>';
+  $('needed').innerHTML = groupList(['veh', 'equip', 'act', 'goods']) + otherDocsHtml(act, hits, ids) + groupList(['fisc']) + '<p class="foot" style="margin:0">المجموع: ' + ids.filter(function(id){ return ['veh', 'act', 'goods', 'other', 'fisc'].indexOf(DOCS[id].g) >= 0; }).length + ' وثائق' + (ids.some(function(id){ return DOCS[id].g === 'equip'; }) ? ' و' + ids.filter(function(id){ return DOCS[id].g === 'equip'; }).length + ' تجهيزات' : '') + '.</p>';
   var gHtml = {};
   GROUPS.forEach(function(g){ gHtml[g[0]] = ''; });
   GROUPS.forEach(function(g){ gHtml[g[0]] = (function(g){
@@ -1310,10 +1540,10 @@ function render(){
     }
     if (!mine.length) return '';
     var bad = mine.filter(function(id){ var k = state.sel[id]; return k != null && k !== '' && DOCS[id].cases[+k].type !== 'none'; }).length;
-    return '<section class="card hc-' + g[0] + '"><div class="group-h"><h2>' + g[1] + '</h2><span class="count">' + mine.length + ' وثائق' + (bad ? ' · <b style="color:var(--bad)">' + bad + ' مخالفات</b>' : '') + '</span></div>' +
+    return '<section class="card hc-' + g[0] + '"><div class="group-h"><h2>' + g[1] + '</h2><span class="count">' + mine.length + (g[0] === 'equip' ? ' تجهيزات' : ' وثائق') + (bad ? ' · <b style="color:var(--bad)">' + bad + ' مخالفات</b>' : '') + '</span></div>' +
       mine.map(docHtml).join('') + '</section>';
   })(g); });
-  $('groups').innerHTML = gHtml.veh + gHtml.act;
+  $('groups').innerHTML = gHtml.veh + gHtml.equip + gHtml.act;
   $('groupsRest').innerHTML = gHtml.goods + gHtml.other + gHtml.fisc + gHtml.gen;
   $('groupsRoad').innerHTML = (gHtml.tech + gHtml.road) || '<section class="card"><h2>المخالفات</h2><p class="foot" style="margin:0">مخالفات السير وحالة المركبة تخص السائق. مخالفات صاحب النشاط (السجل التجاري، الفاتورة، الرخص) في «وثائقي» و«السجل».</p></section>';
 
