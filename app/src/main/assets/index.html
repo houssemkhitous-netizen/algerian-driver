@@ -317,7 +317,7 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
       <button type="button" class="chip" data-role="business">صاحب شركة أو محل (لا أقود)</button>
     </div>
     <p class="match" id="roleNow" style="margin:0"></p>
-    <span class="lbl" id="vehLbl">الوزن والحمولة</span>
+    <span class="lbl" id="vehLbl">وزن الشاحنة</span>
     <div class="chips" id="vehChips" role="group" aria-label="نوع المركبة">
       <button type="button" class="chip" data-veh="light">نفعية حتى 3,5 طن</button>
       <button type="button" class="chip" data-veh="heavy">شاحنة أكثر من 3,5 طن</button>
@@ -568,6 +568,8 @@ function closing(c){
       ? '- الأصل إلى السيد المدير الولائي للتجارة لولاية …………… (المادة 55 من القانون 04-02)، وهو الذي يحيله إلى وكيل الجمهورية أو يقترح المصالحة إن كانت الغرامة لا تتجاوز 1.000.000 دج (المادة 60)'
       : c.type === 'admin'
       ? '- الأصل إلى السيد والي ولاية إقامة المخالف …………… (المادة 59 من القانون 01-13)، الذي يقرر العقوبة الإدارية بعد رأي لجنة العقوبات الإدارية (المادة 62)\n- نسخة إلى السيد وكيل الجمهورية لدى محكمة …………… إن كانت الوقائع تستوجب متابعة جزائية'
+      : c.law === 'mines'
+      ? '- الأصل مرفقاً بنسختين منه إلى السيد وكيل الجمهورية لدى محكمة …………… فوراً (المادة 187 من القانون 25-12)'
       : '- الأصل + نسخة طبق الأصل إلى السيد وكيل الجمهورية لدى محكمة ……………' + (c.law === 'route' ? ' مرفقاً برخصة السياقة المحتفظ بها' : '')) +
     (c.type === 'customs' ? '\n- نسخة إلى مصالح الجمارك المختصة إقليمياً' : '') +
     (c.law === 'forest' ? '\n- نسخة إلى السيد محافظ الغابات لولاية ……………' : '') +
@@ -1008,6 +1010,40 @@ Object.assign(DOCS, {
   ]}
 });
 
+// ===== Re-checked against the uploaded Journal officiel PDFs: Law 25-12 (JO 52/2025), Law 26-09 (JO 36/2026), Law 01-13 (JO 44/2001), Decree 03-452 (JO 75/2003). =====
+(function(){
+  var set = function(id, i, o){ if (DOCS[id] && DOCS[id].cases[i]) Object.assign(DOCS[id].cases[i], o); };
+  var T1 = 'المادتان 61 (البند 1) و63 من القانون 01-13', T3 = 'المادتان 61 (البند 3) و63 من القانون 01-13';
+  var P = 'غرامة من 4.000 إلى 8.000 دج تضاعف في العود خلال 12 شهراً (المادة 63)، وجواز وضع المركبة في المحشر من 3 إلى 45 يوماً على نفقة المخالف (المادة 62). المادة 61 (البند 1) تعاقب على عدم مراعاة التعليمات الخاصة بالوثائق المتعلقة باستغلال مركبات النقل المنصوص عليها في القانون 01-13 والنصوص المتخذة لتطبيقه، والبند 3 على عدم احترام نظام الاستغلال و/أو دفتر الشروط. نص الجريدة الرسمية 44 لسنة 2001';
+  // Mining law 25-12
+  DOCS.sand_bon.cases = [
+    {when: 'رمل أو حصى أو مواد مقلع مستخرجة من مكان غير مرخص (استخراج دون سند منجمي)', nature: 'جنحة', act: 'ممارسة نشاط استغلال منجمي دون سند أو رخصة منجميين', law: 'mines', nass: 'المادة 190', iqab: 'المادة 190', type: 'court', amount: [1000000, 3000000], extra: 'حبس من سنة إلى 3 سنوات (المادة 190). يمكن حجز التجهيزات والعتاد والوسائل المستعملة في الجريمة، ومنها المركبة (المادة 209)، وتقضي المحكمة بمصادرتها عند الإدانة مع مراعاة حقوق الغير حسن النية (المادة 210). القانون 25-12 لا ينص على جريمة مستقلة للناقل وحده: تقوم مسؤوليته إن شارك في الاستخراج أو كان يعلم به. المقالع تُستغل برخصة استغلال (المادة 99) أو ترخيص من الوالي لمدة سنتين قابلة للتجديد مرة (المادتان 113 و114). الجريدة الرسمية 52 لسنة 2025', v: 'ok'},
+    {when: 'المواد من مقلع مرخص لكن دون فاتورة أو وصل خروج', nature: '', act: 'لا تقوم جريمة منجمية إن ثبت أن المقلع مرخص. يبقى غياب الفاتورة مخالفة فوترة (انظر «فاتورة البضاعة»)', type: 'none', amount: null, v: 'ok'}
+  ];
+  // Taxi: Law 01-13 arts 61-63 read
+  ['taxi_seats', 'taxi_meter_card'].forEach(function(id){ DOCS[id].cases.forEach(function(c, i){ if (!(id === 'taxi_seats' && i === 2)) Object.assign(c, {iqab: T1, extra: P, v: 'ok'}); }); });
+  set('taxi_seats', 2, {iqab: T3, extra: P, v: 'ok'});
+  set('taxi_receipts', 0, {iqab: T3, extra: P, v: 'ok'});
+  set('eq_taxi_cover', 0, {iqab: T3, extra: P, v: 'ok'}); set('eq_taxi_cover', 1, {iqab: T3, v: 'ok'});
+  set('eq_taxi', 0, {iqab: T3, v: 'ok'});
+  // Dangerous goods: Decree 03-452 was issued under art. 38 of Law 01-13
+  set('danger_docs', 0, {iqab: T1, extra: 'السائق يقدم الوثائق التي تبيّن طبيعة المواد وصنفها ووزنها كلما طلبتها السلطات المؤهلة (المادة 19 من المرسوم 03-452). المرسوم صدر تطبيقاً للمادة 38 من القانون 01-13 ولا عقوبة فيه. ' + P, v: 'ok'});
+  DOCS.dangerous.cases.push({when: 'شحن مواد خطرة مع مواد غذائية، أو مواد متعارضة في المركبة نفسها، أو مواد صلبة خطرة سائبة', nature: 'مخالفة', act: 'خرق ممنوعات شحن المواد الخطرة', law: 'tr', nass: 'المادة 12 من المرسوم 03-452', iqab: T3, type: 'admin', amount: [4000, 8000], extra: 'تكييفها بعدم احترام نظام الاستغلال (البند 3) قراءتي للنص. ' + P, v: 'one'});
+  // Law 26-09
+  ['danger_signs', 'eq_danger'].forEach(function(id){ DOCS[id].cases.forEach(function(c){ if (c.v === 'no') Object.assign(c, {iqab: T3, type: 'admin', amount: [4000, 8000], extra: (c.extra ? c.extra + '. ' : '') + 'تكييفها بعدم احترام نظام الاستغلال (البند 3) قراءتي للنص؛ المرسوم 03-452 لا عقوبة فيه. ' + P, v: 'one'}); }); });
+  set('trailer', 0, {nass: 'المادتان 86 و94 من القانون 26-09، والمرسوم 25-169', v: 'ok'});
+  DOCS.rental_contract.cases[0].act = 'عند كراء المركبة أو إعارتها تقع المسؤولية المدنية على المستأجر أو المستعير، ويتحمل السائق المسؤولية الجزائية (المادة 57 من القانون 26-09). لم أجد نصاً يفرض حمل عقد الكراء أو يعاقب على غيابه، ونشاط «كراء السيارات مع أو بدون سائق» (الرمز 603004) غير مصنف نشاطاً منظماً. العقد يُنصح بحمله لإثبات أنك تقود المركبة بإذن الوكالة';
+  DOCS.rental_contract.cases[0].v = 'ok';
+})();
+Object.assign(DOCS, {
+  foreign_licence: {g: 'veh', name: 'رخصة سياقة أجنبية سارية (مع رخصة دولية للمقيم بالخارج)', fr: 'Permis étranger', cases: [
+    {when: 'رخصة أجنبية انقضت مدة الاعتراف بها في الجزائر', nature: 'جنحة', act: 'قيادة مركبة دون حيازة رخصة السياقة أو برخصة غير موافقة لصنف المركبة', law: 'route', nass: 'المادتان 64 و76', iqab: 'المادة 141', type: 'court', amount: [50000, 100000], extra: 'يُعترف بالرخصة الأجنبية السارية 6 أشهر للمواطنين والأجانب غير المقيمين، وسنة للأجانب المقيمين، ثم يجب استبدالها برخصة جزائرية مع مراعاة المعاملة بالمثل (المادتان 75 و76). ويمكن للجزائري المقيم بالخارج السياقة سنة إذا كانت رخصته الأجنبية مرفقة برخصة دولية مطابقة للمعايير الدولية (المادة 76). تكييف القيادة بعد هذه المدة كقيادة دون رخصة قراءتي للنص. حبس من 6 أشهر إلى سنة أو إحدى العقوبتين (المادة 141)', v: 'one'}
+  ]},
+  autoecole_eq: {g: 'equip', name: 'جهاز القيادة المزدوج للكبح والوصل في سيارة التعليم', fr: 'Double commande', cases: [
+    {when: 'سيارة التعليم دون جهاز قيادة مزدوج', nature: 'مخالفة', act: 'مخالفة الأحكام المتعلقة بتعليم سياقة المركبات ذات محرك، من الدرجة الثانية', law: 'route', nass: 'المادة 91', iqab: 'المادة 121 (ب، البند 13)', type: 'forfait', amount: [4000, 4000], extra: 'المادة 91 تفرض تجهيز مركبات التعليم بالأجهزة اللازمة، لا سيما جهاز القيادة المزدوج للكبح والوصل. ربطها بالبند 13 قراءتي للنص. التعليم مجاناً خارج مدارس السياقة مسموح لأصناف A1 وA وB فقط (المادة 67)', v: 'one'}
+  ]}
+});
+
 DOCS.helmet.g = 'equip';
 delete DOCS.id_card;
 
@@ -1349,8 +1385,8 @@ function buildList(ctx){
   if (r === 'tractor') ids.push('tractor_rules');
   if (r === 'rental') ids.push('rental_contract');
   if (r === 'company') ids.push('mission');
-  if (r === 'autoecole') ids.push('autoecole_agr');
-  if (r === 'foreign') ids.push('tpd');
+  if (r === 'autoecole') ids.push('autoecole_agr', 'autoecole_eq');
+  if (r === 'foreign') ids.push('tpd', 'foreign_licence');
   if (r === 'moto') ids.push('helmet');
   if (r === 'private' || r === 'rental' || r === 'foreign' || r === 'company' || r === 'autoecole' || r === 'vtc' || r === 'ambulance' || r === 'staff' || r === 'taxi') ids.push('belt');
   if (r === 'taxi') ids.push('brevet', 'taxi_lic', 'taxi_seats', 'taxi_meter_card', 'taxi_receipts', 'passengers');
@@ -1359,7 +1395,7 @@ function buildList(ctx){
   if (r === 'semi') ids.push('trailer', 'mission');
   if (goodsRole || r === 'tricycle' || r === 'tow') ids.push('load_safe');
   if (r === 'owner' || r === 'staff') ids.push('own_acc');
-  if (r === 'staff') ids.push('brevet', 'passengers');
+  if (r === 'staff') ids.push('brevet', 'chrono', 'passengers');
   if (goodsRole) {
     var TRUCK = {tipper: ['sand_bon'], fridge: ['food_hyg'], tanker: ['dangerous', 'danger_docs', 'danger_driver', 'danger_signs', 'eq_danger'], livestock: ['vet_cert'], container: [], carrier: ['transport_ex'], plain: []};
     (TRUCK[ctx.truck] || []).forEach(function(id){ if (DOCS[id]) ids.push(id); });
@@ -1652,7 +1688,7 @@ function docHtml(id){
           '<details' + (bad ? ' open' : '') + '><summary>المخالفات والإجراءات (' + d.cases.length + ')</summary><div class="body">' + rows + '</div></details></div>';
 }
 function render(){
-  var cat = state.cat || ROLE_CAT[state.role] || 'car';
+  var cat = ROLE_CAT[state.role] || 'car'; state.cat = cat;
   document.querySelectorAll('[data-cat]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-cat') === cat)); });
   document.querySelectorAll('[data-catg]').forEach(function(g){ g.hidden = g.getAttribute('data-catg') !== cat; });
   document.querySelectorAll('[data-role]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-role') === state.role)); });
@@ -1823,7 +1859,7 @@ document.addEventListener('click', function(e){
     catch (err) { selectText(cp.previousElementSibling); }
     return;
   }
-  var cg = e.target.closest('[data-cat]'); if (cg) { state.cat = cg.getAttribute('data-cat'); render(); return; }
+  var cg = e.target.closest('[data-cat]'); if (cg) { state.cat = cg.getAttribute('data-cat'); if (ROLE_CAT[state.role] !== state.cat) { var first = document.querySelector('[data-catg="' + state.cat + '"] [data-role]'); if (first) state.role = first.getAttribute('data-role'); } save(); render(); return; }
   var r = e.target.closest('[data-role]'); if (r) { state.role = r.getAttribute('data-role'); state.cat = ROLE_CAT[state.role]; save(); render(); return; }
   var v = e.target.closest('[data-veh]'); if (v) { state.veh = v.getAttribute('data-veh'); save(); render(); return; }
   var tk = e.target.closest('[data-truck]'); if (tk) { state.truck = tk.getAttribute('data-truck'); save(); render(); return; }
