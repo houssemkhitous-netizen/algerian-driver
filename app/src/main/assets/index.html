@@ -334,11 +334,11 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
       <button type="button" class="chip" data-truck="container">ناقلة حاويات</button>
       <button type="button" class="chip" data-truck="carrier">ناقلة مركبات أو آليات</button>
     </div>
-    <span class="lbl">3. المكان</span>
-    <div class="chips" role="group" aria-label="المكان">
+    <span class="lbl" id="zoneLbl">3. المكان</span>
+    <div class="chips" id="zoneBox" role="group" aria-label="المكان">
       <button type="button" class="chip" id="zoneChip" aria-pressed="false">داخل النطاق الجمركي (ولاية حدودية)</button>
     </div>
-    <label class="lbl" for="q">4. السلعة المنقولة أو النشاط (اختياري)</label>
+    <label class="lbl" for="q" id="qLbl">4. السلعة المنقولة أو النشاط (اختياري)</label>
     <input type="text" id="q" list="sugg" placeholder="مثال: قطع غيار، سبائك ألمنيوم، مواشي، رمل، خضر وفواكه…" autocomplete="off">
     <datalist id="sugg"></datalist>
     <p class="match" id="match"></p>
@@ -1431,7 +1431,7 @@ function buildList(ctx){
   if (r === 'taxi') ids.push('eq_taxi', 'eq_taxi_cover');
   if (r === 'school') ids.push('eq_school');
   if (r === 'carrier') ids = ids.concat(CARRIER_DOCS);
-  if (r === 'owner' || biz || (ctx.act && GOODS_ROLES.indexOf(r) >= 0)) ids.push('rc_copy');
+  if (r === 'owner' || (ctx.act && GOODS_ROLES.indexOf(r) >= 0)) ids.push('rc_copy');
   if (ctx.act && DOCS.act_lic) ids.push('act_lic');
   var profs = ctx.profiles;
   var hasGoods = goodsRole || biz || profs.length || ctx.act;
@@ -1444,7 +1444,6 @@ function buildList(ctx){
   sectorPermits(ctx).forEach(function(id){ ids.push(id); });
   if (biz || r === 'owner') ids.push('tax_exist', 'casnos', 'books');
   if (biz) ids.push('rc_shop', 'shop_prices', 'shop_info', 'shop_sales', 'shop_regprice', 'shop_stock', 'shop_ads', 'conso_food', 'conso_label', 'conso_conform', 'shop_permanence');
-  if (r === 'business') ids.push('food_hyg');
   if (biz) ids.push('fake_doc', 'respect');
   else {
     ids.push('obey', 'fake_doc', 'respect');
@@ -1716,7 +1715,8 @@ function render(){
   document.querySelectorAll('[data-catg]').forEach(function(g){ g.hidden = g.getAttribute('data-catg') !== cat; });
   document.querySelectorAll('[data-role]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-role') === state.role)); });
   var rb = document.querySelector('[data-role="' + state.role + '"]');
-  $('roleNow').innerHTML = rb ? 'اخترت: <b>' + esc(rb.textContent) + '</b>' : '';
+  var HINT = {car: 'وثائق السائق والمركبة، التجهيزات الإجبارية، ومخالفات السير.', pax: 'وثائق السائق والمركبة، رخصة الاستغلال، شهادة الكفاءة المهنية، عدد الركاب، ومخالفات السير.', goods: 'وثائق السائق والمركبة، شهادة الكفاءة، الحمولة، وثائق السلعة حسب نوع الشاحنة، ومخالفات السير.', bike: 'وثائق الدراجة، الخوذة، ومخالفات السير.', machine: 'وثائق الآلة وقواعد سيرها.', biz: 'السجل التجاري، إشهار الأسعار، الفاتورة، ممارسات البيع، حماية المستهلك، الجباية والضمان الاجتماعي، والرخص الخاصة بنشاطك. لا تظهر مخالفات السير.'};
+  $('roleNow').innerHTML = rb ? 'اخترت: <b>' + esc(rb.textContent) + '</b><br><span class="foot">سيعرض لك التطبيق: ' + HINT[cat] + '</span>' : '';
   document.querySelectorAll('[data-veh]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-veh') === state.veh)); });
   document.querySelectorAll('[data-truck]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-truck') === (state.truck || 'plain'))); });
   var act = state.actCode ? codeInfo(state.actCode) : null;
@@ -1727,7 +1727,7 @@ function render(){
   $('zoneChip').setAttribute('aria-pressed', String(state.zone));
   var zoneHint = !state.zone && profs.some(function(p){ return p.docs.some(function(id){ return DOCS[id] && DOCS[id].zone; }); });
   var ids = buildList(ctx);
-  if (!state.q.trim()) $('match').innerHTML = 'اكتب السلعة لتظهر وثائقها الخاصة. تظهر الآن الوثائق العامة فقط.';
+  if (!state.q.trim()) $('match').innerHTML = ROLE_CAT[state.role] === 'biz' ? 'اكتب نشاطك لتظهر الرخص الخاصة به. تظهر الآن الالتزامات العامة لكل محل.' : 'اكتب السلعة لتظهر وثائقها الخاصة. تظهر الآن الوثائق العامة فقط.';
   else if (profs.length) $('match').innerHTML = 'تم التعرف على: ' + profs.map(function(p){ return '<b>' + esc(p.label) + '</b>'; }).join('، ') + (profs.some(function(p){ return p.note; }) ? '<br>' + profs.filter(function(p){ return p.note; }).map(function(p){ return esc(p.note); }).join('<br>') : '') + (zoneHint ? '<br>' + esc(CUSTOMS_NOTE) : '');
   else if (act) $('match').innerHTML = 'تظهر الوثائق اللازمة لهذا النشاط أدناه. لاختيار نشاط آخر امسح الخانة واكتب السلعة من جديد.';
   else $('match').innerHTML = 'لا وثيقة خاصة بـ«' + esc(state.q) + '» في قائمة السلع المنظمة. تظهر الوثائق العامة لأي سلعة تجارية (الفاتورة أولاً).';
@@ -1751,6 +1751,10 @@ function render(){
   $('codeHits').innerHTML = pick;
   var goodsRole = GOODS_ROLES.indexOf(state.role) >= 0;
   $('vehLbl').hidden = $('vehChips').hidden = $('truckLbl').hidden = $('truckChips').hidden = !goodsRole;
+  var isBiz = ROLE_CAT[state.role] === 'biz';
+  $('zoneLbl').hidden = $('zoneBox').hidden = !(goodsRole || state.role === 'vendor');
+  $('qLbl').textContent = isBiz ? '3. نشاطك أو ما تبيعه (لمعرفة الرخص الخاصة به)' : (goodsRole ? '4. السلعة المنقولة (اختياري)' : '3. هل تنقل سلعة؟ اكتبها (اختياري)');
+  $('q').placeholder = isBiz ? 'مثال: مطعم، مخبزة، بيع الأدوية، ورشة ميكانيك، مواد البناء…' : 'مثال: قطع غيار، سبائك ألمنيوم، مواشي، رمل، خضر وفواكه…';
 
   var groupList = function(keys){ return GROUPS.filter(function(g){ return keys.indexOf(g[0]) >= 0; }).map(function(g){
     var mine = ids.filter(function(id){ return DOCS[id].g === g[0]; });
