@@ -892,6 +892,10 @@ Object.assign(DOCS, {
   taxi_receipts: {g: 'act', name: 'دفتر وصولات ذو أرومات لتسليم وصل للزبون عند طلبه', fr: 'Carnet de reçus à souches', cases: [
     {when: 'لا يحمله أو رفض تسليم وصل للزبون', nature: 'مخالفة', act: 'عدم حمل دفتر الوصولات أو عدم تسليم وصل للزبون عند طلبه', law: 'tr', nass: 'المادة 25 من ' + CDC, iqab: 'المواد 61 و62 و63 من القانون 01-13', type: 'admin', amount: [4000, 8000], extra: CDC_PEN, v: 'one'}
   ]},
+  eq_taxi_cover: {g: 'equip', name: 'الغلاف المعتم (الغمد) لتغطية شارة «طاكسي» المضيئة', fr: 'Housse opaque du dispositif lumineux', cases: [
+    {when: 'لا يملك الغلاف المعتم', nature: 'مخالفة', act: 'عدم توفر الغلاف المعتم لتغطية الجهاز المضيء ضمن تجهيزات سيارة الأجرة', law: 'tr', nass: 'المادة 5 من ' + CDC, iqab: 'المواد 61 و62 و63 من القانون 01-13', type: 'admin', amount: [4000, 8000], extra: CDC_PEN, v: 'one'},
+    {when: 'الشارة غير مغطاة والسيارة خارج الخدمة، أو يقودها شخص غير السائق خارج الخدمة', nature: 'مخالفة', act: 'عدم تغطية الجهاز المضيء بالغلاف المعتم خارج الخدمة', law: 'tr', nass: 'المادتان 9 و15 من ' + CDC, iqab: 'المواد 61 و62 و63 من القانون 01-13', type: 'admin', amount: [4000, 8000], extra: 'تُضاء الشارة حين يكون العداد في وضع «حر» وتُطفأ في وضع «مشغول»، وتُغطى بالغلاف المعتم خارج الخدمة (المادة 15)، وكذلك إذا قاد السيارة خارج الخدمة شخص غير سائقها (المادة 9). ' + CDC_PEN, v: 'one'}
+  ]},
   rental_contract: {g: 'veh', rec: true, name: 'عقد كراء السيارة (من الوكالة المؤجرة)', fr: 'Contrat de location', cases: [
     {when: 'غير موجود', nature: '', act: 'لم أجد نصاً رسمياً يفرض حمل عقد الكراء أو يعاقب على غيابه، ونشاط «كراء السيارات مع أو بدون سائق» (الرمز 603004) غير مصنف نشاطاً منظماً في مدونة السجل التجاري. الوثائق الإلزامية تبقى نفسها: رخصة السياقة، وبطاقة الترقيم، وشهادة التأمين، والمراقبة التقنية. العقد يُنصح بحمله لإثبات أنك تقود المركبة بإذن الوكالة المالكة', type: 'none', amount: null, v: 'no'}
   ]},
@@ -1312,7 +1316,7 @@ function buildList(ctx){
   if (goodsRole && ctx.veh === 'exceptional') ids.push('transport_ex');
   if (r === 'driver') ids.push('mission');
   if (!biz && ['moto', 'tractor', 'tricycle', 'moped', 'engine'].indexOf(r) < 0) ids.push('eq_ext', 'eq_tri', 'eq_vest', 'eq_aid', 'eq_spare');
-  if (r === 'taxi') ids.push('eq_taxi');
+  if (r === 'taxi') ids.push('eq_taxi', 'eq_taxi_cover');
   if (r === 'school') ids.push('eq_school');
   if (r === 'carrier') ids = ids.concat(CARRIER_DOCS);
   if (r === 'owner' || biz || (ctx.act && GOODS_ROLES.indexOf(r) >= 0)) ids.push('rc_copy');
