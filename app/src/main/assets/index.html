@@ -283,10 +283,15 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
       <button type="button" class="chip" data-role="ambulance">سائق سيارة إسعاف</button>
       <button type="button" class="chip" data-role="tractor">سائق جرار فلاحي</button>
       <button type="button" class="chip" data-role="moto">سائق دراجة نارية</button>
+      <button type="button" class="chip" data-role="tricycle">دراجة ثلاثية أو رباعية العجلات بمحرك</button>
+      <button type="button" class="chip" data-role="moped">دراجة متحركة (50 سم³ أو أقل)</button>
       <button type="button" class="chip" data-role="taxi">سائق سيارة أجرة</button>
       <button type="button" class="chip" data-role="bus">سائق حافلة (نقل المسافرين)</button>
       <button type="button" class="chip" data-role="school">سائق نقل مدرسي</button>
       <button type="button" class="chip" data-role="driver">سائق شاحنة أجير</button>
+      <button type="button" class="chip" data-role="semi">سائق شاحنة جرّ بمقطورة أو نصف مقطورة</button>
+      <button type="button" class="chip" data-role="tow">سائق شاحنة قطر (إسعاف ميكانيكي)</button>
+      <button type="button" class="chip" data-role="engine">سائق رافعة أو آلية أشغال عمومية</button>
       <button type="button" class="chip" data-role="carrier">ناقل بضائع لحساب الغير</button>
       <button type="button" class="chip" data-role="owner">مالك السلعة ينقلها بنفسه</button>
     </div>
@@ -928,6 +933,30 @@ Object.assign(DOCS, {
   ]}
 });
 
+// ===== Trailers, tow trucks, special/public-works engines, tricycles, mopeds: décret exécutif 04-381 (JO 76/2004), read. =====
+var D381_NOTE = 'المرسوم 04-381 صدر تطبيقاً لقانون المرور القديم 01-14 وعُدّل بالمرسوم 25-169 سنة 2025؛ لم أجد نصاً يلغيه بعد صدور القانون 26-09';
+Object.assign(DOCS, {
+  trailer: {g: 'veh', name: 'بطاقة ترقيم المقطورة أو نصف المقطورة وتجهيزاتها (الإنارة والعواكس والفرامل)', fr: 'Remorque / semi-remorque', cases: [
+    {when: 'بطاقة ترقيم المقطورة لم تُحمل أو لم تُقدَّم', nature: 'مخالفة', act: 'مخالفة إلزامية تقديم وثائق المركبة، من الدرجة الأولى', law: 'route', nass: 'المادة 94 من القانون 26-09؛ المرسوم 25-169 (ترقيم المقطورات ونصف المقطورات التي يفوق وزنها الإجمالي 500 كغ)', iqab: 'المادة 121 (أ، البند 2)', type: 'forfait', amount: [3000, 3000], extra: IMMO, v: 'one'},
+    {when: 'أضواء المقطورة أو عواكسها ناقصة أو معطلة', nature: 'مخالفة', act: LIGHT, law: 'route', nass: 'المواد 135 و138 و139 و141 و142 و144 من ' + D381, iqab: L_IQ, type: 'forfait', amount: [6000, 6000], extra: 'ضوءان أحمران خلفيان (138)؛ ضوء الفرملة وأضواء الاتجاه إن تجاوز وزنها الإجمالي 0,5 طن (141 و142)؛ عواكس مثلثة خلفية، وبيضاء أمامية، وبرتقالية جانبية (144)؛ أضواء التحديد إن تجاوز طولها 6 م أو عرضها 2,10 م (139)؛ ضوء لوحة الترقيم (140). ' + D381_NOTE, v: 'one'},
+    {when: 'لا نظام فرملة رغم أن وزنها يفوق 750 كغ', nature: '', act: 'يلزم نظاما فرملة مستقلان، وتُعفى المقطورة التي لا يتجاوز وزنها الإجمالي 750 كغ ولا نصف الوزن الفارغ للمركبة الجارة (المادتان 132 و133 من المرسوم 04-381). لم أجد البند المعاقب في القانون 26-09', type: 'none', amount: null, v: 'no'},
+    {when: 'أكثر من مقطورة، أو أبعاد وأوزان المجموعة', nature: '', act: 'دون رخصة خاصة لا تسير إلا مقطورة واحدة أو قطار مزدوج؛ تعدد المقطورات أو مركبة مفصلية مع مقطورة يحتاج رخصة الوالي (المواد 94 إلى 98). الحدود: العرض 2,50 م، المقطورة 11 م، المركبة المفصلية 15,50 م، القطار 18 م (المادة 112)؛ الوزن الإجمالي للمجموعة 38 طناً حتى 4 محاور و40 طناً لأكثر من 4 (المادة 105)؛ والمحور الأثقل 13 طناً (المادة 106). تجاوزها يدخل في النقل الاستثنائي أو الحمولة الزائدة', type: 'none', amount: null, v: 'one'}
+  ]},
+  tow_rules: {g: 'veh', rec: true, name: 'قواعد شاحنة القطر (الإسعاف الميكانيكي)', fr: 'Véhicule spécialisé de remorquage', cases: [
+    {when: 'طول مجموعة القطر', nature: '', act: 'شاحنة القطر مع المركبة المعطلة: 26 م كحد أقصى، و34,5 م مع حافلة مفصلية معطلة. المركبة المفصلية التي تحمل مركبة معطلة يفوق وزنها 3,5 طن: 20 م محملة، وبروز خلفي لا يتجاوز 3 م، وعرض 3,20 م إن كانت المركبة المنقولة مشوهة (المادة 113 من المرسوم 04-381). لم أجد البند المعاقب في القانون 26-09', type: 'none', amount: null, v: 'no'},
+    {when: 'الضوء البرتقالي الدوار', nature: '', act: 'شاحنة القطر ليست من «المركبات ذات تسهيل المرور» المعدودة في المادة 2 من المرسوم 04-381، فلا يحق لها الضوء البرتقالي المتقطع المخصص لتلك المركبات (المادة 148). المادة 149 تسمح بضوء أصفر متقطع للمركبات الضخمة أو البطيئة', type: 'none', amount: null, v: 'one'},
+    {when: 'رفع مركبة معطلة على الطريق', nature: '', act: 'المركبة المتوقفة التي تشكل خطراً يجب الإشارة إليها مسبقاً (المادة 77)، وفي الطريق السريع تجب الإشارة المسبقة والإخلاء العاجل للمركبة التي لا يمكن تشغيلها (المادة 88)', type: 'none', amount: null, v: 'one'}
+  ]},
+  engine_rules: {g: 'veh', rec: true, name: 'قواعد سير الرافعات وآليات الأشغال العمومية (الآلات الخاصة)', fr: 'Engins spéciaux, matériels de travaux publics', cases: [
+    {when: 'السير في الطريق السريع', nature: '', act: 'ممنوع على آليات الأشغال العمومية (المادة 81، البند 9) وعلى كل مركبة لا تبلغ بحكم صنعها 60 كم/سا في الطريق المستوي (البند 10) من المرسوم 04-381. لم أجد البند المعاقب في القانون 26-09', type: 'none', amount: null, v: 'no'},
+    {when: 'ما هي «الآلة الخاصة»', nature: '', act: 'آلة ذاتية الحركة أو مقطورة للرفع أو التكديس أو نقل البضائع، لا تتجاوز سرعتها بحكم الصنع 25 كم/سا، ولا تحمل غير السائق ومرافقاً عند الاقتضاء (المادة 2 من المرسوم 04-381). آليات الأشغال العمومية مصنوعة للمقاولات ولا تنقل عادة البضائع ولا الأشخاص على الطريق', type: 'none', amount: null, v: 'one'},
+    {when: 'نقل آلية ضخمة أو حمولة غير قابلة للتجزئة', nature: '', act: 'يحتاج رخصة الوالي (المادتان 95 و98 من المرسوم 04-381)، وهو نقل استثنائي (انظر «رخصة النقل الاستثنائي»)', type: 'none', amount: null, v: 'one'}
+  ]},
+  moped_note: {g: 'veh', rec: true, name: 'قواعد الدراجة المتحركة (50 سم³ أو أقل)', fr: 'Cyclomoteur', cases: [
+    {when: 'ما يجب معرفته', nature: '', act: 'الدراجة المتحركة محركها 50 سم³ أو أقل وسرعتها بحكم الصنع لا تتجاوز 45 كم/سا (المادة 2 من المرسوم 04-381). منذ المرسوم 25-169 (2025) تخضع الدراجات النارية والمتحركة للمراقبة والترقيم كالمركبات ذات المحرك. الخوذة إلزامية (المادة 100)، وتشغيل الأضواء ليلاً أو عند ضعف الرؤية (المادة 72). لم أتحقق من صنف رخصة السياقة المطلوب لها', type: 'none', amount: null, v: 'one'}
+  ]}
+});
+
 DOCS.helmet.g = 'equip';
 delete DOCS.id_card;
 
@@ -1255,13 +1284,14 @@ function matchProfiles(q){
   return res.filter(function(r){ return r.score >= Math.max(2, top * 0.6); }).slice(0, 3).map(function(r){ return r.p; });
 }
 // Build the list of documents for a context.
-var GOODS_ROLES = ['driver', 'carrier', 'owner'];
+var GOODS_ROLES = ['driver', 'carrier', 'owner', 'semi'];
 function buildList(ctx){
   var r = ctx.role, ids = ['permis', 'carte_grise', 'assurance'];
+  if (r === 'moped') ids = ['carte_grise', 'assurance'];
   var biz = r === 'business';
   if (biz) ids = [];
   var goodsRole = GOODS_ROLES.indexOf(r) >= 0;
-  if (r !== 'moto' && r !== 'foreign' && r !== 'tractor' && !biz) ids.push('ct');
+  if (['moto', 'foreign', 'tractor', 'tricycle', 'moped', 'engine'].indexOf(r) < 0 && !biz) ids.push('ct');
   if (r === 'vtc') ids.push('vtc_lic');
   if (r === 'ambulance') ids.push('amb_agr', 'eq_amb');
   if (r === 'tractor') ids.push('tractor_rules');
@@ -1273,10 +1303,15 @@ function buildList(ctx){
   if (r === 'private' || r === 'rental' || r === 'foreign' || r === 'company' || r === 'autoecole' || r === 'vtc' || r === 'ambulance' || r === 'taxi') ids.push('belt');
   if (r === 'taxi') ids.push('brevet', 'taxi_lic', 'taxi_seats', 'taxi_meter_card', 'taxi_receipts', 'passengers');
   if (r === 'bus' || r === 'school') ids.push('brevet', 'chrono', r === 'bus' ? 'bus_lic' : 'school_lic', 'passengers');
-  if (goodsRole && ctx.veh !== 'light') ids.push('brevet', 'chrono', 'load');
+  if (goodsRole && (ctx.veh !== 'light' || r === 'semi')) ids.push('brevet', 'chrono', 'load');
+  if (r === 'semi') ids.push('trailer', 'mission');
+  if (r === 'tow') ids.push('tow_rules');
+  if (r === 'engine') ids.push('engine_rules', 'transport_ex');
+  if (r === 'tricycle' || r === 'moped') ids.push('helmet');
+  if (r === 'moped') ids.push('moped_note');
   if (goodsRole && ctx.veh === 'exceptional') ids.push('transport_ex');
   if (r === 'driver') ids.push('mission');
-  if (!biz && r !== 'moto' && r !== 'tractor') ids.push('eq_ext', 'eq_tri', 'eq_vest', 'eq_aid', 'eq_spare');
+  if (!biz && ['moto', 'tractor', 'tricycle', 'moped', 'engine'].indexOf(r) < 0) ids.push('eq_ext', 'eq_tri', 'eq_vest', 'eq_aid', 'eq_spare');
   if (r === 'taxi') ids.push('eq_taxi');
   if (r === 'school') ids.push('eq_school');
   if (r === 'carrier') ids = ids.concat(CARRIER_DOCS);
