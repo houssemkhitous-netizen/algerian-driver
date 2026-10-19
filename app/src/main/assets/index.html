@@ -292,8 +292,9 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
       <button type="button" class="chip" data-role="semi">سائق شاحنة جرّ بمقطورة أو نصف مقطورة</button>
       <button type="button" class="chip" data-role="tow">سائق شاحنة قطر (إسعاف ميكانيكي)</button>
       <button type="button" class="chip" data-role="engine">سائق رافعة أو آلية أشغال عمومية</button>
-      <button type="button" class="chip" data-role="carrier">ناقل بضائع لحساب الغير</button>
-      <button type="button" class="chip" data-role="owner">مالك السلعة ينقلها بنفسه</button>
+      <button type="button" class="chip" data-role="carrier">ناقل بضائع لحساب الغير (نقل عمومي)</button>
+      <button type="button" class="chip" data-role="owner">مالك السلعة ينقلها بنفسه (نقل للحساب الخاص)</button>
+      <button type="button" class="chip" data-role="staff">نقل العمال أو المستخدمين (للحساب الخاص)</button>
     </div>
     <span class="lbl" style="margin:0">صاحب النشاط</span>
     <div class="chips" role="group" aria-label="صاحب النشاط">
@@ -304,6 +305,16 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
       <button type="button" class="chip" data-veh="light">نفعية حتى 3,5 طن</button>
       <button type="button" class="chip" data-veh="heavy">شاحنة أكثر من 3,5 طن</button>
       <button type="button" class="chip" data-veh="exceptional">حمولة استثنائية</button>
+    </div>
+    <span class="lbl" id="truckLbl">نوع الشاحنة</span>
+    <div class="chips small" id="truckChips" role="group" aria-label="نوع الشاحنة">
+      <button type="button" class="chip" data-truck="plain">عادية (مسطحة أو مغلقة)</button>
+      <button type="button" class="chip" data-truck="tipper">قلابة (رمل، حصى، ردوم)</button>
+      <button type="button" class="chip" data-truck="fridge">مبردة (مواد غذائية)</button>
+      <button type="button" class="chip" data-truck="tanker">صهريج محروقات أو غاز</button>
+      <button type="button" class="chip" data-truck="livestock">ناقلة مواشي</button>
+      <button type="button" class="chip" data-truck="container">ناقلة حاويات</button>
+      <button type="button" class="chip" data-truck="carrier">ناقلة مركبات أو آليات</button>
     </div>
     <span class="lbl">المكان</span>
     <div class="chips" role="group" aria-label="المكان">
@@ -961,6 +972,25 @@ Object.assign(DOCS, {
   ]}
 });
 
+// ===== Loads: split of the Law 26-09 art. 11 / art. 158 safety case; own-account transport: Law 01-13 art. 2, 17, 61. =====
+(function(){
+  var last = DOCS.load.cases[DOCS.load.cases.length - 1];
+  if (/مغطاة/.test(last.when)) DOCS.load.cases.pop();
+  var base = {nature: 'جنحة', act: last.act, law: last.law, nass: last.nass, iqab: last.iqab, type: last.type, amount: last.amount, v: last.v};
+  var x = function(when, extra){ return Object.assign({}, base, {when: when, extra: (last.extra ? last.extra + '. ' : '') + extra}); };
+  DOCS.load_safe = {g: 'veh', name: 'حمولة مغطاة ومثبّتة لا تشكل خطراً', fr: 'Chargement bâché, arrimé, sans danger', cases: [
+    x('حمولة غير مغطاة (رمل، حصى، ردوم، حبوب، نفايات…) تتطاير أو تتساقط', 'تغطية الحمولة القابلة للتطاير أو التساقط من شروط سلامة الحمولة'),
+    x('حمولة غير مثبتة أو سيئة التوزيع قد تسقط أو تُخلّ بتوازن المركبة', 'إن تسببت الحمولة في خطر مباشر على الغير يمكن أيضاً تكييفها بجنحة تعريض حياة الغير للخطر (ابحث عنها في «بحث»)'),
+    x('حمولة بارزة تشكل خطراً على مستعملي الطريق', 'البروز الذي يتجاوز أبعاد المركبة دون إشارة له مخالفة مستقلة في «حالة المركبة»، وإن تجاوز الأبعاد القانونية فهو نقل استثنائي'),
+    x('حاويات غير مثبتة بأقفالها أو دون شروط السلامة', 'تخص نقل الحاويات')
+  ]};
+})();
+Object.assign(DOCS, {
+  own_acc: {g: 'act', name: 'شروط النقل للحساب الخاص (لا يُنقل للغير بمقابل)', fr: 'Transport pour compte propre', cases: [
+    {when: 'ينقل بضائع أو أشخاصاً لغيره بمقابل بمركبة الحساب الخاص', nature: 'جنحة', act: 'مخالفة الأحكام المتعلقة بتنظيم النقل الخاضع للرخصة', law: 'route', nass: 'المادتان 17 و61 (البند 5) من القانون 01-13', iqab: 'المادة 158', type: 'court', amount: [200000, 500000], extra: 'النقل للحساب الخاص ينجزه أشخاص طبيعيون أو معنويون لحاجاتهم الخاصة بمركبات يملكونها (المادة 2 من القانون 01-13). النقل بمقابل لحساب الغير نقل عمومي يحتاج رخصة (المادة 17). زيادة على التوقيف الفوري للمركبة (المادة 158 من القانون 26-09)، والمحشر من 15 إلى 45 يوماً (المادة 62 من القانون 01-13)', v: 'ok'}
+  ]}
+});
+
 DOCS.helmet.g = 'equip';
 delete DOCS.id_card;
 
@@ -1304,11 +1334,18 @@ function buildList(ctx){
   if (r === 'autoecole') ids.push('autoecole_agr');
   if (r === 'foreign') ids.push('tpd');
   if (r === 'moto') ids.push('helmet');
-  if (r === 'private' || r === 'rental' || r === 'foreign' || r === 'company' || r === 'autoecole' || r === 'vtc' || r === 'ambulance' || r === 'taxi') ids.push('belt');
+  if (r === 'private' || r === 'rental' || r === 'foreign' || r === 'company' || r === 'autoecole' || r === 'vtc' || r === 'ambulance' || r === 'staff' || r === 'taxi') ids.push('belt');
   if (r === 'taxi') ids.push('brevet', 'taxi_lic', 'taxi_seats', 'taxi_meter_card', 'taxi_receipts', 'passengers');
   if (r === 'bus' || r === 'school') ids.push('brevet', 'chrono', r === 'bus' ? 'bus_lic' : 'school_lic', 'passengers');
   if (goodsRole && (ctx.veh !== 'light' || r === 'semi')) ids.push('brevet', 'chrono', 'load');
   if (r === 'semi') ids.push('trailer', 'mission');
+  if (goodsRole || r === 'tricycle' || r === 'tow') ids.push('load_safe');
+  if (r === 'owner' || r === 'staff') ids.push('own_acc');
+  if (r === 'staff') ids.push('brevet', 'passengers');
+  if (goodsRole) {
+    var TRUCK = {tipper: ['sand_bon'], fridge: ['food_hyg'], tanker: ['dangerous', 'danger_docs', 'danger_driver', 'danger_signs', 'eq_danger'], livestock: ['vet_cert'], container: [], carrier: ['transport_ex'], plain: []};
+    (TRUCK[ctx.truck] || []).forEach(function(id){ if (DOCS[id]) ids.push(id); });
+  }
   if (r === 'tow') ids.push('tow_rules');
   if (r === 'engine') ids.push('engine_rules', 'transport_ex');
   if (r === 'tricycle' || r === 'moped') ids.push('helmet');
@@ -1438,8 +1475,8 @@ function searchOffences(q){
 function selectText(el){ try { var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); } catch (e) {} }
 var $ = function(id){ return document.getElementById(id); };
 var state = {role: 'carrier', veh: 'heavy', zone: false, q: 'سبائك ألمنيوم', sel: {}, extra: {}, offQ: '', value: '', rcCodes: '', rcAct: '', rcOwner: 'owner'};
-try { var saved = JSON.parse(localStorage.getItem('rbdocs') || 'null'); if (saved) { state.role = saved.role || state.role; state.veh = saved.veh || state.veh; state.q = saved.q != null ? saved.q : state.q; state.zone = !!saved.zone; state.rcCodes = saved.rcCodes || ''; state.rcAct = saved.rcAct || ''; state.rcOwner = 'owner'; state.rcIn = saved.rcIn || ''; state.actCode = saved.actCode && NOMEN[saved.actCode] ? saved.actCode : ''; } } catch (e) {}
-function save(){ try { localStorage.setItem('rbdocs', JSON.stringify({role: state.role, veh: state.veh, q: state.q, zone: state.zone, rcCodes: state.rcCodes, rcAct: state.rcAct, rcIn: state.rcIn, actCode: state.actCode})); } catch (e) {} }
+try { var saved = JSON.parse(localStorage.getItem('rbdocs') || 'null'); if (saved) { state.role = saved.role || state.role; state.veh = saved.veh || state.veh; state.truck = saved.truck || 'plain'; state.q = saved.q != null ? saved.q : state.q; state.zone = !!saved.zone; state.rcCodes = saved.rcCodes || ''; state.rcAct = saved.rcAct || ''; state.rcOwner = 'owner'; state.rcIn = saved.rcIn || ''; state.actCode = saved.actCode && NOMEN[saved.actCode] ? saved.actCode : ''; } } catch (e) {}
+function save(){ try { localStorage.setItem('rbdocs', JSON.stringify({role: state.role, veh: state.veh, truck: state.truck, q: state.q, zone: state.zone, rcCodes: state.rcCodes, rcAct: state.rcAct, rcIn: state.rcIn, actCode: state.actCode})); } catch (e) {} }
 
 // Sector permits (environment, commerce/food hygiene, veterinary), from the texts named in each case.
 Object.assign(DOCS, {
@@ -1599,11 +1636,12 @@ function docHtml(id){
 function render(){
   document.querySelectorAll('[data-role]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-role') === state.role)); });
   document.querySelectorAll('[data-veh]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-veh') === state.veh)); });
+  document.querySelectorAll('[data-truck]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-truck') === (state.truck || 'plain'))); });
   var act = state.actCode ? codeInfo(state.actCode) : null;
   var profs = matchProfiles(state.q);
   if (act) codeProfiles(act.code).forEach(function(p){ if (profs.indexOf(p) < 0) profs.push(p); });
   if (act && act.status === 'regulated' && !act.transport) DOCS.act_lic = actLicDoc(act); else delete DOCS.act_lic;
-  var ctx = {act: act, role: state.role, veh: state.veh, zone: state.zone, profiles: profs};
+  var ctx = {act: act, role: state.role, veh: state.veh, truck: state.truck, zone: state.zone, profiles: profs};
   $('zoneChip').setAttribute('aria-pressed', String(state.zone));
   var zoneHint = !state.zone && profs.some(function(p){ return p.docs.some(function(id){ return DOCS[id] && DOCS[id].zone; }); });
   var ids = buildList(ctx);
@@ -1630,7 +1668,7 @@ function render(){
   }
   $('codeHits').innerHTML = pick;
   var goodsRole = GOODS_ROLES.indexOf(state.role) >= 0;
-  $('vehLbl').hidden = $('vehChips').hidden = !goodsRole;
+  $('vehLbl').hidden = $('vehChips').hidden = $('truckLbl').hidden = $('truckChips').hidden = !goodsRole;
 
   var groupList = function(keys){ return GROUPS.filter(function(g){ return keys.indexOf(g[0]) >= 0; }).map(function(g){
     var mine = ids.filter(function(id){ return DOCS[id].g === g[0]; });
@@ -1764,6 +1802,7 @@ document.addEventListener('click', function(e){
   }
   var r = e.target.closest('[data-role]'); if (r) { state.role = r.getAttribute('data-role'); save(); render(); return; }
   var v = e.target.closest('[data-veh]'); if (v) { state.veh = v.getAttribute('data-veh'); save(); render(); return; }
+  var tk = e.target.closest('[data-truck]'); if (tk) { state.truck = tk.getAttribute('data-truck'); save(); render(); return; }
 });
 document.addEventListener('change', function(e){
   if (e.target.id === 'rcOwner') { state.rcOwner = e.target.value; save(); render(); return; }
