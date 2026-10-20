@@ -102,7 +102,7 @@ textarea { resize: vertical; }
 .sum ul { margin: 0; padding-inline-start: 18px; color: var(--ink); font-size: 0.9rem; }
 .ai { white-space: pre-wrap; background: var(--bg); border-radius: 8px; padding: 12px; font-size: 0.9rem; }
 .foot { font-size: 0.8rem; color: var(--muted); }
-.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--surface); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(6, 1fr); padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--surface); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(7, 1fr); padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
 .tabs button { border: 0; border-radius: 0; background: transparent; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px 6px; min-height: 58px; font-size: 0.74rem; position: relative; }
 .tabs svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .tabs button[aria-current="page"] { color: var(--accent); font-weight: 600; }
@@ -262,6 +262,10 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
 .needed li .ico-s svg { width: 28px; height: 28px; }
 .ref { display: inline-block; margin-top: 4px; font-size: 0.78rem; color: var(--hc); text-decoration: underline; }
 .ico-note { font-size: 0.72rem; color: var(--muted); margin: 0; }
+.linkbtn { background: none; border: 0; padding: 4px 0; min-height: 0; color: var(--muted); font-size: 0.8rem; text-decoration: underline; cursor: pointer; align-self: flex-start; }
+.modebtn { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; font-weight: 700; font-size: 0.98rem; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); }
+.modebtn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.modebtn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
 </style>
 
 <div class="app" dir="rtl" lang="ar">
@@ -279,7 +283,6 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
       <button type="button" class="chip" data-cat="goods">نقل البضائع</button>
       <button type="button" class="chip" data-cat="bike">دراجات</button>
       <button type="button" class="chip" data-cat="machine">آليات</button>
-      <button type="button" class="chip" data-cat="biz">صاحب نشاط</button>
     </div>
     <span class="lbl" style="margin:0">2. اختر صفتك</span>
     <div class="chips" data-catg="car" role="group" aria-label="سيارة">
@@ -313,10 +316,6 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
       <button type="button" class="chip" data-role="tractor">جرار فلاحي</button>
       <button type="button" class="chip" data-role="engine">رافعة أو آلية أشغال عمومية</button>
     </div>
-    <div class="chips" data-catg="biz" role="group" aria-label="صاحب نشاط">
-      <button type="button" class="chip" data-role="business">صاحب محل أو شركة (تاجر مستقر)</button>
-      <button type="button" class="chip" data-role="vendor">تاجر غير مستقر (أسواق، معارض، بيع متجول)</button>
-    </div>
     <p class="match" id="roleNow" style="margin:0"></p>
     <span class="lbl" id="vehLbl">وزن الشاحنة</span>
     <div class="chips" id="vehChips" role="group" aria-label="نوع المركبة">
@@ -338,11 +337,16 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
     <div class="chips" id="zoneBox" role="group" aria-label="المكان">
       <button type="button" class="chip" id="zoneChip" aria-pressed="false">داخل النطاق الجمركي (ولاية حدودية)</button>
     </div>
+    <div id="qBlock">
     <label class="lbl" for="q" id="qLbl">4. السلعة المنقولة أو النشاط (اختياري)</label>
     <input type="text" id="q" list="sugg" placeholder="مثال: قطع غيار، سبائك ألمنيوم، مواشي، رمل، خضر وفواكه…" autocomplete="off">
     <datalist id="sugg"></datalist>
     <p class="match" id="match"></p>
     <div id="codeHits" class="rcout"></div>
+    </div>
+    <div class="chips" id="carryBox"><button type="button" class="chip" id="carryChip" aria-pressed="false">أنقل سلعة أو بضاعة في هذه المركبة</button></div>
+    <div id="whoSlot"></div>
+    <button type="button" class="linkbtn" data-mode="biz">صاحب محل أو شركة؟ اعرف التزامات نشاطك</button>
   </section>
 
   <section class="card" data-tab="search" aria-labelledby="offH">
@@ -352,7 +356,19 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
     <div id="offOut" class="rcout"></div>
   </section>
 
-  <section class="card" data-tab="who" aria-labelledby="needH">
+  <section class="card" data-tab="biz" aria-labelledby="bizH">
+    <h2 id="bizH">نشاطي: صاحب محل أو شركة</h2>
+    <button type="button" class="linkbtn" data-mode="drv">رجوع إلى قسم السائق</button>
+    <p class="foot" style="margin:0">هذا القسم منفصل عن السائقين: يعرض التزامات المحل أو الشركة (السجل التجاري، الأسعار، الفاتورة، حماية المستهلك، الجباية والضمان الاجتماعي) والرخص الخاصة بنشاطك. لا تظهر فيه مخالفات السير.</p>
+    <span class="lbl" style="margin:0">1. نوع النشاط</span>
+    <div class="chips" id="bizChips" role="group" aria-label="صاحب نشاط">
+      <button type="button" class="chip" data-role="business">صاحب محل أو شركة (تاجر مستقر)</button>
+      <button type="button" class="chip" data-role="vendor">تاجر غير مستقر (أسواق، معارض، بيع متجول)</button>
+    </div>
+    <div id="bizSlot"></div>
+  </section>
+
+  <section class="card" data-tab="who" id="neededCard" aria-labelledby="needH">
     <h2 id="needH">الوثائق والتجهيزات اللازمة</h2>
     <div id="needed" class="needed"></div>
     <p class="ico-note">الصور رسوم توضيحية للتعرف على كل عنصر. رسوم الوثائق تبيّن نوعها فقط وليست نسخاً من النماذج الرسمية.</p>
@@ -392,6 +408,7 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
 </div>
 
 <nav class="tabs" aria-label="الأقسام">
+  <button type="button" data-go="biz"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5L5.5 4h13L20 9.5"/><path d="M4 9.5h16v1.5a2.7 2.7 0 0 1-5.3 0a2.7 2.7 0 0 1-5.4 0A2.7 2.7 0 0 1 4 11z"/><path d="M5.5 13.5V20h13v-6.5M10 20v-4h4v4"/></svg><span>نشاطي</span></button>
   <button type="button" data-go="who" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></svg><span>من أنت</span></button>
   <button type="button" data-go="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span>بحث</span></button>
   <button type="button" data-go="docs"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4"/></svg><span>وثائقي</span></button>
@@ -1006,8 +1023,9 @@ Object.assign(DOCS, {
   ]};
 })();
 Object.assign(DOCS, {
-  own_acc: {g: 'act', name: 'شروط النقل للحساب الخاص (لا يُنقل للغير بمقابل)', fr: 'Transport pour compte propre', cases: [
-    {when: 'ينقل بضائع أو أشخاصاً لغيره بمقابل بمركبة الحساب الخاص', nature: 'جنحة', act: 'مخالفة الأحكام المتعلقة بتنظيم النقل الخاضع للرخصة', law: 'route', nass: 'المادتان 17 و61 (البند 5) من القانون 01-13', iqab: 'المادة 158', type: 'court', amount: [200000, 500000], extra: 'النقل للحساب الخاص ينجزه أشخاص طبيعيون أو معنويون لحاجاتهم الخاصة بمركبات يملكونها (المادة 2 من القانون 01-13). النقل بمقابل لحساب الغير نقل عمومي يحتاج رخصة (المادة 17). زيادة على التوقيف الفوري للمركبة (المادة 158 من القانون 26-09)، والمحشر من 15 إلى 45 يوماً (المادة 62 من القانون 01-13)', v: 'ok'}
+  own_acc: {g: 'act', name: 'النقل للحساب الخاص فقط: لا تنقل بضائع أو أشخاصاً لغيرك بمقابل', fr: 'Transport pour compte propre', cases: [
+    {when: 'ينقل بضائع أو أشخاصاً لغيره بمقابل بمركبة الحساب الخاص', nature: 'جنحة', act: 'مخالفة الأحكام المتعلقة بتنظيم النقل الخاضع للرخصة', law: 'route', nass: 'المادتان 17 و61 (البند 5) من القانون 01-13', iqab: 'المادة 158', type: 'court', amount: [200000, 500000], extra: 'النقل للحساب الخاص ينجزه أشخاص طبيعيون أو معنويون لحاجاتهم الخاصة بمركبات يملكونها (المادة 2 من القانون 01-13). النقل بمقابل لحساب الغير نقل عمومي يحتاج رخصة (المادة 17). زيادة على التوقيف الفوري للمركبة (المادة 158 من القانون 26-09)، والمحشر من 15 إلى 45 يوماً (المادة 62 من القانون 01-13)', v: 'ok'},
+    {when: 'ينقل سلعته هو بسيارته الخاصة (سياحية)', nature: '', act: 'لم أجد نصاً يمنع التاجر من نقل سلعته الخاصة بمركبة يملكها، ولو كانت سيارة سياحية: القانون 01-13 يعرّف النقل للحساب الخاص بأنه نقل ينجزه الأشخاص لحاجاتهم الخاصة بمركبات يملكونها (المادة 2). المخالفات الممكنة هنا: غياب الفاتورة (القانون 04-02)، وحمولة زائدة أو بارزة أو غير مثبتة (المادة 11 من القانون 26-09)، ونقل سلع النطاق الجمركي دون رخصة، والنقل للغير بمقابل (الحالة أعلاه)', type: 'none', amount: null, v: 'ok'}
   ]}
 });
 
@@ -1415,7 +1433,8 @@ function buildList(ctx){
   if (r === 'semi') ids.push('trailer', 'mission');
   if (goodsRole || r === 'tricycle' || r === 'tow') ids.push('load_safe');
   if (goodsRole || r === 'tricycle' || r === 'engine') ids.push('waste_dump');
-  if (r === 'owner' || r === 'staff') ids.push('own_acc');
+  if (r === 'owner' || r === 'staff' || (ctx.carry && !goodsRole && !biz)) ids.push('own_acc');
+  if (ctx.carry && !goodsRole && !biz) ids.push('load_safe');
   if (r === 'staff') ids.push('brevet', 'chrono', 'passengers');
   if (goodsRole) {
     var TRUCK = {tipper: ['sand_bon'], fridge: ['food_hyg'], tanker: ['dangerous', 'danger_docs', 'danger_driver', 'danger_signs', 'eq_danger'], livestock: ['vet_cert'], container: [], carrier: ['transport_ex'], plain: []};
@@ -1434,7 +1453,7 @@ function buildList(ctx){
   if (r === 'owner' || (ctx.act && GOODS_ROLES.indexOf(r) >= 0)) ids.push('rc_copy');
   if (ctx.act && DOCS.act_lic) ids.push('act_lic');
   var profs = ctx.profiles;
-  var hasGoods = goodsRole || biz || profs.length || ctx.act;
+  var hasGoods = goodsRole || biz || profs.length || ctx.act || ctx.carry;
   if (hasGoods) {
     var commercial = !profs.length || profs.some(function(p){ return p.commercial !== false; });
     if (commercial) ids.push('invoice');
@@ -1531,7 +1550,10 @@ function searchOffences(q){
   var boost = [];
   matchProfiles(q).forEach(function(p){ boost = boost.concat(p.docs); });
   var res = [];
+  var DRIVE_G = {veh: 1, equip: 1, road: 1, tech: 1, act: 1}, SHOP_G = {shop: 1, fisc: 1, other: 1};
   Object.keys(DOCS).forEach(function(id){
+    var gg = DOCS[id].g;
+    if (state.mode === 'biz' ? DRIVE_G[gg] : SHOP_G[gg]) return;
     var d = DOCS[id];
     d.cases.forEach(function(c, i){
       if (c.type === 'none') return;
@@ -1551,8 +1573,13 @@ function searchOffences(q){
 function selectText(el){ try { var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); } catch (e) {} }
 var $ = function(id){ return document.getElementById(id); };
 var state = {role: 'private', veh: 'light', zone: false, q: '', sel: {}, extra: {}, offQ: '', value: '', rcCodes: '', rcAct: '', rcOwner: 'owner'};
-try { var saved = JSON.parse(localStorage.getItem('rbdocs') || 'null'); if (saved) { state.role = saved.role || state.role; state.veh = saved.veh || state.veh; state.truck = saved.truck || 'plain'; state.q = saved.q != null ? saved.q : state.q; state.zone = !!saved.zone; state.rcCodes = saved.rcCodes || ''; state.rcAct = saved.rcAct || ''; state.rcOwner = 'owner'; state.rcIn = saved.rcIn || ''; state.actCode = saved.actCode && NOMEN[saved.actCode] ? saved.actCode : ''; } } catch (e) {}
-function save(){ try { localStorage.setItem('rbdocs', JSON.stringify({role: state.role, veh: state.veh, truck: state.truck, q: state.q, zone: state.zone, rcCodes: state.rcCodes, rcAct: state.rcAct, rcIn: state.rcIn, actCode: state.actCode})); } catch (e) {} }
+try { var saved = JSON.parse(localStorage.getItem('rbdocs') || 'null'); if (saved) { state.role = saved.role || state.role; state.veh = saved.veh || state.veh; state.truck = saved.truck || 'plain'; state.carry = !!saved.carry; state.sel_drv = saved.sel_drv || {}; state.sel_biz = saved.sel_biz || {}; ['q_drv', 'q_biz', 'act_drv', 'act_biz', 'role_drv', 'role_biz'].forEach(function(k){ if (saved[k] != null) state[k] = saved[k]; }); state.q = saved.q != null ? saved.q : state.q; state.zone = !!saved.zone; state.rcCodes = saved.rcCodes || ''; state.rcAct = saved.rcAct || ''; state.rcOwner = 'owner'; state.rcIn = saved.rcIn || ''; state.actCode = saved.actCode && NOMEN[saved.actCode] ? saved.actCode : ''; } } catch (e) {}
+state.mode = (typeof ROLE_CAT !== 'undefined' && ROLE_CAT[state.role] === 'biz') || state.role === 'business' || state.role === 'vendor' ? 'biz' : 'drv';
+state['role_' + state.mode] = state.role;
+if (!state.role_drv) state.role_drv = 'private';
+if (!state.role_biz) state.role_biz = 'business';
+state.sel = state['sel_' + state.mode] || {};
+function save(){ try { localStorage.setItem('rbdocs', JSON.stringify({carry: !!state.carry, mode: state.mode, sel_drv: state.mode === 'drv' ? state.sel : state.sel_drv, sel_biz: state.mode === 'biz' ? state.sel : state.sel_biz, q_drv: state.q_drv, q_biz: state.q_biz, act_drv: state.act_drv, act_biz: state.act_biz, role_drv: state.role_drv, role_biz: state.role_biz, role: state.role, veh: state.veh, truck: state.truck, q: state.q, zone: state.zone, rcCodes: state.rcCodes, rcAct: state.rcAct, rcIn: state.rcIn, actCode: state.actCode})); } catch (e) {} }
 
 // Sector permits (environment, commerce/food hygiene, veterinary), from the texts named in each case.
 Object.assign(DOCS, {
@@ -1719,18 +1746,22 @@ function render(){
   $('roleNow').innerHTML = rb ? 'اخترت: <b>' + esc(rb.textContent) + '</b><br><span class="foot">سيعرض لك التطبيق: ' + HINT[cat] + '</span>' : '';
   document.querySelectorAll('[data-veh]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-veh') === state.veh)); });
   document.querySelectorAll('[data-truck]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-truck') === (state.truck || 'plain'))); });
-  var act = state.actCode ? codeInfo(state.actCode) : null;
-  var profs = matchProfiles(state.q);
+  var showQ = state.mode === 'biz' || GOODS_ROLES.indexOf(state.role) >= 0 || !!state.carry;
+  $('carryBox').hidden = state.mode === 'biz' || GOODS_ROLES.indexOf(state.role) >= 0;
+  $('carryChip').setAttribute('aria-pressed', String(!!state.carry));
+  $('qBlock').hidden = !showQ;
+  var act = showQ && state.actCode ? codeInfo(state.actCode) : null;
+  var profs = showQ ? matchProfiles(state.q) : [];
   if (act) codeProfiles(act.code).forEach(function(p){ if (profs.indexOf(p) < 0) profs.push(p); });
   if (act && act.status === 'regulated' && !act.transport) DOCS.act_lic = actLicDoc(act); else delete DOCS.act_lic;
-  var ctx = {act: act, role: state.role, veh: state.veh, truck: state.truck, zone: state.zone, profiles: profs};
+  var ctx = {act: act, role: state.role, veh: state.veh, truck: state.truck, zone: state.zone, profiles: profs, carry: showQ && state.mode !== 'biz'};
   $('zoneChip').setAttribute('aria-pressed', String(state.zone));
   var zoneHint = !state.zone && profs.some(function(p){ return p.docs.some(function(id){ return DOCS[id] && DOCS[id].zone; }); });
   var ids = buildList(ctx);
   if (!state.q.trim()) $('match').innerHTML = ROLE_CAT[state.role] === 'biz' ? 'اكتب نشاطك لتظهر الرخص الخاصة به. تظهر الآن الالتزامات العامة لكل محل.' : 'اكتب السلعة لتظهر وثائقها الخاصة. تظهر الآن الوثائق العامة فقط.';
   else if (profs.length) $('match').innerHTML = 'تم التعرف على: ' + profs.map(function(p){ return '<b>' + esc(p.label) + '</b>'; }).join('، ') + (profs.some(function(p){ return p.note; }) ? '<br>' + profs.filter(function(p){ return p.note; }).map(function(p){ return esc(p.note); }).join('<br>') : '') + (zoneHint ? '<br>' + esc(CUSTOMS_NOTE) : '');
   else if (act) $('match').innerHTML = 'تظهر الوثائق اللازمة لهذا النشاط أدناه. لاختيار نشاط آخر امسح الخانة واكتب السلعة من جديد.';
-  else $('match').innerHTML = 'لا وثيقة خاصة بـ«' + esc(state.q) + '» في قائمة السلع المنظمة. تظهر الوثائق العامة لأي سلعة تجارية (الفاتورة أولاً).';
+  else $('match').innerHTML = state.mode === 'biz' ? 'اختر نشاطك من القائمة أدناه لتظهر الرخص الخاصة به.' : 'لا وثيقة خاصة بـ«' + esc(state.q) + '» في قائمة السلع المنظمة. تظهر الوثائق العامة لأي سلعة تجارية (الفاتورة أولاً).';
   // Activity picker: the goods typed lead to CNRC codes; choosing one sets the documents and offences.
   var hits = state.q.trim() ? searchCodes(state.q) : [];
   var pick = '';
@@ -1742,7 +1773,7 @@ function render(){
     pick = notes.join('');
   } else if (hits.length) {
     var shown = state.codesAll ? hits : hits.slice(0, 5);
-    pick = '<span class="lbl" style="margin:0;color:var(--hc)">أنشطة السجل المطابقة للسلعة (' + hits.length + ')</span><span class="foot" style="margin:0">المقارنة بالسجل المحمول تتم تلقائياً في «السجل». اختيار نشاط هنا اختياري، لتحديد وثائقه بدقة.</span>' +
+    pick = '<span class="lbl" style="margin:0;color:var(--hc)">' + (state.mode === 'biz' ? 'أنشطة السجل التجاري المطابقة (' + hits.length + '): اختر نشاطك' : 'أنشطة السجل المطابقة للسلعة (' + hits.length + ')') + '</span><span class="foot" style="margin:0">' + (state.mode === 'biz' ? 'باختيار نشاطك تظهر رخصه الخاصة والجهة التي تمنحها.' : 'المقارنة بالسجل المحمول تتم تلقائياً في «السجل». اختيار نشاط هنا اختياري، لتحديد وثائقه بدقة.') + '</span>' +
       shown.map(function(c){ return pickRowHtml(codeInfo(c)); }).join('') +
       (hits.length > 5 ? '<button type="button" class="small" data-codes-all>' + (state.codesAll ? 'عرض أقل' : 'عرض الكل (' + hits.length + ')') + '</button>' : '');
   } else if (state.q.trim() && !profs.length) {
@@ -1753,7 +1784,7 @@ function render(){
   $('vehLbl').hidden = $('vehChips').hidden = $('truckLbl').hidden = $('truckChips').hidden = !goodsRole;
   var isBiz = ROLE_CAT[state.role] === 'biz';
   $('zoneLbl').hidden = $('zoneBox').hidden = !(goodsRole || state.role === 'vendor');
-  $('qLbl').textContent = isBiz ? '3. نشاطك أو ما تبيعه (لمعرفة الرخص الخاصة به)' : (goodsRole ? '4. السلعة المنقولة (اختياري)' : '3. هل تنقل سلعة؟ اكتبها (اختياري)');
+  $('qLbl').textContent = isBiz ? '2. نشاطك أو ما تبيعه (لمعرفة الرخص الخاصة به)' : (goodsRole ? '4. السلعة المنقولة (اختياري)' : 'السلعة التي تنقلها');
   $('q').placeholder = isBiz ? 'مثال: مطعم، مخبزة، بيع الأدوية، ورشة ميكانيك، مواد البناء…' : 'مثال: قطع غيار، سبائك ألمنيوم، مواشي، رمل، خضر وفواكه…';
 
   var groupList = function(keys){ return GROUPS.filter(function(g){ return keys.indexOf(g[0]) >= 0; }).map(function(g){
@@ -1834,7 +1865,7 @@ function render(){
       '<details class="pvc"><summary style="color:var(--accent)">إجراءات رجل الأمن</summary><ol class="steps">' + (PROCS[c.type] || []).map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ol></details>' +
       (closing(c) ? '<details class="pvc"><summary>اختتام المحضر</summary><div class="pv">' + esc(closing(c)) + '</div><button type="button" class="small" data-copy-pv="' + r.id + ':' + r.i + '">نسخ النص</button></details>' : '') +
       '<div><button type="button" class="small" data-add="' + r.id + ':' + r.i + '">' + (added ? 'إزالة من الملخص' : 'أضف إلى الملخص') + '</button></div></div>';
-  }).join('') : '<p class="foot" style="margin:0">لم أجد مخالفة مطابقة. جرّب كلمات أخرى (مثال: سرعة، رخصة، تأمين، حمولة، فاتورة، سكر، خوذة).</p>');
+  }).join('') : '<p class="foot" style="margin:0">' + (state.mode === 'biz' ? 'لم أجد مخالفة مطابقة لصاحب المحل. جرّب: أسعار، فاتورة، سجل، وسم، نظافة، ضمان، رفض البيع.' : 'لم أجد مخالفة مطابقة. جرّب كلمات أخرى (مثال: سرعة، رخصة، تأمين، حمولة، فاتورة، سكر، خوذة).') + '</p>');
 
   var ids2 = ids.slice(), sel2 = Object.assign({}, state.sel);
   Object.keys(state.extra).forEach(function(k){ if (ids2.indexOf(k) < 0) ids2.push(k); if (!sel2[k]) sel2[k] = state.extra[k]; });
@@ -1864,6 +1895,7 @@ function render(){
 }
 
 document.addEventListener('click', function(e){
+  if (e.target.closest('#carryChip')) { state.carry = !state.carry; save(); render(); return; }
   if (e.target.closest('#zoneChip')) { state.zone = !state.zone; save(); render(); return; }
   var pk = e.target.closest('[data-pick]');
   if (pk) { state.prQ = ''; if ($('prQ')) $('prQ').value = ''; state.actCode = pk.getAttribute('data-pick'); if (state.actCode) { state.q = state.actCode + ' ' + NOMEN[state.actCode][0]; $('q').value = state.q; } else if (pk.closest && pk.closest('.br-act')) { state.q = ''; $('q').value = ''; } delete state.sel.act_lic; delete state.sel.rc_copy; state.codesAll = false; save(); render(); return; }
@@ -1887,7 +1919,7 @@ document.addEventListener('click', function(e){
     return;
   }
   var cg = e.target.closest('[data-cat]'); if (cg) { state.cat = cg.getAttribute('data-cat'); if (ROLE_CAT[state.role] !== state.cat) { var first = document.querySelector('[data-catg="' + state.cat + '"] [data-role]'); if (first) state.role = first.getAttribute('data-role'); } save(); render(); return; }
-  var r = e.target.closest('[data-role]'); if (r) { state.role = r.getAttribute('data-role'); state.cat = ROLE_CAT[state.role]; save(); render(); return; }
+  var r = e.target.closest('[data-role]'); if (r) { state.role = r.getAttribute('data-role'); state.cat = ROLE_CAT[state.role]; state.mode = ROLE_CAT[state.role] === 'biz' ? 'biz' : 'drv'; save(); render(); return; }
   var v = e.target.closest('[data-veh]'); if (v) { state.veh = v.getAttribute('data-veh'); save(); render(); return; }
   var tk = e.target.closest('[data-truck]'); if (tk) { state.truck = tk.getAttribute('data-truck'); save(); render(); return; }
 });
@@ -1906,17 +1938,42 @@ document.addEventListener('input', function(e){
   if (e.target.id === 'prQ') { state.q = e.target.value; $('q').value = state.q; if (state.actCode && searchCodes(state.q).indexOf(state.actCode) < 0) { state.actCode = ''; delete state.sel.act_lic; } save(); render(); }
   if (e.target.id === 'val') { state.value = e.target.value; state.focusVal = true; render(); state.focusVal = false; }
 });
+function setMode(m){
+  if (state.mode === m) return;
+  var cur = state.mode || 'drv';
+  state['q_' + cur] = state.q; state['act_' + cur] = state.actCode; state['role_' + cur] = state.role; state['sel_' + cur] = state.sel; state['extra_' + cur] = state.extra;
+  state.mode = m;
+  state.q = state['q_' + m] || ''; state.actCode = state['act_' + m] || '';
+  state.role = state['role_' + m] || (m === 'biz' ? 'business' : 'private');
+  state.sel = state['sel_' + m] || {}; state.extra = state['extra_' + m] || {};
+  $('q').value = state.q;
+}
+function placeShared(){
+  var biz = state.mode === 'biz';
+  (biz ? $('bizSlot') : $('whoSlot')).appendChild($('qBlock'));
+  $('neededCard').setAttribute('data-tab', biz ? 'biz' : 'who');
+}
 function showTab(t){
+  if (t === 'biz') setMode('biz'); else if (t === 'who') setMode('drv');
+  if (state.mode === 'biz' && (t === 'who' || t === 'rc' || t === 'list')) t = 'biz';
+  if (state.mode !== 'biz' && t === 'biz') t = 'who';
+  placeShared();
+  var NAV = state.mode === 'biz' ? ['biz', 'search', 'docs', 'sum'] : ['who', 'search', 'docs', 'rc', 'list', 'sum'];
+  document.querySelectorAll('.tabs [data-go]').forEach(function(b){ b.hidden = NAV.indexOf(b.getAttribute('data-go')) < 0; });
+  document.querySelector('.tabs').style.gridTemplateColumns = 'repeat(' + NAV.length + ', 1fr)';
+  document.querySelectorAll('[data-mode]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === (state.mode || 'drv'))); });
   state.tab = t;
   document.querySelectorAll('[data-tab]').forEach(function(el){ el.classList.toggle('on', el.getAttribute('data-tab') === t); });
   document.querySelectorAll('[data-go]').forEach(function(b){ if (b.getAttribute('data-go') === t) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   window.scrollTo(0, 0);
   try { localStorage.setItem('rbtab', t); } catch (e) {}
+  save(); render();
 }
 document.querySelectorAll('[data-go]').forEach(function(b){ b.addEventListener('click', function(){ showTab(b.getAttribute('data-go')); }); });
+document.querySelectorAll('[data-mode]').forEach(function(b){ b.addEventListener('click', function(){ var m = b.getAttribute('data-mode'); setMode(m); showTab(state.tab === 'search' || state.tab === 'docs' || state.tab === 'sum' ? state.tab : (m === 'biz' ? 'biz' : 'who')); }); });
 document.addEventListener('click', function(e){ var g = e.target.closest('[data-go2]'); if (g) showTab(g.getAttribute('data-go2')); });
 var startTab = 'who'; try { startTab = localStorage.getItem('rbtab') || 'who'; } catch (e) {}
-if (['who', 'search', 'docs', 'rc', 'list', 'sum'].indexOf(startTab) < 0) startTab = 'who';
+if (['who', 'search', 'docs', 'rc', 'list', 'sum', 'biz'].indexOf(startTab) < 0) startTab = 'who';
 
 
 function applyTheme(t){
@@ -2016,6 +2073,23 @@ $('themeBtn').addEventListener('click', function(){ theme = theme === 'dark' ? '
       x({when: 'عدم احترام برنامج المداومة أو العطل أو استئناف النشاط بعد الأعياد', act: 'مخالفة القواعد المتعلقة بالمداومة والعطل والتوقف التقني واستئناف النشاط', law: 'rc', nass: 'المادة 41 مكرر', iqab: 'المادة 41 مكرر', type: 'court', amount: [30000, 200000], extra: 'المادة 41 مكرر أضيفت للقانون 04-08 بتعديل نُشر في الجريدة الرسمية 35 لسنة 2018. قرأت ملخصها فقط', v: 'one'})
     ]}
   });
+  // Law 09-03 penalties read from JO 15/2009: arts 68-79, 82, 85, 86-88
+  var CS2 = ' القانون 09-03 (الجريدة الرسمية 15 لسنة 2009)، المعدل بالقانون 18-09. يمكن للأعوان فرض غرامة صلح (المادة 86) إن لم تكن هناك عقوبة أخرى ولا عود؛ إن لم تُدفع خلال 30 يوماً من الإنذار يُرسل المحضر إلى القضاء وترفع الغرامة إلى حدها الأقصى (المادتان 86 و92). مصادرة المنتوجات والأدوات المستعملة (المادة 82)، وفي العود تضاعف الغرامات ويمكن شطب السجل التجاري (المادة 85). يمكن غلق المحل إدارياً 15 يوماً قابلة للتجديد (المادة 65)';
+  var cs = function(o){ return Object.assign({nature: 'مخالفة', law: 'conso', type: 'settle', v: 'ok'}, o); };
+  DOCS.conso_food.cases = [
+    cs({when: 'مواد غذائية غير سليمة أو بها ملوِّث بنسبة غير مقبولة', act: 'مخالفة إلزامية سلامة المواد الغذائية', nass: 'المادتان 4 و5', iqab: 'المادة 71', amount: [200000, 500000], extra: 'غرامة الصلح: 300.000 دج (المادة 88).' + CS2}),
+    cs({when: 'المحل أو العمال أو وسائل النقل لا تحترم النظافة الصحية', act: 'مخالفة إلزامية النظافة والنظافة الصحية', nass: 'المادتان 6 و7', iqab: 'المادة 72', amount: [50000, 1000000], extra: 'غرامة الصلح: 200.000 دج (المادة 88).' + CS2})
+  ];
+  DOCS.conso_conform.cases = [
+    cs({when: 'منتوج غير مضمون (يشكل خطراً في الاستعمال العادي)', act: 'مخالفة إلزامية أمن المنتوج', nass: 'المادة 10', iqab: 'المادة 73', amount: [200000, 500000], extra: 'غرامة الصلح: 300.000 دج (المادة 88). وإن ألحق المنتوج مرضاً أو عجزاً بالمستهلك: عقوبات المادة 432 من قانون العقوبات، وحتى السجن من 10 إلى 20 سنة إن سبب مرضاً عضالاً أو عاهة مستديمة (المادة 83).' + CS2}),
+    cs({when: 'عرض منتوج دون مراقبة مطابقته مسبقاً', act: 'مخالفة إلزامية رقابة المطابقة المسبقة', nass: 'المادة 12', iqab: 'المادة 74', amount: [50000, 500000], extra: 'غرامة الصلح: 300.000 دج (المادة 88).' + CS2}),
+    cs({when: 'رفض تنفيذ الضمان (إصلاح، استبدال، إرجاع الثمن)', act: 'مخالفة إلزامية الضمان أو تنفيذه', nass: 'المادة 13', iqab: 'المادة 75', amount: [100000, 500000], extra: 'غرامة الصلح: 300.000 دج (المادة 88).' + CS2}),
+    cs({when: 'رفض تجربة المنتوج', act: 'مخالفة إلزامية تجربة المنتوج', nass: 'المادة 15', iqab: 'المادة 76', amount: [50000, 100000], extra: 'غرامة الصلح: 50.000 دج (المادة 88).' + CS2}),
+    cs({when: 'رفض خدمة ما بعد البيع', act: 'مخالفة إلزامية تنفيذ الخدمة ما بعد البيع', nass: 'المادة 16', iqab: 'المادة 77', amount: [50000, 1000000], extra: 'غرامة الصلح: 10% من ثمن المنتوج (المادة 88).' + CS2}),
+    cs({when: 'غش المستهلك في الكمية أو النوع أو تاريخ الصلاحية أو طريقة الاستعمال، أو بموازين ومكاييل مزورة', act: 'خداع المستهلك أو محاولة خداعه', nass: 'المادتان 68 و69', iqab: 'المادة 429 من قانون العقوبات (المادة 68)، والمادة 69', type: 'court', amount: null, extra: 'ترفع العقوبة إلى الحبس حتى 5 سنوات وغرامة 500.000 دج إن تم الخداع بموازين أو مكاييل أو أدوات مزورة، أو بإشارات أو ادعاءات تدليسية (المادة 69).' + CS2}),
+    cs({when: 'بيع منتوج محجوز أو مسحوب مؤقتاً أو مخالفة التوقيف المؤقت للنشاط', act: 'بيع منتوج مشمع أو مودع لضبط المطابقة أو مسحوب من العرض', nass: 'المادة 79', iqab: 'المادة 79', type: 'court', amount: [500000, 2000000], extra: 'حبس من 6 أشهر إلى 3 سنوات أو إحدى العقوبتين، ويُدفع مبلغ بيع المنتوجات للخزينة (المادتان 79 و80).' + CS2})
+  ];
+  DOCS.conso_label.cases[0].extra = 'غرامة الصلح: 200.000 دج (المادة 88).' + CS2;
   // Decree 04-82: obligations, no sanctions in the decree
   DOCS.vet_doc.cases[0] = Object.assign(DOCS.vet_doc.cases[0], {nature: '', act: 'تهيأ وسائل نقل الحيوانات وتجهز بشكل يحافظ على حياتها وراحتها (المادة 15)، وتعيّن السلطة البيطرية وسائل نقل الحيوانات والمنتجات الحيوانية ومنتجات الصيد البحري بمنح وثيقة تحمل مراجع التعيين (المادة 16). المرسوم 04-82 (الجريدة الرسمية 17 لسنة 2004) لا يتضمن عقوبات، والقانون 88-08 لا يدرج مادته 9 ضمن المواد المعاقب عليها في المادة 92', type: 'none', amount: null, v: 'ok'});
   // Law 83-14 original text (JO 28/1983)
