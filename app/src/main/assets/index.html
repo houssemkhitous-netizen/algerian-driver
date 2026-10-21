@@ -266,6 +266,43 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
 .modebtn { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; font-weight: 700; font-size: 0.98rem; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); }
 .modebtn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .modebtn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+
+/* ===== guide («دليل») ===== */
+.g-crumb { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; font-size: 0.8rem; color: var(--muted); }
+.g-crumb button { min-height: 0; padding: 2px 8px; border-radius: 999px; font-size: 0.8rem; background: var(--bg); }
+.g-crumb .sep { opacity: .6; }
+.g-head { display: flex; flex-direction: column; gap: 4px; }
+.g-head h2 { margin: 0; display: flex; gap: 8px; align-items: baseline; }
+.g-head .g-desc { margin: 0; color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
+.g-back { align-self: flex-start; min-height: 34px; padding: 4px 12px; font-size: 0.85rem; }
+.g-tiles { display: flex; flex-direction: column; gap: 8px; }
+.g-tile { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: center; width: 100%; text-align: start; padding: 12px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); }
+.g-tile:hover { border-color: var(--accent); }
+.g-tile .g-num { grid-row: span 2; min-width: 2.4em; height: 2.4em; padding: 0 4px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-family: var(--f-data); font-size: 0.85rem; }
+.g-tile .g-tt { font-weight: 700; font-size: 0.95rem; }
+.g-tile .g-td { grid-column: 2 / 4; font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+.g-tile .g-cnt { font-size: 0.75rem; color: var(--muted); white-space: nowrap; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; }
+.g-tiles.compact .g-tile { padding: 8px 10px; }
+.g-tiles.compact .g-tile .g-num { height: 2em; }
+.g-list { display: flex; flex-direction: column; }
+.g-row { border-top: 1px solid var(--line); padding: 10px 0; font-size: 0.88rem; display: flex; flex-direction: column; gap: 4px; }
+.g-row:first-child { border-top: 0; }
+.g-row .meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.g-row .g-ref { font-size: 0.78rem; color: var(--muted); }
+.g-row .g-sit { color: var(--ink); }
+.g-doc { border-top: 1px solid var(--line); padding: 8px 0; }
+.g-doc > summary { cursor: pointer; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; font-size: 0.9rem; }
+.g-doc > summary .g-cnt { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+.g-doc .g-row { margin-inline-start: 10px; padding-inline-start: 10px; border-inline-start: 3px solid var(--accent-soft); }
+.g-def { border-top: 1px solid var(--line); padding: 8px 0; font-size: 0.9rem; line-height: 1.7; }
+.g-def:first-child { border-top: 0; }
+.g-def b { color: var(--hc); }
+.g-filter { width: 100%; box-sizing: border-box; font: inherit; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
+.g-tree ul { list-style: none; margin: 0; padding-inline-start: 14px; border-inline-start: 1px dashed var(--line); }
+.g-tree > ul { padding: 0; border: 0; }
+.g-tree li { margin: 3px 0; font-size: 0.85rem; }
+.g-tree .g-num2 { font-family: var(--f-data); color: var(--muted); font-size: 0.78rem; margin-inline-end: 4px; }
+button.g-link { background: none; border: 0; padding: 0; min-height: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font: inherit; text-align: start; }
 </style>
 
 <div class="app" dir="rtl" lang="ar">
@@ -353,6 +390,7 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
     <h2 id="offH">اكتب مخالفة لمعرفة تكييفها</h2>
     <p class="foot" style="margin:0">صف المخالفة بكلماتك (مثال: «سائق يتكلم في الهاتف»، «شاحنة بلا فاتورة»، «طفل في الكرسي الأمامي»، «سياقة بلا بيرمي»)، فتظهر المخالفات المطابقة بصيغتها والمادة الناصة والمعاقبة والإجراء.</p>
     <input type="text" id="offQ" placeholder="اكتب المخالفة هنا…" autocomplete="off">
+    <div id="offScope"></div>
     <div id="offOut" class="rcout"></div>
   </section>
 
@@ -390,6 +428,7 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
   <div id="groupsRoad" data-tab="list" style="display:flex;flex-direction:column;gap:16px"></div>
 
 
+  <section class="card" data-tab="guide" id="guideCard" aria-labelledby="guideH"></section>
   <div id="summary" data-tab="sum"></div>
 
   <section class="card" data-tab="sum">
@@ -410,11 +449,12 @@ html.dark .card, html.dark [data-tab], html.dark .card[class*="hc-"] { --hc: okl
 <nav class="tabs" aria-label="الأقسام">
   <button type="button" data-go="biz"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5L5.5 4h13L20 9.5"/><path d="M4 9.5h16v1.5a2.7 2.7 0 0 1-5.3 0a2.7 2.7 0 0 1-5.4 0A2.7 2.7 0 0 1 4 11z"/><path d="M5.5 13.5V20h13v-6.5M10 20v-4h4v4"/></svg><span>نشاطي</span></button>
   <button type="button" data-go="who" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></svg><span>من أنت</span></button>
-  <button type="button" data-go="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span>بحث</span></button>
   <button type="button" data-go="docs"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4"/></svg><span>وثائقي</span></button>
-  <button type="button" data-go="rc"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7" width="17" height="12.5" rx="2"/><path d="M9 7V5.5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 5.5V7M3.5 12.5h17"/></svg><span>السجل</span></button>
   <button type="button" data-go="list"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l8-14 8 14z"/><path d="M12 10v3.5M12 16.2v.3"/></svg><span>المخالفات</span></button>
+  <button type="button" data-go="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span>بحث</span></button>
+  <button type="button" data-go="rc"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7" width="17" height="12.5" rx="2"/><path d="M9 7V5.5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 5.5V7M3.5 12.5h17"/></svg><span>السجل</span></button>
   <button type="button" data-go="sum"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span>الملخص</span><b class="badge" id="badge" hidden></b></button>
+  <button type="button" data-go="guide"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M8 7h8M8 10.5h6"/></svg><span>الدليل</span></button>
 </nav>
 
 <script>
@@ -1354,7 +1394,7 @@ function otherDocsHtml(act, hits, ids){
   return '<div><div class="lbl">الوثائق الأخرى</div>' + body + '</div>';
 }
 function pickRowHtml(i, attr){
-  return '<button type="button" class="pick" ' + (attr || 'data-pick') + '="' + i.code + '"><span class="code num">' + i.code + '</span><span class="pick-t">' + esc(i.ar) + '<span style="display:block;direction:ltr;text-align:left;font-size:0.72rem;color:var(--muted)">' + esc(i.fr) + '</span></span>' + (i.status ? '<span class="tag ' + (i.status === 'blocked' ? 'seize' : 'part') + '">' + (i.status === 'blocked' ? 'مجمّد' : 'منظم') + '</span>' : '') + '</button>';
+  return '<button type="button" class="pick" ' + (attr || 'data-pick') + '="' + i.code + '"><span class="code num">' + i.code + '</span><span class="pick-t">' + codeKindTag(i.code) + esc(i.ar) + '<span style="display:block;direction:ltr;text-align:left;font-size:0.72rem;color:var(--muted)">' + esc(i.fr) + '</span></span>' + (i.status ? '<span class="tag ' + (i.status === 'blocked' ? 'seize' : 'part') + '">' + (i.status === 'blocked' ? 'مجمّد' : 'منظم') + '</span>' : '') + '</button>';
 }
 function codeRowHtml(i){
   var reg = i.status && (i.tutelle || i.auth) ? '<div class="extra" style="direction:ltr;text-align:left">' + esc([i.auth, i.tutelle].filter(Boolean).join(' — ')) + '</div>' : '';
@@ -1564,9 +1604,11 @@ function searchOffences(q){
   Object.keys(DOCS).forEach(function(id){
     var gg = DOCS[id].g;
     if (state.mode === 'biz' ? DRIVE_G[gg] : SHOP_G[gg]) return;
+    if (!offInScope(id)) return;
     var d = DOCS[id];
     d.cases.forEach(function(c, i){
       if (c.type === 'none') return;
+      if (!caseInScope(c)) return;
       var hay = normAr(d.name + ' ' + c.when + ' ' + c.act);
       var score = 0;
       stems.forEach(function(s){ if (hay.indexOf(s) >= 0) score += GENERIC[s] ? 0.5 : (s.length > 3 ? 2 : 1); });
@@ -1729,8 +1771,9 @@ function docHtml(id){
         var bad = cur && cur.type !== 'none';
         var worstV = d.cases.some(function(c){ return c.v === 'no'; }) ? 'no' : (d.cases.some(function(c){ return c.v === 'one'; }) ? 'one' : 'ok');
         var tags = (d.rec ? '<span class="tag rec">موصى به</span>' : '') + (worstV === 'no' ? '<span class="tag part">فيها عقوبة غير مؤكدة</span>' : '');
-        var opts = '<option value="">' + (d.g === 'road' ? 'لم أرتكبها' : d.g === 'tech' ? 'سليمة' : (d.g === 'gen' ? 'لا' : 'معي وسارية')) + '</option>' + d.cases.map(function(c, i){ return '<option value="' + i + '"' + (k === String(i) ? ' selected' : '') + '>' + esc(c.when) + '</option>'; }).join('');
+        var opts = '<option value="">' + (d.g === 'road' ? 'لم أرتكبها' : d.g === 'tech' ? 'سليمة' : (d.g === 'gen' ? 'لا' : 'معي وسارية')) + '</option>' + d.cases.map(function(c, i){ if (!caseInScope(c)) return ''; return '<option value="' + i + '"' + (k === String(i) ? ' selected' : '') + '>' + esc(c.when) + '</option>'; }).join('');
         var rows = d.cases.map(function(c, i){
+          if (!caseInScope(c) && String(k) !== String(i)) return '';
           var T = TYPES[c.type];
           var amt = c.pct ? (c.pct === 2 ? 'ضعف قيمة البضاعة' : Math.round(c.pct * 100) + '% من قيمة البضاعة') : (c.amount ? (c.amount[0] === c.amount[1] ? '<span class="num">' + fmt0(c.amount[0]) + '</span> دج' : 'من <span class="num">' + fmt0(c.amount[0]) + '</span> إلى <span class="num">' + fmt0(c.amount[1]) + '</span> دج') : (c.type === 'none' ? '—' : 'غير محدد'));
           var vt = {ok: '<span class="v ok">مؤكد</span>', one: '<span class="v one">مصدر واحد</span>', no: '<span class="v no">غير مؤكد</span>'}[c.v];
@@ -1773,7 +1816,7 @@ function render(){
   else if (act) $('match').innerHTML = 'تظهر الوثائق اللازمة لهذا النشاط أدناه. لاختيار نشاط آخر امسح الخانة واكتب السلعة من جديد.';
   else $('match').innerHTML = state.mode === 'biz' ? 'اختر نشاطك من القائمة أدناه لتظهر الرخص الخاصة به.' : 'لا وثيقة خاصة بـ«' + esc(state.q) + '» في قائمة السلع المنظمة. تظهر الوثائق العامة لأي سلعة تجارية (الفاتورة أولاً).';
   // Activity picker: the goods typed lead to CNRC codes; choosing one sets the documents and offences.
-  var hits = state.q.trim() ? searchCodes(state.q) : [];
+  var hits = state.q.trim() ? roleFilterCodes(searchCodes(state.q)) : [];
   var pick = '';
   if (act) {
     var notes = [];
@@ -1789,7 +1832,7 @@ function render(){
   } else if (state.q.trim() && !profs.length) {
     pick = '<p class="foot" style="margin:0">لم أجد نشاطاً مطابقاً في السجل التجاري. جرّب كلمة أدق (مثال: «قطع غيار سيارات»، «مواد بناء») أو اكتب رمز النشاط (6 أرقام).</p>';
   }
-  $('codeHits').innerHTML = pick;
+  $('codeHits').innerHTML = (state.q.trim() && !act ? codeFilterBar() : '') + pick;
   var goodsRole = GOODS_ROLES.indexOf(state.role) >= 0;
   $('vehLbl').hidden = $('vehChips').hidden = $('truckLbl').hidden = $('truckChips').hidden = !goodsRole;
   var isBiz = ROLE_CAT[state.role] === 'biz';
@@ -1968,7 +2011,7 @@ function showTab(t){
   if (state.mode === 'biz' && (t === 'who' || t === 'rc' || t === 'list')) t = 'biz';
   if (state.mode !== 'biz' && t === 'biz') t = 'who';
   placeShared();
-  var NAV = state.mode === 'biz' ? ['biz', 'search', 'docs', 'sum'] : ['who', 'search', 'docs', 'rc', 'list', 'sum'];
+  var NAV = state.mode === 'biz' ? ['biz', 'docs', 'search', 'sum', 'guide'] : ['who', 'docs', 'list', 'search', 'rc', 'sum', 'guide'];
   document.querySelectorAll('.tabs [data-go]').forEach(function(b){ b.hidden = NAV.indexOf(b.getAttribute('data-go')) < 0; });
   document.querySelector('.tabs').style.gridTemplateColumns = 'repeat(' + NAV.length + ', 1fr)';
   document.querySelectorAll('[data-mode]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === (state.mode || 'drv'))); });
@@ -1980,10 +2023,10 @@ function showTab(t){
   save(); render();
 }
 document.querySelectorAll('[data-go]').forEach(function(b){ b.addEventListener('click', function(){ showTab(b.getAttribute('data-go')); }); });
-document.querySelectorAll('[data-mode]').forEach(function(b){ b.addEventListener('click', function(){ var m = b.getAttribute('data-mode'); setMode(m); showTab(state.tab === 'search' || state.tab === 'docs' || state.tab === 'sum' ? state.tab : (m === 'biz' ? 'biz' : 'who')); }); });
+document.querySelectorAll('[data-mode]').forEach(function(b){ b.addEventListener('click', function(){ var m = b.getAttribute('data-mode'); setMode(m); showTab(state.tab === 'search' || state.tab === 'docs' || state.tab === 'sum' || state.tab === 'guide' ? state.tab : (m === 'biz' ? 'biz' : 'who')); }); });
 document.addEventListener('click', function(e){ var g = e.target.closest('[data-go2]'); if (g) showTab(g.getAttribute('data-go2')); });
 var startTab = 'who'; try { startTab = localStorage.getItem('rbtab') || 'who'; } catch (e) {}
-if (['who', 'search', 'docs', 'rc', 'list', 'sum', 'biz'].indexOf(startTab) < 0) startTab = 'who';
+if (['who', 'search', 'docs', 'rc', 'list', 'sum', 'biz', 'guide'].indexOf(startTab) < 0) startTab = 'who';
 
 
 function applyTheme(t){
@@ -2243,7 +2286,7 @@ DOCS.transport_control = {g: 'act', name: 'التعامل مع أعوان مرا
 
 
 // ===== Activity-aware filtering of shop obligations (car wash, services, production…) =====
-var FOOD_RX = /غذائ|أغذية|اغذية|مطعم|مطاعم|مخبز|خبز|حلويات|حلوي|لحوم|لحم|جزار|دواجن|دجاج|خضر|فواكه|حليب|ألبان|البان|أجبان|مشروبات|مقهى|مقاهي|أكل|وجبات|بيتزا|أسماك|سمك|عسل|توابل|بقال|مرطبات|مثلجات|حبوب|دقيق|سميد|مطحن|زيوت غذائية|سكر|تمور|معجنات|alimenta|restaura|boulang|pâtiss|patiss|viande|boucher|volaill|fruits|légumes|legumes|lait|boisson|café|poisson|épicerie|epicerie|glace|pizz|traiteur|confiser/i;
+var FOOD_RX = /غذائ|أغذية|اغذية|مطعم|مطاعم|مخبز|خبز|حلويات|حلوي|لحوم|(^|\s)(ال)?لحم($|\s|،)|جزار|دواجن|دجاج|خضر|فواكه|حليب|ألبان|البان|أجبان|مشروبات|مقهى|مقاهي|أكل|وجبات|بيتزا|أسماك|(^|\s)(ال)?سمك($|\s|،)|عسل|توابل|بقال|مرطبات|مثلجات|حبوب|دقيق|سميد|مطحن|زيوت غذائية|(^|\s)(ال)?سكر|تمور|معجنات|alimenta|restaurant|boulang|pâtiss|patiss|viande|boucher|volaill|fruits|légumes|legumes|lait|boisson|café|poisson|épicerie|epicerie|glace|pizz|traiteur|confiser/i;
 var SUBS_RX = /خبز|مخبز|حليب|سميد|دقيق|زيت|سكر|مطحن|مواد غذائية عامة|بقال|boulang|lait|semoule|farine|huile|sucre|minoterie|alimentation générale|alimentation generale/i;
 var _buildList0 = buildList;
 buildList = function(ctx){
@@ -2340,7 +2383,7 @@ if (DOCS.shop_permanence) DOCS.shop_permanence.cases[0].extra = 'تخص الأن
     fc('عمال دون فحوص طبية دورية (كل 6 أشهر) أو دون التلقيحات الإجبارية', 'عدم إخضاع المستخدمين المتداولين للمواد الغذائية للفحوص الطبية الدورية', 'المادة 55', 'الشهادات الطبية للعمال المتداولين للأغذية: فحوص وتحاليل كل 6 أشهر على الأقل، والتلقيحات الإجبارية'),
     fc('نفايات متراكمة، أو حشرات وقوارض، أو مواد التنظيف مخزنة مع الأغذية', 'مخالفة إلزامية النظافة (النفايات ومكافحة الحشرات والقوارض ومواد التنظيف)', 'المواد 32 و33 و39 و41', 'حاويات النفايات نظيفة وتُخلى بسرعة، برنامج لمكافحة الحشرات والقوارض، مواد التنظيف في خزانة مغلقة أو مكان منفصل')
   ]};
-  var MEAT_RX = /لحوم|لحم|قصاب|جزار|دواجن|ذبح|viande|boucher|volaill|abattage/i;
+  var MEAT_RX = /لحوم|(^|\s)(ال)?لحم($|\s|،)|قصاب|جزار|دواجن|ذبح|viande|boucher|volaill|abattage/i;
   var _bl3 = buildList;
   buildList = function(ctx){
     var ids = _bl3(ctx);
@@ -2355,6 +2398,424 @@ if (DOCS.shop_permanence) DOCS.shop_permanence.cases[0].extra = 'تخص الأن
     return ids;
   };
 })();
+
+
+// ===== Invoices for shop/company owners (law 04-02 arts 10-13, 33 checked in JO 41/2004): purchases and sales, goods and services =====
+(function(){
+  var iv = DOCS.invoice; if (!iv) return;
+  var c0 = iv.cases[0], c1 = iv.cases[1], c2 = iv.cases[2];
+  var X = 'كل بيع سلع أو تأدية خدمات بين الأعوان الاقتصاديين يجب أن يكون محل فاتورة، والمشتري ملزم بطلبها (المادة 10)، ويقدمها البائع أو المشتري للأعوان عند أول طلب (المادة 13). ';
+  DOCS.invoice_biz = {g: 'fisc', name: 'الفواتير: فواتير المشتريات، وفوترة المبيعات أو الخدمات', fr: 'Facturation (achats et ventes / prestations)', cases: [
+    Object.assign({}, c0, {when: 'لا يملك فواتير ما اشتراه (السلع، أو مواد العمل مثل مواد التنظيف والزيوت وقطع الغيار)', nass: 'المواد 10 و13 و34 (الفقرة الأخيرة)', extra: X + (c0.extra || '')}),
+    Object.assign({}, c0, {when: 'بيع سلع أو تأدية خدمة لتاجر أو مؤسسة دون فاتورة، أو بيع للمستهلك دون تذكرة صندوق أو وصل، أو رفض تسليم الفاتورة لمستهلك طلبها', nass: 'المادة 10', extra: 'البيع للمستهلك يكون بتذكرة صندوق أو وصل يبرر المعاملة، وتُسلَّم الفاتورة إن طلبها الزبون (المادة 10). وتعدّ المادة 33 كل مخالفة للمواد 10 و11 و13 عدم فوترة. ' + (c0.extra || '')}),
+    c1, c2
+  ]};
+  var _bl4 = buildList;
+  buildList = function(ctx){ var ids = _bl4(ctx); if (ctx && ctx.role === 'business') { var at = ids.indexOf('invoice'); if (at >= 0) ids.splice(at, 1); if (ids.indexOf('invoice_biz') < 0) { var t = ids.indexOf('books'); if (t >= 0) ids.splice(t + 1, 0, 'invoice_biz'); else ids.push('invoice_biz'); } } return ids; };
+})();
+
+
+// ===== Classified installations by activity: decree 07-144 nomenclature (JO 34/2007), read page by page =====
+(function(){
+  var REG = 'أنواع الرخص في القائمة: رخصة وزارية، أو رخصة الوالي، أو رخصة رئيس المجلس الشعبي البلدي، أو تصريح لدى رئيس المجلس الشعبي البلدي. الملف يُودع لدى مصالح البيئة حسب المرسوم التنفيذي 06-198. ';
+  var P102 = 'استغلال منشأة مصنفة دون الترخيص المطلوب';
+  var mk = function(id, title, rub, tiersLic, tiersDecl, todo, v){
+    var cases = [];
+    if (tiersLic) cases.push({when: 'تُستغل دون رخصة، وهي من الأحجام التي تحتاج رخصة: ' + tiersLic, nature: 'جنحة', act: P102, law: 'env', nass: 'المادة 19 من القانون 03-10، و' + rub + ' من المرسوم التنفيذي 07-144', iqab: 'المادة 102 من القانون 03-10', type: 'court', amount: [500000, 500000], extra: 'ماذا يُراقب: ' + todo + '. العقوبة: حبس سنة وغرامة 500.000 دج، ويجوز للمحكمة منع استعمال المنشأة حتى الحصول على الرخصة والأمر بإعادة الأماكن إلى حالتها. ' + REG + 'المرسوم 07-144 (الجريدة الرسمية 34 لسنة 2007)، قرأت الخانة في الجدول الأصلي', v: v || 'ok'});
+    if (tiersDecl) cases.push({when: 'الحجم الصغير: ' + tiersDecl, nature: '', act: 'يكفي تصريح لدى رئيس المجلس الشعبي البلدي قبل بدء الاستغلال (' + rub + ' من المرسوم 07-144). لم أتحقق من عقوبة خاصة بعدم التصريح: المادة 102 من القانون 03-10 تخص الاستغلال دون رخصة', type: 'none', amount: null, v: 'one'});
+    DOCS[id] = {g: 'other', name: 'المنشأة المصنفة: ' + title, fr: 'Installation classée — ' + rub.replace('الخانة', 'rubrique'), cases: cases};
+  };
+  mk('icpe_garage', 'ورشة إصلاح وصيانة المركبات (غسل، تشحيم، ميكانيك، هيكل وصفائح)', 'الخانة 2912',
+    'مساحة الورشة أكثر من 5.000 م² ← رخصة وزارية (مع دراسة التأثير ودراسة الخطر)؛ أكثر من 500 م² وحتى 5.000 م² ← رخصة رئيس المجلس الشعبي البلدي (مع موجز التأثير وتقرير حول المواد الخطرة). وإن كانت تدهن أو تطلي المركبات: أكثر من 100 كغ/اليوم من المواد ← رخصة الوالي؛ أكثر من 10 كغ/اليوم أو أكثر من 0,5 طن مذيبات في السنة ← رخصة رئيس البلدية',
+    'مساحة الورشة 500 م² أو أقل',
+    'مساحة الورشة، ونوع الأشغال (غسل، تشحيم، ميكانيك، طلاء)، ووثيقة الرخصة أو وصل التصريح');
+  mk('icpe_fuel', 'محطة توزيع الوقود (بنزين، مازوت)', 'الخانتان 1534 و1532',
+    'تعبئة خزانات المركبات بتدفق أقصى يعادل 20 م³/سا أو أكثر ← رخصة الوالي؛ من 1 م³/سا إلى أقل من 20 م³/سا ← رخصة رئيس المجلس الشعبي البلدي (الخانة 1534). وتخزين السوائل القابلة للاشتعال بسعة معادلة أكثر من 100 م³ ← رخصة الوالي؛ أكثر من 10 م³ وحتى 100 م³ ← رخصة رئيس البلدية (الخانة 1532)',
+    '', 'التدفق الأقصى للمضخات، وسعة الخزانات، ووثيقة الرخصة');
+  mk('icpe_gpl', 'محطة تعبئة غاز البترول المميع للمركبات (سيرغاز)', 'الخانة 1513',
+    'منشأة تعبئة خزانات تزويد المحركات مزودة بأجهزة أمن (سدادات وصمامات) ← رخصة رئيس المجلس الشعبي البلدي؛ ومنشأة تعبئة القارورات أو الخزانات ← رخصة وزارية',
+    '', 'نوع المنشأة (تعبئة المركبات أو القارورات)، ووثيقة الرخصة');
+  mk('icpe_bakery', 'المخبزة', 'الخانتان 2218 و2219',
+    'مخبزة صناعية بقدرة إنتاج أكثر من 5 أطنان في اليوم ← رخصة رئيس المجلس الشعبي البلدي (الخانة 2218)',
+    'مخبزة صناعية بين 0,5 و5 أطنان في اليوم (الخانة 2218)؛ ومخبزة الخبز والحلويات والمعجنات المنشأة في عمارة سكنية أو ملاصقة لبناية يشغلها الغير (الخانة 2219)',
+    'قدرة الإنتاج اليومية، وموقع المخبزة (في عمارة سكنية أو ملاصقة لها)، ووثيقة الرخصة أو وصل التصريح');
+  mk('icpe_laundry', 'المصبغة وغسل الملابس والتنظيف الجاف', 'الخانتان 2310 و2316',
+    'غسل الملابس بقدرة أكثر من 5 أطنان/اليوم ← رخصة الوالي؛ من 500 كغ إلى 5 أطنان/اليوم ← رخصة رئيس المجلس الشعبي البلدي (الخانة 2310). التنظيف الجاف بالمذيبات بقدرة اسمية للآلات أكثر من 50 كغ ← رخصة الوالي؛ من 20 إلى 50 كغ ← رخصة رئيس البلدية (الخانة 2316)',
+    'غسل 500 كغ/اليوم أو أقل؛ أو تنظيف جاف 20 كغ أو أقل', 'القدرة اليومية أو القدرة الاسمية للآلات، ووثيقة الرخصة أو وصل التصريح');
+  mk('icpe_wood', 'ورشة العمل على الخشب (نجارة)', 'الخانة 2410',
+    'قدرة الآلات أكثر من 2.000 كيلوواط (هكذا طُبع الرقم) ← رخصة الوالي؛ أكثر من 50 كيلوواط وحتى 200 كيلوواط ← رخصة رئيس المجلس الشعبي البلدي',
+    'قدرة الآلات 50 كيلوواط أو أقل', 'القدرة الإجمالية للآلات بالكيلوواط، ووثيقة الرخصة أو وصل التصريح. تنبيه: الجدول المنشور لا يذكر ما بين 200 و2.000 كيلوواط، وقد يكون خطأ مطبعياً', 'one');
+  mk('icpe_slaughter', 'المذبح (ذبح الحيوانات)', 'الخانة 2210',
+    'وزن الذبائح أكثر من 2 طن/اليوم ← رخصة الوالي؛ أكثر من 500 كغ وحتى 2 طن/اليوم ← رخصة رئيس المجلس الشعبي البلدي',
+    '500 كغ/اليوم أو أقل', 'وزن الذبائح اليومي، ووثيقة الرخصة أو وصل التصريح');
+  mk('icpe_milk', 'وحدة جمع أو تحويل الحليب', 'الخانة 2227',
+    'أكثر من 70.000 لتر/اليوم (أو ما يعادلها) ← رخصة الوالي؛ أكثر من 7.000 وحتى 70.000 لتر/اليوم ← رخصة رئيس المجلس الشعبي البلدي',
+    '', 'الكمية اليومية المعالجة، ووثيقة الرخصة');
+  mk('icpe_foodanimal', 'تحضير أو حفظ مواد غذائية من أصل حيواني (لحوم محولة، أسماك، مصبرات…)', 'الخانة 2215',
+    'المواد الداخلة أكثر من 2 طن/اليوم ← رخصة الوالي؛ أكثر من 500 كغ وحتى 2 طن/اليوم ← رخصة رئيس المجلس الشعبي البلدي',
+    '500 كغ/اليوم أو أقل', 'الكمية الداخلة يومياً، ووثيقة الرخصة أو وصل التصريح');
+  mk('icpe_foodveg', 'تحضير أو حفظ مواد غذائية من أصل نباتي (مصبرات، تجميد، تجفيف، ورشات إنضاج الفواكه والخضر)', 'الخانة 2214',
+    'المواد الداخلة أكثر من 10 أطنان/اليوم ← رخصة الوالي؛ أكثر من 2 وحتى 10 أطنان/اليوم ← رخصة رئيس المجلس الشعبي البلدي',
+    '2 طن/اليوم أو أقل', 'الكمية الداخلة يومياً، ووثيقة الرخصة أو وصل التصريح');
+  mk('icpe_drinks', 'صناعة المشروبات (عصير، مشروبات غازية…)', 'الخانة 2217',
+    'قدرة الإنتاج أكثر من 20.000 لتر/اليوم ← رخصة الوالي؛ أكثر من 2.000 وحتى 20.000 لتر/اليوم ← رخصة رئيس المجلس الشعبي البلدي',
+    '2.000 لتر/اليوم أو أقل', 'قدرة الإنتاج اليومية، ووثيقة الرخصة أو وصل التصريح');
+  mk('icpe_parking', 'حظيرة توقف مغطاة أو مرأب للمركبات', 'الخانة 2919',
+    'أكثر من 1.000 مركبة ← رخصة الوالي؛ أكثر من 250 وحتى 1.000 مركبة ← رخصة رئيس المجلس الشعبي البلدي',
+    'أقل من 250 مركبة', 'عدد المركبات التي يتسع لها المرأب، ووثيقة الرخصة أو وصل التصريح');
+  var MAP = [
+    ['icpe_garage', /غسيل السيارات|غسل السيارات|مغسلة السيارات|lavage|lave-auto|تصليح.{0,30}(السيارات|العربات|المركبات|ميكانيك)|صيانة ميكانيكية|ميكانيك السيارات|كهرباء السيارات|تشحيم|سمكرة|هيكل (السيارات|العربات)|سراجة السيارات|vidange|graissage|carrosserie|mécanique auto|mecanique auto|réparation (de )?véhicule|reparation (de )?vehicule/i],
+    ['icpe_fuel', /محطات الوقود|محطة (توزيع|خدمات) (الوقود|البنزين)|stations? (de )?service|station-service/i],
+    ['icpe_gpl', /(توزيع|محطة|تعبئة|بيع).{0,25}(غاز البترول المميع وقود|سيرغاز)|gpl.?c(arburant)?\b|sirghaz/i],
+    ['icpe_bakery', /^(مخبزة|المخبزة)|^boulangerie/i],
+    ['icpe_laundry', /^التبييض أو الغسل|مصبغة|غسل الملابس|غسيل الملابس|مغسلة الملابس|التنظيف الجاف|pressing|nettoyage à sec/i],
+    ['icpe_wood', /(مؤسسة|ورشة)[^"]{0,30}نجارة(?! المعدنية)|النجارة العامة|للنجارة$|نجارة الخشب|العمل على الخشب|scierie/i],
+    ['icpe_slaughter', /ذبح|مذبح|abattage|abattoir/i],
+    ['icpe_milk', /ملبنة|تحويل الحليب|جمع الحليب|مشتقات الحليب|laiterie|transformation du lait/i],
+    ['icpe_drinks', /صناعة المشروبات|إنتاج المشروبات|عصير|مشروبات غازية|fabrication de boissons|jus de fruits|boissons gazeuses/i],
+    ['icpe_parking', /حظيرة (توقف|السيارات|المركبات)|حظائر السيارات|مرأب|موقف السيارات|parking|garage de stationnement/i]
+  ];
+  var _bl5 = buildList;
+  buildList = function(ctx){
+    var ids = _bl5(ctx);
+    if (!(ctx && (ctx.role === 'business' || ctx.role === 'vendor'))) return ids;
+    var code = ctx.act && ctx.act.code; if (!code || !NOMEN[code]) return ids;
+    var lab = NOMEN[code][0] + ' ' + NOMEN[code][1], k = code[0], prod = k === '1' || k === '2';
+    var ONLY = {icpe_fuel: function(c){ return c === '604611' || c === '604618'; }, icpe_garage: function(c){ return c[0] === '6' && c !== '613114'; }, icpe_drinks: function(c){ return c.indexOf('107') === 0; }};
+    var add = MAP.filter(function(m){ return m[1].test(lab) && (!ONLY[m[0]] || ONLY[m[0]](code)); }).map(function(m){ return m[0]; });
+    if (code.indexOf('107') === 0 && /الحليب|lait/i.test(lab) && add.indexOf('icpe_milk') < 0) add.push('icpe_milk');
+    if (['107601', '107609', '107611', '107613'].indexOf(code) >= 0) add.push('icpe_foodveg');
+    if (['107602', '107604', '107610'].indexOf(code) >= 0) add.push('icpe_foodanimal');
+    if (add.indexOf('icpe_bakery') >= 0) { var i2 = add.indexOf('icpe_foodveg'); if (i2 >= 0) add.splice(i2, 1); }
+    if (k === '5' || k === '3' || k === '4') add = add.filter(function(id){ return ['icpe_fuel', 'icpe_gpl', 'icpe_bakery', 'icpe_parking'].indexOf(id) >= 0; });
+    if (add.length) { ids = ids.filter(function(id){ return id !== 'env_permit'; }); add.forEach(function(id){ if (ids.indexOf(id) < 0) ids.push(id); }); }
+    return ids;
+  };
+})();
+
+
+// ===== Activity kind (sedentary / itinerant, production / wholesale / retail…) and filtering by role =====
+function isItinerant(c){ if (!c || !NOMEN[c]) return false; return c.indexOf('511') === 0 || c.indexOf('617') === 0 || /متنقل|متجول|التجوال|ambulant|itin[ée]rant/i.test(NOMEN[c][0] + ' ' + NOMEN[c][1]); }
+var KIND_LBL = {'1': 'إنتاج صناعي', '2': 'صناعة تقليدية وحرف', '3': 'تجارة بالجملة', '4': 'استيراد', '5': 'تجارة بالتجزئة', '6': 'خدمات', '7': 'تصدير'};
+function codeKindTag(c){ if (!c) return ''; var it = isItinerant(c); return '<span class="tag ' + (it ? 'part' : 'rec') + '" style="margin-inline-end:6px">' + (it ? 'غير مستقر (متنقل)' : 'مستقر') + ' · ' + (KIND_LBL[c[0]] || '') + '</span>'; }
+function roleFilterCodes(list){
+  var all = list.slice(), f;
+  if (state.mode === 'biz') f = state.role === 'vendor' ? 'itin' : 'fixed';
+  else f = state.drvKind || 'all';
+  var keep = f === 'all' ? all : all.filter(function(c){ return f === 'itin' ? isItinerant(c) : !isItinerant(c); });
+  state.codesHidden = all.length - keep.length; state.codesFilter = f;
+  if (state.actCode && keep.indexOf(state.actCode) < 0 && all.indexOf(state.actCode) >= 0) keep.unshift(state.actCode);
+  return keep;
+}
+function codeFilterBar(){
+  var h = state.codesHidden || 0;
+  if (state.mode === 'biz') {
+    if (!h) return '';
+    var other = state.role === 'vendor' ? 'business' : 'vendor';
+    return '<p class="foot" style="margin:0">' + (state.role === 'vendor' ? 'تظهر أنشطة التاجر غير المستقر فقط. أُخفي ' : 'تظهر أنشطة التاجر المستقر (محل أو شركة) فقط. أُخفي ') + '<b class="num">' + h + '</b> نشاط' + (state.role === 'vendor' ? ' مستقر' : ' غير مستقر (متنقل)') + '. <button type="button" class="linkbtn" data-role="' + other + '">' + (state.role === 'vendor' ? 'عرض أنشطة المحل أو الشركة' : 'عرض أنشطة التاجر غير المستقر') + '</button></p>';
+  }
+  var f = state.drvKind || 'all';
+  var chip = function(v, t){ return '<button type="button" class="chip" data-drvkind="' + v + '" aria-pressed="' + (f === v) + '">' + t + '</button>'; };
+  return '<div class="chips small" role="group" aria-label="نوع نشاط صاحب السلعة">' + chip('all', 'كل الأنشطة') + chip('fixed', 'تاجر مستقر') + chip('itin', 'تاجر غير مستقر (متنقل)') + '</div>' + (h ? '<p class="foot" style="margin:0">أُخفي <b class="num">' + h + '</b> نشاط حسب الاختيار.</p>' : '');
+}
+document.addEventListener('click', function(e){ var b = e.target.closest('[data-drvkind]'); if (b) { state.drvKind = b.getAttribute('data-drvkind'); render(); } });
+
+
+// ===== Offence search limited to the chosen driver type / activity (with a switch to search everything) =====
+(function(){
+  var _bl6 = buildList;
+  buildList = function(ctx){ var ids = _bl6(ctx); if (ctx && ctx.role === state.role) state.lastIds = ids.slice(); return ids; };
+})();
+function offInScope(id){ if (state.offAll || !state.lastIds) return true; return state.lastIds.indexOf(id) >= 0; }
+function caseInScope(c){
+  if (state.offAll || state.mode !== 'biz') return true;
+  var w = (c.when || '') + ' ' + (c.act || '');
+  if (state.role === 'business') return !/غير مستقر|غير قار|متنقل|التجوال/.test(c.when || '');
+  if (state.role === 'vendor') return !/(نشاط|تاجر) (قار|مستقر)|دون محل|\(محل\)/.test(c.when || '');
+  return true;
+}
+(function(){
+  var _r = render;
+  render = function(){
+    _r();
+    var el = $('offScope'); if (!el) return;
+    var rb = document.querySelector('[data-role="' + state.role + '"]'), name = rb ? rb.textContent : '';
+    var all = !!state.offAll;
+    el.innerHTML = '<div class="chips small" role="group" aria-label="نطاق البحث"><button type="button" class="chip" data-offall="0" aria-pressed="' + !all + '">مخالفات صنفي فقط' + (name ? ': ' + esc(name) : '') + '</button><button type="button" class="chip" data-offall="1" aria-pressed="' + all + '">كل المخالفات</button></div>';
+  };
+})();
+document.addEventListener('click', function(e){ var b = e.target.closest('[data-offall]'); if (b) { state.offAll = b.getAttribute('data-offall') === '1'; render(); } });
+
+
+// ===== «دليل»: everything in the app as a numbered tree (chapter > section > items), browsed level by level =====
+function gAllCases(){ var o = []; Object.keys(DOCS).forEach(function(id){ var d = DOCS[id]; (d.cases || []).forEach(function(c, i){ if (c.type !== 'none') o.push({id: id, i: i, d: d, c: c}); }); }); return o; }
+function gAmt(c){ return c.pct ? (c.pct === 2 ? 'ضعف قيمة البضاعة' : Math.round(c.pct * 100) + '% من القيمة') : (c.amount ? (c.amount[0] === c.amount[1] ? '<span class="num">' + fmt0(c.amount[0]) + '</span> دج' : 'من <span class="num">' + fmt0(c.amount[0]) + '</span> إلى <span class="num">' + fmt0(c.amount[1]) + '</span> دج') : 'المبلغ غير محدد'); }
+var G_SUBJ = {'90-11': 'علاقات العمل', '18-11': 'الصحة', '17-09': 'القياسة القانونية', '05-12': 'المياه', '74-15': 'إلزامية تأمين السيارات'};
+function gLawLabel(kind, num){
+  var subj = G_SUBJ[num] || '';
+  if (!subj) Object.keys(LAWS).forEach(function(k){ if (!subj && LAWS[k].indexOf(num) >= 0 && LAWS[k].indexOf(num) < 30) { var m = LAWS[k].match(/(?:المتضمن|المتعلق ب|المتعلق|المحدد)\s*(.+?)(?:،| \(|$)/); subj = m ? m[1].replace(/^ال?قانون /, 'قانون ').replace(/^لل/, 'ال') : ''; } });
+  return kind + ' ' + num + (subj ? ' — ' + subj : '');
+}
+function gLaw(c){
+  var src = LAWS[c.law] || '', m = src.match(/^(القانون|الأمر|المرسوم التنفيذي)(?: رقم)? (\d{2}-\d{2,3})/);
+  if (m) return gLawLabel(m[1], m[2]);
+  if (src) return src;
+  var t = (c.iqab || '') + ' ' + (c.nass || '');
+  m = t.match(/(القانون|الأمر|المرسوم التنفيذي|المرسوم)(?: رقم)? ?(\d{2}-\d{2,3})/);
+  if (m) return gLawLabel(m[1], m[2]);
+  if (/الضرائب غير المباشرة/.test(t)) return 'قانون الضرائب غير المباشرة';
+  return 'نصوص أخرى';
+}
+function gDegree(c){ var m = (c.iqab || '').match(/المادة 121 \((أ|ب|ج|د)/); return m ? m[1] : ''; }
+var G_TUT = [[/defense.*interieur/, 'وزارة الدفاع و/أو الداخلية'], [/interieur.*industrie/, 'وزارة الداخلية ووزارة الصناعة'], [/amenagement.*agriculture/, 'وزارة البيئة و/أو الفلاحة'], [/pharmaceutique/, 'وزارة الصناعة الصيدلانية'], [/interieur/, 'وزارة الداخلية'], [/d\.r\.a\.g/, 'الولاية (مديرية التنظيم والشؤون العامة)'], [/^wilaya/, 'الولاية'], [/finances/, 'وزارة المالية'], [/direction des transports/, 'مديرية النقل للولاية'], [/travaux publics/, 'وزارة الأشغال العمومية والنقل'], [/transports/, 'وزارة النقل'], [/poste/, 'سلطة ضبط البريد والاتصالات'], [/protection de la nature/, 'وزارة حماية الطبيعة'], [/agriculture/, 'وزارة الفلاحة'], [/energie et des mines/, 'وزارة الطاقة والمناجم'], [/hydrocarbures/, 'وزارة المحروقات'], [/energie/, 'وزارة الطاقة'], [/mines/, 'وزارة المناجم'], [/defense/, 'وزارة الدفاع الوطني'], [/environnement/, 'وزارة البيئة'], [/peches/, 'وزارة الصيد البحري'], [/industrie/, 'وزارة الصناعة'], [/sans pilote/, 'المركز الوطني لأنظمة الطائرات بدون طيار'], [/marine marchande/, 'وزارة البحرية التجارية'], [/habitat/, 'وزارة السكن'], [/sante/, 'وزارة الصحة'], [/développement de cinéma/, 'المركز الجزائري لتطوير السينما'], [/cinéma/, 'المركز الوطني للسينما'], [/banque centrale/, 'محافظ بنك الجزائر'], [/conseil monétaire/, 'رئيس مجلس النقد والقرض'], [/aviation/, 'سلطة الطيران المدني'], [/cosob/, 'لجنة تنظيم عمليات البورصة ومراقبتها'], [/tabac/, 'سلطة ضبط سوق التبغ'], [/populaire communale/, 'رئيس المجلس الشعبي البلدي'], [/direction du commerce/, 'مديرية التجارة للولاية'], [/information et/, 'وزارة الإعلام والثقافة'], [/presse/, 'سلطة الصحافة الإلكترونية'], [/audiovisuel/, 'سلطة ضبط السمعي البصري'], [/solidarité/, 'وزارة التضامن الوطني'], [/électricité/, 'لجنة ضبط الكهرباء والغاز'], [/impôts/, 'مديرية الضرائب للولاية'], [/opérateur/, 'متعامل الهاتف'], [/douanes/, 'إدارة الجمارك'], [/tourisme/, 'وزارة السياحة'], [/domaines/, 'إدارة أملاك الدولة'], [/architectes/, 'الهيئة الوطنية للمهندسين المعماريين'], [/travail/, 'وزارة العمل'], [/education/, 'وزارة التربية الوطنية'], [/jeunesse/, 'وزارة الشباب والرياضة'], [/enseignement/, 'وزارة التعليم العالي'], [/divers/, 'هيئات مختلفة']];
+function gTut(t){ var l = String(t || '').toLowerCase().replace(/[’']/g, "'"); for (var i = 0; i < G_TUT.length; i++) if (G_TUT[i][0].test(l)) return G_TUT[i][1]; return t || 'جهة غير محددة في المدونة'; }
+var G_AUTH = [[/agr[eé]ment/i, 'اعتماد'], [/constitution/i, 'قرار الترخيص بالتأسيس'], [/autorisation/i, 'رخصة (ترخيص)'], [/licence/i, 'رخصة (Licence)'], [/accord/i, 'موافقة مسبقة'], [/concession/i, 'امتياز'], [/approbation/i, 'موافقة لجنة إقامة الفضاءات التجارية'], [/inscription/i, 'تسجيل لدى الجهة الوصية'], [/attestation/i, 'شهادة'], [/déclaration/i, 'تصريح'], [/extrait/i, 'مستخرج'], [/carreau/i, 'مربع في سوق الجملة']];
+function gAuth(a){ for (var i = 0; i < G_AUTH.length; i++) if (G_AUTH[i][0].test(a || '')) return G_AUTH[i][1]; return 'نوع الرخصة غير محدد في المدونة'; }
+function gS(t){ return esc(String(t || '').toLowerCase()); }
+
+// ---- rows
+function gCaseRow(x, withDoc){
+  var c = x.c, T = TYPES[c.type] || TYPES.court;
+  var vt = c.v === 'ok' ? '<span class="v ok">مؤكد</span>' : (c.v === 'one' ? '<span class="v one">مصدر واحد</span>' : '<span class="v no">غير مؤكد</span>');
+  return '<div class="g-row" data-s="' + gS(x.d.name + ' ' + c.when + ' ' + (c.act || '') + ' ' + (c.iqab || '')) + '">' +
+    (withDoc ? '<b>' + esc(x.d.name) + '</b>' : '') +
+    '<span class="g-sit">' + (withDoc ? 'الحالة: ' : '') + esc(c.when) + '</span>' +
+    '<span class="meta"><span class="type ' + T.cls + '">' + T.label + '</span><span class="amt">' + gAmt(c) + '</span>' + vt + '</span>' +
+    '<span class="g-ref">' + (c.nass ? 'الواجب: ' + esc(c.nass) + ' · ' : '') + 'العقوبة: ' + esc(c.iqab || '—') + ' · ' + esc(gLaw(c)) + '</span>' +
+    (c.extra ? '<details><summary class="foot" style="margin:0">الإجراءات والتفاصيل</summary><div class="extra">' + esc(c.extra) + '</div></details>' : '') + '</div>';
+}
+function gDocRow(id){
+  var d = DOCS[id], cs = (d.cases || []).map(function(c, i){ return {id: id, i: i, d: d, c: c}; }).filter(function(x){ return x.c.type !== 'none'; });
+  return '<details class="g-doc" data-s="' + gS(d.name + ' ' + (d.fr || '') + ' ' + cs.map(function(x){ return x.c.when; }).join(' ')) + '"><summary><b>' + esc(d.name) + '</b><span class="g-cnt">' + (cs.length ? 'حالات المخالفة: ' + cs.length : 'دون عقوبة خاصة') + '</span></summary>' +
+    (cs.length ? cs.map(function(x){ return gCaseRow(x, false); }).join('') : '<p class="foot" style="margin:6px 0 0">معلومة أو قاعدة لم أجد لها عقوبة خاصة.</p>') + '</details>';
+}
+function gCodeRow(c){
+  var i = codeInfo(c);
+  return '<div class="g-row" data-s="' + gS(c + ' ' + i.ar + ' ' + i.fr) + '"><button type="button" class="g-link" data-gpick="' + c + '"><span class="num">' + c + '</span> ' + esc(i.ar) + '</button><span class="meta">' + codeKindTag(c) +
+    (i.status === 'blocked' ? '<span class="tag seize">محظور التسجيل</span>' : '') +
+    (i.status === 'regulated' ? '<span class="tag part">منظم</span><span class="g-ref">' + gAuth(i.auth) + ' · ' + esc(gTut(i.tutelle)) + '</span>' : '') + '</span></div>';
+}
+function _gCount(r){ var keep = state.lastIds; var ids = buildList({act: null, role: r, veh: 'light', truck: 'plain', zone: false, profiles: [], carry: false}); state.lastIds = keep; return ids.length; }
+function gRoleRow(r){
+  var b = document.querySelector('[data-role="' + r + '"]'), lbl = b ? b.textContent : r, n = 0;
+  if (r === 'business') lbl = 'صاحب محل أو شركة (نشاط مستقر)'; if (r === 'vendor') lbl = 'تاجر غير مستقر (متنقل، أسواق)';
+  if (ROLE_CAT[r] !== 'biz') { try { n = _gCount(r); } catch (e) {} }
+  return '<div class="g-row" data-s="' + gS(lbl) + '"><button type="button" class="g-link" data-grole="' + r + '">' + esc(lbl) + '</button><span class="g-ref">' + (n ? 'وثائق وتجهيزات والتزامات: ' + n + ' — اضغط لفتح القائمة' : 'يختار نشاطه من المدونة ثم تظهر وثائقه والتزاماته') + '</span></div>';
+}
+function gDefRow(x){ return '<div class="g-def" data-s="' + gS(x[0] + ' ' + x[1]) + '"><b>' + x[0] + ':</b> ' + x[1] + '</div>'; }
+
+// ---- tree
+function gNode(t, d, o){ o = o || {}; o.t = t; o.d = d; return o; }
+function gLeaf(t, d, items, row, unit, o){ o = o || {}; o.items = items; o.row = row; o.unit = unit; return gNode(t, d, o); }
+function gKids(n){ if (typeof n.kids === 'function') n.kids = n.kids(); return n.kids; }
+function gItems(n){ if (typeof n.items === 'function') n.items = n.items(); return n.items; }
+var G_ROOT = null;
+function gRoot(){
+  if (G_ROOT) return G_ROOT;
+  var all = gAllCases(), codes = Object.keys(NOMEN), gname = {};
+  GROUPS.forEach(function(g){ gname[g[0]] = g[1]; });
+  var byG = function(gs){ return Object.keys(DOCS).filter(function(id){ return gs.indexOf(DOCS[id].g) >= 0; }); };
+  var casesOfG = function(gs){ return all.filter(function(x){ return gs.indexOf(x.d.g) >= 0; }); };
+  var caseLeaf = function(t, d, arr){ return gLeaf(t, d, arr, function(x){ return gCaseRow(x, true); }, 'مخالفات'); };
+  var docLeaf = function(t, d, ids){ return gLeaf(t, d, ids.filter(function(id){ return DOCS[id]; }), gDocRow, 'عناصر'); };
+  var codeLeaf = function(t, d, arr){ return gLeaf(t, d, arr, gCodeRow, 'أنشطة'); };
+  var defLeaf = function(t, d, arr){ return gLeaf(t, d, arr, gDefRow, 'تعريفات'); };
+  var sortBy = function(map){ return Object.keys(map).sort(function(a, b){ return map[b].length - map[a].length; }); };
+
+  // 1. definitions
+  var n1 = gNode('المصطلحات والتعريفات', 'معاني الكلمات المستعملة في التطبيق، مقسّمة حسب مجالها.', {kids: [
+    defLeaf('الجرائم والعقوبات', 'الفرق بين المخالفة والجنحة، وأنواع الغرامات.', [
+      ['الجريمة', 'كل فعل يعاقب عليه القانون، وتنقسم حسب خطورتها إلى جناية وجنحة ومخالفة.'],
+      ['المخالفة', 'أخف الجرائم، وأغلب مخالفات المرور منها وتُعاقَب بغرامة جزافية.'],
+      ['الجنحة', 'جريمة أخطر من المخالفة: يُحرَّر محضر ويُحال إلى وكيل الجمهورية، والقاضي يحدد العقوبة بين حدّين (غرامة و/أو حبس).'],
+      ['الغرامة الجزافية', TYPES.forfait.how],
+      ['درجات الغرامة الجزافية', 'حسب المادة 121 من القانون 26-09: الدرجة الأولى (أ) 3.000 دج، الثانية (ب) 4.000 دج، الثالثة (ج) 6.000 دج، الرابعة (د) 10.000 دج.'],
+      ['الغرامة بين حدّين', 'في الجنح يذكر النص حداً أدنى وحداً أقصى، والقاضي يختار المبلغ بينهما.'],
+      ['غرامة الصلح', 'في مخالفات التجارة يمكن أن تنتهي المتابعة بدفع غرامة صلح لدى مدير التجارة إن قبلها المخالف وكان المبلغ في الحد المسموح.'],
+      ['الحبس', 'عقوبة سالبة للحرية لا يحكم بها إلا القاضي، وتكون في الجنح.']
+    ]),
+    defLeaf('الإجراءات', 'ما يمكن أن يُتخذ ضد المخالف أو مركبته أو سلعته أو محله، ومسار كل محضر.', [
+      ['المحضر', 'وثيقة يحررها العون المؤهل يثبت فيها المخالفة والمعاينات وأقوال المخالف.'],
+      ['محضر يُحال إلى وكيل الجمهورية', TYPES.court.how],
+      ['محضر النقل والإجراء الإداري', TYPES.admin.how],
+      ['محضر إلى مديرية التجارة', TYPES.settle.how],
+      ['المحضر الجمركي', TYPES.customs.how],
+      ['التوقيف الفوري', 'إيقاف المركبة في مكانها حتى زوال سبب المخالفة (المادة 173 من القانون 26-09).'],
+      ['الوضع في المحشر', 'نقل المركبة إلى المحشر وإبقاؤها فيه على نفقة المخالف للمدة التي يحددها النص (مثلاً من 15 إلى 45 يوماً في مخالفات النقل حسب القانون 01-13).'],
+      ['الحجز', 'وضع السلعة أو الوسيلة تحت يد الإدارة مؤقتاً.'],
+      ['المصادرة', 'نقل ملكية السلعة أو الوسيلة إلى الدولة نهائياً بحكم أو بقرار حسب النص.'],
+      ['الغلق الإداري', 'غلق المحل مؤقتاً بقرار من السلطة المختصة التي يحددها النص، أو بحكم قضائي.'],
+      ['سحب الرخصة', 'تعليق رخصة النشاط أو السياقة مؤقتاً أو إلغاؤها نهائياً حسب النص.'],
+      ['العود', 'تكرار المخالفة نفسها خلال الأجل الذي يحدده النص (مثلاً 12 شهراً في القانون 01-13)، وغالباً ما تُضاعَف العقوبة.']
+    ]),
+    defLeaf('النشاط التجاري', 'مصطلحات قسم «نشاطي» ومدونة الأنشطة.', [
+      ['السجل التجاري', 'القيد الإلزامي لكل تاجر قبل ممارسة نشاطه (القانون 04-08).'],
+      ['رمز النشاط', 'رقم من 6 أرقام في مدونة الأنشطة الاقتصادية الخاضعة للتسجيل في السجل التجاري. الرقم الأول يدل على القطاع.'],
+      ['القطاعات السبعة', Object.keys(SECTORS).map(function(k){ return k + ' ' + SECTORS[k]; }).join('، ') + '.'],
+      ['التاجر المستقر', 'يمارس نشاطه في محل ثابت (محل، مكتب، ورشة، مصنع).'],
+      ['التاجر غير المستقر', 'يمارس نشاطه في الأسواق والمعارض أو بالتجوال. رموز نشاطه تبدأ غالباً بـ 511 (تجارة) و617 (خدمات).'],
+      ['النشاط الحر', 'نشاط لا تذكر المدونة أنه يحتاج رخصة أو اعتماداً خاصاً، فيكفي فيه القيد في السجل التجاري مع الالتزامات العامة.'],
+      ['النشاط المنظم (المقنن)', 'نشاط يحتاج، إضافة إلى السجل التجاري، رخصة أو اعتماداً من جهة مختصة (المادة 25 من القانون 04-08).'],
+      ['النشاط المحظور التسجيل', 'نشاط لا يُقبل فيه حالياً تسجيل جديد في السجل التجاري.'],
+      ['الاعتماد والرخصة', 'إذن تمنحه الوزارة أو الهيئة الوصية بعد التحقق من شروط معينة، وتختلف تسميته حسب النشاط (اعتماد، رخصة، موافقة مسبقة، امتياز…).'],
+      ['المنشأة المصنفة', 'منشأة قد تضر بالبيئة أو الجوار. حسب حجمها تحتاج رخصة من الوزير المكلف بالبيئة (رو) أو من الوالي (رول) أو من رئيس المجلس الشعبي البلدي (ررم ش ب)، أو تصريحاً لديه (ت). المرجع: المرسوم 07-144.']
+    ]),
+    defLeaf('قراءة بطاقة المخالفة', 'كيف تُقرأ كل بطاقة في التطبيق.', [
+      ['الحالة', 'الوضعية التي يجدها العون أثناء المراقبة، مثلاً: يملك الوثيقة لكن لم يحملها.'],
+      ['المادة الناصّة (الواجب)', 'المادة التي تفرض الواجب أو المنع.'],
+      ['المادة المعاقِبة (العقوبة)', 'المادة التي تحدد العقوبة. قد تكون في نص آخر غير النص الناصّ.'],
+      ['نوع المتابعة', 'اللون يدل على مسار المحضر: أزرق للغرامة الجزافية، وأحمر للمحكمة أو الجمارك، وأصفر لمحاضر النقل الإدارية ومديرية التجارة.'],
+      ['مؤكد', 'الواجب والعقوبة مقروءان في الجريدة الرسمية ومرتبطان صراحة.'],
+      ['مصدر واحد', 'العقوبة صحيحة على الأرجح لكنها تكييف أو من مصدر غير رسمي واحد.'],
+      ['غير مؤكد', 'الواجب موجود ولم أجد له عقوبة صريحة.']
+    ])
+  ]});
+
+  // 2. who
+  var CAT = [['car', 'السيارات الخاصة والمستأجرة والمؤسسات'], ['pax', 'نقل الأشخاص'], ['goods', 'نقل البضائع'], ['bike', 'الدراجات'], ['machine', 'الآليات والجرارات'], ['biz', 'أصحاب الأنشطة التجارية']];
+  var n2 = gNode('الأصناف: من يُراقَب؟', 'كل صنف تظهر له قائمة مختلفة من الوثائق والتجهيزات والمخالفات. اضغط على الصنف لفتح قائمته مباشرة.', {kids: CAT.map(function(c){ return gLeaf(c[1], '', Object.keys(ROLE_CAT).filter(function(r){ return ROLE_CAT[r] === c[0]; }), gRoleRow, 'أصناف'); })});
+
+  // 3. documents and obligations
+  var D = function(g, d){ return docLeaf(gname[g], d, byG([g])); };
+  var n3 = gNode('الوثائق والتجهيزات والالتزامات', 'كل ما يمكن أن يُطلب أو يُراقَب، مقسّم حسب مكان المراقبة ثم حسب طبيعته. اضغط على أي عنصر لرؤية حالات مخالفته.', {kids: [
+    gNode('على الطريق: السائق والمركبة', 'ما يُراقَب عند أي توقيف لمركبة.', {kids: [
+      D('veh', 'الوثائق الأساسية التي يقدمها السائق، وقواعد المركبة وحمولتها.'),
+      D('equip', 'ما يجب أن يكون داخل المركبة أو عليها.'),
+      D('tech', 'عيوب المركبة التي تُعاين بالعين (أضواء، إطارات، فرامل…).'),
+      D('road', 'مخالفات قواعد السير (السرعة، الأولوية، الوقوف…).'),
+      D('gen', 'سلوك المعني أثناء المراقبة.')
+    ]}),
+    gNode('النقل: الأشخاص والبضائع', 'ما يخص من يمارس النقل أو ينقل سلعة.', {kids: [
+      D('act', 'رخص ممارسة النقل (أجرة، حافلة، مدرسي، بضائع) وقواعد العمل.'),
+      D('goods', 'وثائق السلعة المنقولة والرخص الخاصة بنقلها.')
+    ]}),
+    gNode('المحل والنشاط التجاري', 'ما يُراقَب في المحل أو الشركة.', {kids: [
+      D('shop', 'الالتزامات تجاه الزبون: الأسعار، البيع، النظافة، الوسم، الموازين.'),
+      D('other', 'الرخص القطاعية: البيئة، المنشآت المصنفة، البيطرة، المياه، النفايات.'),
+      D('fisc', 'الوثائق الجبائية والاجتماعية والفواتير وتشغيل العمال.')
+    ]})
+  ]});
+
+  // 4. permits
+  var P = function(t, d, ids){ return docLeaf(t, d, ids); };
+  var n6ref = {};
+  var n4 = gNode('الرخص والتراخيص', 'الوثائق التي تمنحها الإدارة وتسمح بالسياقة أو بممارسة نشاط أو بنقل سلعة معينة.', {kids: [
+    P('وثائق السائق والمركبة الأساسية', 'تُطلب من كل سائق حسب مركبته.', ['permis', 'foreign_licence', 'carte_grise', 'assurance', 'ct', 'brevet', 'mission', 'rental_contract', 'tpd', 'transport_ex']),
+    P('رخص ممارسة النقل', 'لمن ينقل أشخاصاً أو بضائع لحساب الغير أو لحسابه الخاص.', ['licence_tr', 'own_acc_auth', 'taxi_lic', 'bus_lic', 'bus_trip', 'school_lic', 'amb_agr', 'autoecole_agr', 'vtc_lic', 'receveur', 'contrat_tr']),
+    P('رخص استثنائية لنقل سلع خاصة', 'سلع لا تُنقل إلا برخصة أو وثيقة خاصة: المواد الخطرة، التبغ، المنتجات الغابية، النفايات، المواشي واللحوم…', ['dangerous', 'danger_driver', 'danger_docs', 'customs_circ', 'tobacco', 'pharma', 'forest_permit', 'plants_permit', 'waste_auth', 'sand_bon', 'vet_cert', 'meat_cert', 'vet_doc']),
+    P('رخص النشاط والمحل والبيئة', 'السجل التجاري والرخص البيئية للمحل أو الورشة.', ['rc_shop', 'rc_copy', 'env_permit', 'water_discharge', 'waste_biz', 'tax_exist', 'casnos'].concat(Object.keys(DOCS).filter(function(id){ return /^icpe_/.test(id); }))),
+    gNode('الأنشطة التجارية التي تحتاج رخصة أو اعتماداً مسبقاً', 'تنقلك إلى قائمة الأنشطة المنظمة في الباب 6.', {go: n6ref})
+  ]});
+
+  // 5. offences
+  var deg = [['أ', 'الدرجة الأولى: 3.000 دج'], ['ب', 'الدرجة الثانية: 4.000 دج'], ['ج', 'الدرجة الثالثة: 6.000 دج'], ['د', 'الدرجة الرابعة: 10.000 دج']];
+  var fo = all.filter(function(x){ return x.c.type === 'forfait'; });
+  var byType = [
+    gNode('غرامة جزافية (مخالفات المرور البسيطة)', 'يدفعها المخالف خلال 45 يوماً. مقسّمة حسب درجات المادة 121 من القانون 26-09.', {kids: deg.map(function(k){ return caseLeaf(k[1], '', fo.filter(function(x){ return gDegree(x.c) === k[0]; })); }).concat(fo.some(function(x){ return !gDegree(x.c); }) ? [caseLeaf('درجة غير محددة في المصدر', 'غرامة جزافية لم أجد درجتها بدقة.', fo.filter(function(x){ return !gDegree(x.c); }))] : [])}),
+    caseLeaf('جنحة: محضر إلى وكيل الجمهورية', TYPES.court.how, all.filter(function(x){ return x.c.type === 'court'; })),
+    caseLeaf('محضر النقل وإجراء إداري', TYPES.admin.how, all.filter(function(x){ return x.c.type === 'admin'; })),
+    caseLeaf('محضر إلى مديرية التجارة', TYPES.settle.how, all.filter(function(x){ return x.c.type === 'settle'; })),
+    caseLeaf('محضر جمركي', TYPES.customs.how, all.filter(function(x){ return x.c.type === 'customs'; })),
+    caseLeaf('غرامة جبائية أو إدارية', 'تفرضها الإدارة المختصة (الضرائب مثلاً) دون المرور بالمحكمة.', all.filter(function(x){ return x.c.type === 'tax'; }))
+  ].filter(function(n){ return n.kids || n.items.length; });
+  var laws = {}; all.forEach(function(x){ var k = gLaw(x.c); (laws[k] = laws[k] || []).push(x); });
+  var M = [['توقيف المركبة فوراً', 'المركبة تُوقف في مكانها حتى زوال سبب المخالفة.', /التوقيف الفوري|توقيف المركبة|يجوز توقيف/], ['الوضع في المحشر', 'المركبة تُنقل إلى المحشر.', /المحشر/], ['حجز السلع أو مصادرتها', 'السلعة أو الوسيلة تُحجز أو تُصادر.', /حجز|مصادرة/], ['غلق المحل أو تعليق النشاط', 'يمكن غلق المحل إدارياً أو بحكم.', /غلق|تعليق النشاط/], ['سحب الرخصة أو الشطب', 'سحب رخصة النشاط أو الشطب من السجل التجاري.', /سحب الرخصة|سحب رخصة|الشطب/], ['الحبس', 'المخالفات التي يمكن أن يحكم فيها القاضي بالحبس.', /حبس/]];
+  var n5 = gNode('المخالفات والعقوبات', 'كل حالات المخالفة (' + all.length + ') مقسّمة بخمس طرق مختلفة. اختر طريقة التقسيم التي تناسبك.', {kids: [
+    gNode('حسب نوع المتابعة', 'غرامة جزافية، جنحة، محضر نقل، محضر تجاري، جمركي.', {kids: byType}),
+    gNode('حسب المجال', 'مخالفات الطريق، ومخالفات النقل، ومخالفات المحل والنشاط.', {kids: [
+      caseLeaf('الطريق: السائق والمركبة', '', casesOfG(['veh', 'equip', 'tech', 'road', 'gen'])),
+      caseLeaf('النقل: الأشخاص والبضائع', '', casesOfG(['act', 'goods'])),
+      caseLeaf('المحل والنشاط التجاري', '', casesOfG(['shop', 'other', 'fisc']))
+    ]}),
+    gNode('حسب النص القانوني', 'كل قانون أو مرسوم مع المخالفات التي تُعاقَب بموجبه.', {compact: true, kids: sortBy(laws).map(function(k){ return caseLeaf(k, '', laws[k]); })}),
+    gNode('حسب الإجراء الفوري والعقوبة التكميلية', 'المخالفات التي يرافقها توقيف أو محشر أو حجز أو غلق أو سحب أو حبس.', {kids: M.map(function(m){ return caseLeaf(m[0], m[1], all.filter(function(x){ return m[2].test((x.c.extra || '') + ' ' + (x.c.act || '')); })); })}),
+    gNode('حسب درجة الثقة', 'مدى تأكدي من كل عقوبة.', {kids: [['ok', 'مؤكدة', 'الواجب والعقوبة مقروءان في الجريدة الرسمية ومرتبطان صراحة.'], ['one', 'مصدر واحد', 'صحيحة على الأرجح لكنها تكييف أو من مصدر غير رسمي.'], ['no', 'غير مؤكدة', 'الواجب موجود ولم أجد له عقوبة صريحة.']].map(function(t){ return caseLeaf(t[1], t[2], all.filter(function(x){ return x.c.v === t[0]; })); })})
+  ]});
+
+  // 6. activities
+  var reg = codes.filter(function(c){ return codeInfo(c).status === 'regulated'; });
+  var grp = function(fn){ var by = {}; reg.forEach(function(c){ var k = fn(codeInfo(c)); (by[k] = by[k] || []).push(c); }); return sortBy(by).map(function(k){ return codeLeaf(k, '', by[k]); }); };
+  var nReg = gNode('نشاط منظم: يحتاج رخصة أو اعتماداً', 'مقسّم مرة حسب نوع الرخصة المطلوبة، ومرة حسب الجهة التي تمنحها.', {kids: [
+    gNode('حسب نوع الرخصة', 'اعتماد، رخصة، موافقة مسبقة، امتياز…', {kids: grp(function(i){ return gAuth(i.auth); })}),
+    gNode('حسب الجهة المانحة', 'الوزارة أو الهيئة أو الولاية.', {compact: true, kids: grp(function(i){ return gTut(i.tutelle); })})
+  ]});
+  var n6 = gNode('الأنشطة التجارية', Object.keys(NOMEN).length + ' نشاطاً من مدونة السجل التجاري، مقسّمة بأربع طرق. اضغط على أي نشاط لفتح وثائقه والتزاماته.', {kids: [
+    gNode('حسب القطاع', 'الرقم الأول من رمز النشاط.', {kids: Object.keys(SECTORS).map(function(k){ var r = codes.filter(function(c){ return c[0] === k; }); return codeLeaf(k + ' — ' + SECTORS[k], 'مستقر: ' + r.filter(function(c){ return !isItinerant(c); }).length + ' · متنقل: ' + r.filter(isItinerant).length, r); })}),
+    gNode('حسب طريقة الممارسة', 'في محل ثابت أو بالتنقل.', {kids: [
+      codeLeaf('نشاط مستقر (محل، شركة، ورشة)', '', codes.filter(function(c){ return !isItinerant(c); })),
+      codeLeaf('نشاط غير مستقر (متنقل، أسواق)', '', codes.filter(isItinerant))
+    ]}),
+    gNode('حسب الوضع القانوني', 'حر، أو منظم يحتاج رخصة، أو محظور التسجيل.', {kids: [
+      codeLeaf('نشاط حر: يكفي السجل التجاري', 'لا تذكر المدونة رخصة خاصة له.', codes.filter(function(c){ return !codeInfo(c).status; })),
+      nReg,
+      codeLeaf('نشاط محظور التسجيل حالياً', '', codes.filter(function(c){ return codeInfo(c).status === 'blocked'; }))
+    ]}),
+    gNode('المنشآت المصنفة (البيئة)', 'الأنشطة التي تُعدّ منشأة مصنفة وتحتاج رخصة أو تصريحاً بيئياً، مقسّمة حسب خانة المرسوم 07-144.', {heavy: true, kids: function(){
+      var keep = state.lastIds, by = {};
+      codes.forEach(function(c){ var ids; try { ids = buildList({act: codeInfo(c), role: 'business', veh: 'light', truck: 'plain', zone: false, profiles: codeProfiles(c), carry: false}); } catch (e) { return; } ids.filter(function(id){ return /^icpe_/.test(id) || id === 'env_permit'; }).forEach(function(id){ (by[id] = by[id] || []).push(c); }); });
+      state.lastIds = keep;
+      return Object.keys(by).sort(function(a, b){ return (a === 'env_permit') - (b === 'env_permit'); }).map(function(id){ return id === 'env_permit' ? codeLeaf('منشآت إنتاجية أخرى (مصنع، ورشة، مقلع، مخزن…)', 'أنشطة الإنتاج التي تحتاج رخصة استغلال أو تصريحاً حسب حجمها؛ يُحدَّد صنفها بخانة المرسوم 07-144 الموافقة.', by[id]) : codeLeaf(DOCS[id].name.replace('المنشأة المصنفة: ', ''), String(DOCS[id].fr || '').replace(/^Installation classée — /, '').replace(/rubrique/, 'الخانة') + ' من المرسوم 07-144.', by[id]); });
+    }})
+  ]});
+  n6ref.node = nReg;
+
+  G_ROOT = gNode('الدليل', 'كل ما في التطبيق مقسّم إلى ستة أبواب مرقّمة. اختر باباً، ثم قسماً، حتى تصل إلى العناصر. الرقم في الشارة هو عدد الأقسام أو العناصر.', {kids: [n1, n2, n3, n4, n5, n6]});
+  return G_ROOT;
+}
+function gFind(n, target, path){ if (n === target) return path; var k = Array.isArray(n.kids) ? n.kids : null; if (!k) return null; for (var i = 0; i < k.length; i++) { var r = gFind(k[i], target, path.concat([i])); if (r) return r; } return null; }
+function gNum(p){ return p.map(function(i){ return i + 1; }).join('.'); }
+function gBadge(n){
+  if (n.go) return 'انتقال';
+  if (n.items) { var it = gItems(n); return n.unit + ': ' + it.length; }
+  if (Array.isArray(n.kids)) return 'أقسام: ' + n.kids.length;
+  return '';
+}
+function gTrail(path){ var n = gRoot(), tr = [n]; for (var i = 0; i < path.length; i++) { var k = gKids(n); if (!k || !k[path[i]]) break; n = k[path[i]]; tr.push(n); } return tr; }
+function gTree(n, p, depth){
+  if (!Array.isArray(n.kids) || depth > 3) return '';
+  return '<ul>' + n.kids.map(function(k, i){ var pp = p.concat([i]); return '<li><span class="g-num2">' + gNum(pp) + '</span><button type="button" class="g-link" data-gto="' + pp.join(',') + '">' + esc(k.t) + '</button> <span class="g-ref">' + (k.heavy && typeof k.kids === 'function' ? '' : '(' + gBadge(k) + ')') + '</span>' + gTree(k, pp, depth + 1) + '</li>'; }).join('') + '</ul>';
+}
+function renderGuide(){
+  var el = $('guideCard'); if (!el) return;
+  var path = (state.gPath || []).slice(), tr = gTrail(path); path = path.slice(0, tr.length - 1); state.gPath = path;
+  var n = tr[tr.length - 1], h = '';
+  if (path.length) {
+    h += '<nav class="g-crumb" aria-label="المسار">' + tr.map(function(t, i){ var p = path.slice(0, i); var lbl = i ? gNum(p) + ' ' + t.t : 'الدليل'; return i === tr.length - 1 ? '' : '<button type="button" data-gto="' + p.join(',') + '">' + esc(lbl) + '</button><span class="sep">‹</span>'; }).join('') + '</nav>';
+    h += '<button type="button" class="g-back" data-gto="' + path.slice(0, -1).join(',') + '">→ رجوع</button>';
+  }
+  h += '<div class="g-head"><h2 id="guideH">' + (path.length ? '<span class="num">' + gNum(path) + '</span>' : '') + esc(path.length ? n.t : 'دليل التطبيق: كل شيء مقسّم') + '</h2>' + (n.d ? '<p class="g-desc">' + esc(n.d) + '</p>' : '') + '</div>';
+  if (n.heavy && typeof n.kids === 'function') {
+    el.innerHTML = h + '<p class="foot">جارٍ الحساب…</p>'; el.setAttribute('data-p', 'x');
+    setTimeout(function(){ gKids(n); renderGuide(); }, 30); return;
+  }
+  var kids = gKids(n);
+  if (kids) {
+    h += '<div class="g-tiles' + (n.compact ? ' compact' : '') + '">' + kids.map(function(k, i){ return '<button type="button" class="g-tile" ' + (k.go ? 'data-ggo="' + i + '"' : 'data-gnav="' + i + '"') + '><span class="g-num">' + gNum(path.concat([i])) + '</span><span class="g-tt">' + esc(k.t) + '</span><span class="g-cnt">' + (k.heavy && typeof k.kids === 'function' ? '…' : gBadge(k)) + '</span>' + (k.d && !n.compact ? '<span class="g-td">' + esc(k.d) + '</span>' : '') + '</button>'; }).join('') + '</div>';
+    if (!path.length) h += '<details class="g-tree"><summary class="foot" style="margin:0;cursor:pointer">عرض شجرة التقسيم كاملة</summary>' + gTree(n, [], 0) + '</details>';
+  } else if (n.items) {
+    var it = gItems(n);
+    if (it.length > 12) h += '<input type="search" class="g-filter" data-gfilter placeholder="ابحث داخل هذه القائمة (' + it.length + ')" aria-label="بحث داخل القائمة">';
+    h += '<div class="g-list">' + (it.length ? it.map(n.row).join('') : '<p class="foot">لا شيء في هذا القسم.</p>') + '</div><p class="foot g-none" hidden>لا نتيجة.</p>';
+  }
+  el.innerHTML = h; el.setAttribute('data-p', path.join(','));
+}
+function gGo(p){ state.gPath = p; save(); renderGuide(); var el = $('guideCard'); if (el) window.scrollTo(0, Math.max(0, el.getBoundingClientRect().top + window.scrollY - 70)); }
+document.addEventListener('click', function(e){
+  var t = e.target.closest('[data-gnav]'); if (t) { gGo((state.gPath || []).concat([+t.getAttribute('data-gnav')])); return; }
+  t = e.target.closest('[data-gto]'); if (t) { var v = t.getAttribute('data-gto'); gGo(v ? v.split(',').map(Number) : []); return; }
+  t = e.target.closest('[data-ggo]'); if (t) { var tr = gTrail(state.gPath || []), k = gKids(tr[tr.length - 1])[+t.getAttribute('data-ggo')]; var p = k && k.go && k.go.node ? gFind(gRoot(), k.go.node, []) : null; if (p) gGo(p); return; }
+  var r = e.target.closest('[data-grole]');
+  if (r) { var role = r.getAttribute('data-grole'); if (ROLE_CAT[role] === 'biz') { setMode('biz'); state.role = role; state.cat = 'biz'; save(); showTab('biz'); return; } setMode('drv'); state.role = role; state.cat = ROLE_CAT[role]; save(); showTab('docs'); return; }
+  var g = e.target.closest('[data-gpick]');
+  if (g) { var c = g.getAttribute('data-gpick'); if (state.mode === 'biz' || !(GOODS_ROLES.indexOf(state.role) >= 0 || state.carry)) { setMode('biz'); state.role = isItinerant(c) ? 'vendor' : 'business'; state.cat = 'biz'; } state.actCode = c; state.q = c + ' ' + NOMEN[c][0]; $('q').value = state.q; state.prQ = ''; state.codesAll = false; delete state.sel.act_lic; delete state.sel.rc_copy; save(); showTab('docs'); return; }
+});
+document.addEventListener('input', function(e){
+  if (!e.target.hasAttribute || !e.target.hasAttribute('data-gfilter')) return;
+  var q = e.target.value.trim().toLowerCase(), list = $('guideCard').querySelector('.g-list'), shown = 0;
+  list.querySelectorAll(':scope > [data-s]').forEach(function(row){ var ok = !q || row.getAttribute('data-s').indexOf(q) >= 0; row.hidden = !ok; if (ok) shown++; });
+  $('guideCard').querySelector('.g-none').hidden = shown > 0;
+});
+(function(){ var _r = render; render = function(){ _r(); if (state.tab === 'guide') { var el = $('guideCard'); if (el && el.getAttribute('data-p') !== (state.gPath || []).join(',')) renderGuide(); } }; })();
 
 render();
 showTab(startTab);
