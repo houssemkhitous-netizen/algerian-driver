@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">مساعدي</string>
+    <string name="a11y_desc">يسمح لمساعدي بقراءة الشاشة والنقر والكتابة في التطبيقات نيابة عنك، فقط عندما تعطيه أمرًا. لا يعمل وحده ولا يرسل شيئًا إلا إلى Gemini لفهم أوامرك.</string>
+</resources>
