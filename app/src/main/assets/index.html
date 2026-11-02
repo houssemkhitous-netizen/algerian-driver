@@ -3688,7 +3688,7 @@ function flexIsJewel(c){ if (!c || !NOMEN[c]) return false; var t = NOMEN[c][0].
      why: 'نقل الفلاح لمنتوجه أو لوازمه ليس مخالفة. أما نقل سلع الغير بمقابل فنقل بضائع دون رخصة (المادة 158): إن ثبت ذلك فاختره في «رخصة ممارسة نشاط نقل البضائع لحساب الغير»'}
   ];
   window.COH = {RULES: RULES, goodsText: goodsText, PERISH: PERISH, NOT_PERISH: NOT_PERISH, UNFIT: UNFIT, ROLE: ROLE};
-  var active = function(){ if (state.mode === 'biz') return []; return RULES.filter(function(r){ try { return r.on(); } catch (e) { return false; } }); };
+  var active = function(){ var biz = state.mode === 'biz'; return RULES.filter(function(r){ if (!!r.biz !== biz) return false; try { return r.on(); } catch (e) { return false; } }); };
 
   // 3. Apply once when a rule turns on; undo when it turns off (unless the user changed the choice)
   var applyRules = function(){
@@ -3711,7 +3711,7 @@ function flexIsJewel(c){ if (!c || !NOMEN[c]) return false; var t = NOMEN[c][0].
   var _blc = buildList;
   buildList = function(ctx){
     var ids = _blc(ctx);
-    if (ctx && ctx.role === state.role && state.mode !== 'biz') {
+    if (ctx && ctx.role === state.role) {
       var add = [];
       active().forEach(function(r){ r.add.forEach(function(id){ if (DOCS[id] && ids.indexOf(id) < 0 && add.indexOf(id) < 0) add.push(id); }); });
       if (add.length) { var at = ids.indexOf('vignette'); if (at < 0) at = ids.indexOf('assurance'); at = at < 0 ? 0 : at + 1; ids.splice.apply(ids, [at, 0].concat(add)); }
@@ -3732,7 +3732,7 @@ function flexIsJewel(c){ if (!c || !NOMEN[c]) return false; var t = NOMEN[c][0].
     return act.map(function(r){
       var names = r.auto.filter(function(a){ return DOCS[a[0]] && String(state.sel[a[0]]) === String(a[1]); }).map(function(a){ return '«' + esc(DOCS[a[0]].cases[a[1]].when.replace(/\s*\(.*$/, '')) + '»'; });
       return '<div class="coh' + (r.auto.length ? '' : ' hint') + '"><b class="t">' + (r.auto.length ? 'عدم انسجام: ' : 'تنبيه: ') + esc(r.title()) + '</b><p>' + esc(r.why) + '.</p>' +
-        (names.length ? '<p class="auto">مخالفات اختيرت تلقائياً في «وثائقي»: ' + names.join('، ') + '. يمكنك تغيير الاختيار من القائمة.</p>' : (r.auto.length ? '<p>غيّرتَ الاختيار التلقائي في «وثائقي».</p>' : '')) + '</div>';
+        (names.length ? '<p class="auto">مخالفات اختيرت تلقائياً في «وثائقي»: ' + names.join('، ') + '. يمكنك تغيير الاختيار من القائمة.</p>' : (r.auto.length ? (r.auto.some(function(a){ return DOCS[a[0]] && state.sel[a[0]] != null && state.sel[a[0]] !== ''; }) ? '<p>في «وثائقي» حالة واحدة لكل عنصر، و«' + esc(DOCS[r.auto[0][0]].name.split(':')[0]) + '» فيه الآن حالة أخرى. اختر الأنسب منهما.</p>' : '<p>غيّرتَ الاختيار التلقائي في «وثائقي».</p>') : '')) + '</div>';
     }).join('');
   };
   var _rc = render;
@@ -3859,6 +3859,262 @@ function flexIsJewel(c){ if (!c || !NOMEN[c]) return false; var t = NOMEN[c][0].
     return ids;
   };
   Object.assign(SYN, {'سيارات للبيع': 'سيارات مستعمله', 'بورت شار': 'نقل السيارات', 'porte-char': 'نقل السيارات', 'حديد الخرسانة': 'حديد البناء', 'تيبان': 'انابيب', 'tuyaux': 'انابيب', 'سردينة': 'سردين', 'حوت': 'سمك', 'الحوت': 'سمك', 'بطاقة جبائية': 'البطاقه الجبائيه', 'البطاقة الجبائية': 'البطاقه الجبائيه'});
+})();
+
+// ===== More coherence checks and goods (02/11/2026) =====
+// Licence categories: décret 04-381 arts 177, 180, 181 as amended by 25-169 (already in the app). Law 26-09 art 141.
+// CII 2026 (local copy, read): arts 2, 16-19, 205, 354, 357, 358, 523-525 bis, 530. Penal code art 387 (local copy, read).
+// Law 01-11 arts 53, 90, 92, 102 (French scan via EFCA, OCR); décret 99-158 arts 2, 29, 31, 40, 41 (FAOLEX scan).
+// Fireworks: ord. 05-06 art 10 as cited by the Prime Minister (Algérie Eco, April 2018); customs code arts 226, 324 (local copy, read).
+(function(){
+  if (!window.COH) return;
+  var C = window.COH, R = C.RULES;
+  var P = (function(){ try { return JSON.parse(localStorage.getItem('rbcoh2') || '{}') || {}; } catch (e) { return {}; } })();
+  state.lic = Array.isArray(P.lic) ? P.lic : []; state.offline = !!P.offline;
+  var keep = function(){ try { localStorage.setItem('rbcoh2', JSON.stringify({lic: state.lic, offline: !!state.offline})); } catch (e) {} };
+  var CII = 'قانون الضرائب غير المباشرة، نسخة 2026';
+  var agTob = DOCS.tobacco && DOCS.tobacco.cases[1] && DOCS.tobacco.cases[1]._ag;
+  var mk = function(o){ var c = Object.assign({nature: o.type === 'none' ? '' : (o.type === 'court' ? 'جنحة' : 'مخالفة'), v: 'ok'}, o); if (c.type !== 'none') { if (o.agent) { c._ag = o.agent; c.extra = (c.extra ? c.extra + '. ' : '') + 'من يعاين ويحرر المحضر: ' + o.agent.who; delete c.agent; } else applyAgent(c); } return c; };
+
+  // 1. Licence category
+  var CATS = ['A1', 'A', 'B', 'BE', 'C1', 'C1E', 'C', 'CE', 'D', 'DE', 'F'];
+  var CAR = ['private', 'rental', 'company', 'foreign', 'autoecole', 'vtc', 'taxi', 'ambulance'];
+  var need = function(){
+    var r = state.role;
+    if (CAR.indexOf(r) >= 0) return {ok: ['B', 'BE', 'F'], label: 'B'};
+    if (r === 'bus') return {ok: ['D', 'DE'], label: 'D'};
+    if (r === 'semi') return {ok: ['C1E', 'CE'], label: 'C1(E) أو C(E)'};
+    if (['driver', 'carrier', 'owner'].indexOf(r) >= 0) return state.veh === 'light' ? {ok: ['B', 'BE', 'F'], label: 'B'} : {ok: ['C1', 'C1E', 'C', 'CE'], label: 'C1 أو C'};
+    if (r === 'tow') return {ok: ['B', 'BE', 'F', 'C1', 'C1E', 'C', 'CE'], label: 'B أو C1 أو C حسب وزنها', hint: 'B'};
+    if (['school', 'staff', 'staff_ext'].indexOf(r) >= 0) return {ok: ['B', 'BE', 'F', 'D', 'DE'], label: 'D (أو B إن لم تتجاوز 8 مقاعد زيادة على السائق)', hint: 'D'};
+    if (['moto', 'tricycle'].indexOf(r) >= 0) return {ok: CATS, label: 'A1 أو A', hint: 'A'};
+    return null;
+  };
+  var has = function(list){ return state.lic.some(function(x){ return list.indexOf(x) >= 0; }); };
+  var CATDEF = 'المادة 180 من المرسوم 04-381 المعدلة بالمرسوم 25-169: B حتى 3.500 كغ وثمانية مقاعد زيادة على مقعد السائق؛ C1 لنقل البضائع فوق 3.500 كغ حتى 19.000 كغ؛ C فوق 19.000 كغ؛ C1(E) وC(E) بمقطورة أو نصف مقطورة؛ D لأكثر من 8 أشخاص زيادة على السائق. والرخصة لا تصلح إلا للأصناف المكتوبة فيها (المادة 177)';
+  R.push(
+    {id: 'lic_bad', on: function(){ var n = need(); if (!n || !state.lic.length || state.mode === 'biz') return false; return !has(n.ok); }, auto: [['permis', 2]], add: [],
+     title: function(){ var n = need(); return 'الرخصة (' + state.lic.join('، ') + ') لا تطابق المركبة: يلزم ' + (n ? n.label : ''); },
+     why: CATDEF + '. اختير تلقائياً «لا يملك رخصة أو صنفها لا يطابق المركبة» (المادة 141 من القانون 26-09: حبس من 6 أشهر إلى سنة و/أو غرامة من 50.000 إلى 100.000 دج، وتوقيف المركبة)'},
+    {id: 'lic_hint', on: function(){ var r = state.role; if (!state.lic.length || state.mode === 'biz') return false; if (r === 'tow') return has(['B', 'BE', 'F']) && !has(['C1', 'C1E', 'C', 'CE']); if (['school', 'staff', 'staff_ext'].indexOf(r) >= 0) return has(['B', 'BE', 'F']) && !has(['D', 'DE']); if (['moto', 'tricycle'].indexOf(r) >= 0) return !has(['A']); return false; }, auto: [], add: [],
+     title: function(){ return 'تحقق من صنف الرخصة'; },
+     get why(){ var r = state.role; return (r === 'tow' ? 'إن تجاوز الوزن الإجمالي لشاحنة الجر 3.500 كغ فيلزم صنف C1 أو C، ورخصة B لا تكفي' : (['moto', 'tricycle'].indexOf(r) >= 0 ? 'كل رخصة صالحة لصنف A1 (دراجة حتى 125 سم³)؛ أما الدراجة التي تتجاوز 125 سم³ فيلزمها صنف A' : 'إن كانت المركبة تنقل أكثر من 8 أشخاص زيادة على السائق فيلزم صنف D')) + '. إن ثبت ذلك فاختر «صنفها لا يطابق المركبة» في «رخصة السياقة»'; }}
+  );
+  // weight hint for C1 holders in heavy trucks
+  R.push({id: 'lic_c1', on: function(){ return ['driver', 'carrier', 'owner'].indexOf(state.role) >= 0 && state.veh !== 'light' && state.lic.length && has(['C1', 'C1E']) && !has(['C', 'CE']); }, auto: [], add: [],
+    title: function(){ return 'رخصة C1 في شاحنة ثقيلة'; },
+    why: 'صنف C1 يغطي الشاحنات حتى 19.000 كغ فقط. إن تجاوز الوزن الإجمالي المرخص به 19.000 كغ فيلزم صنف C، فاختر «صنفها لا يطابق المركبة» في «رخصة السياقة»'});
+
+  // 2. Bus or collective taxi outside its line
+  var OFFW = 'رخصة الاستغلال تحدد الخط ومحطاته. اختير تلقائياً «العمل خارج الخط المرخص» من بنود «المسلك». إن كان التغيير مؤقتاً بسبب أشغال أو حادث أو أمر من أعوان المرور فليس مخالفة، فغيّر الاختيار';
+  R.push({id: 'off_line_bus', on: function(){ return state.offline && state.role === 'bus'; }, auto: [['bus_route', 0]], add: ['bus_route'], title: function(){ return 'حافلة تعمل خارج خطها المرخص'; }, why: OFFW},
+    {id: 'off_line_taxi', on: function(){ return state.offline && state.role === 'taxi'; }, auto: [['bus_route', 1]], add: ['bus_route'], title: function(){ return 'طاكسي جماعي يعمل خارج خطه المرخص'; }, why: OFFW});
+
+  // 3. Foreign-plated vehicle used for money
+  R.push({id: 'foreign_paid', on: function(){ return state.role === 'foreign' && state.pax; }, auto: [['tpd', 2]], add: ['tpd'],
+    title: function(){ return 'مركبة بترقيم أجنبي تُستعمل بمقابل'; },
+    why: 'المركبة الداخلة بسند المرور الجمركي لا تُستعمل بمقابل ولا تُؤجَّر ولا تُعار. اختير تلقائياً «استُعملت بمقابل» في «سند المرور الجمركي»، زيادة على «نقل الأشخاص بمقابل دون رخصة»'});
+
+  // 5. Container trucks
+  R.push({id: 'container', on: function(){ return GOODS_ROLES.indexOf(state.role) >= 0 && state.truck === 'container'; }, auto: [], add: ['load_safe'],
+    title: function(){ return 'ناقلة حاويات'; },
+    why: 'تُثبّت الحاوية بأقفالها على الناقلة. إن لم تكن مثبتة فاختر «حاويات غير مثبتة بأقفالها» في «حمولة مغطاة ومثبّتة» (المادة 158: 200.000 إلى 500.000 دج وتوقيف فوري للمركبة)'});
+
+  // 6. Alcohol
+  DOCS.alcohol_move = {g: 'goods', name: 'سند تنقّل المشروبات الكحولية (congé أو laissez-passer أو acquit-à-caution)', fr: 'Titre de mouvement des vins et alcools', cases: [
+    mk({when: 'نقل خمر أو جعة أو مشروبات كحولية دون سند تنقّل', act: 'نقل منتجات خاضعة لحق التداول دون سند تنقّل', law: 'cii', nass: 'المواد 2 و16 و18 من قانون الضرائب غير المباشرة', iqab: 'المواد 523 إلى 525 من قانون الضرائب غير المباشرة', type: 'tax', amount: [10000, 30000], agent: agTob,
+      extra: 'الكحول والخمور والمشروبات المماثلة خاضعة لحق التداول (المادة 2). لا يجوز رفعها أو نقلها دون تصريح بالرفع ودون أن يحمل الناقل سند تنقّل (المادة 16)، يذكر مكان الرفع والوجهة، وأسماء المرسل والمرسل إليه والناقل، ويوم الرفع وساعته، ومدة النقل والمسار، ونوع البضاعة وكميتها، ورقم تسجيل المركبة (المادة 18)، وتُنقل إلى الوجهة المصرح بها في الأجل المكتوب (المادة 19). الغرامة الجبائية من 10.000 إلى 30.000 دج (المادة 523)؛ وإن تُهرّب من الحق فغرامة تساوي الحق غير المدفوع دون أن تقل عن 30.000 دج، وضعفه مع المناورات التدليسية دون أن تقل عن 70.000 دج (المادة 524). وتُصادر البضاعة ووسيلة النقل في كل الحالات (المادة 525)، وتُتلف المشروبات المحجوزة (المادة 525 مكرر). ' + CII}),
+    mk({when: 'نقل كحول مصنوع أو مستورد دون تصريح، أو بسند مغيّر أو متحصل عليه بالغش', act: 'نقل كحول مصنوع أو مستورد دون تصريح، أو بسند تنقّل مغيّر أو متحصل عليه بالغش', law: 'cii', nass: 'المادة 530 (البند 1) من قانون الضرائب غير المباشرة', iqab: 'المادة 530 (البند 1) والمواد 523 إلى 525 من قانون الضرائب غير المباشرة', type: 'court', amount: [10000, 30000], agent: agTob,
+      extra: 'حبس من 6 أيام إلى 6 أشهر (المادة 530)، زيادة على الغرامات الجبائية ومصادرة البضاعة ووسيلة النقل (المواد 523 إلى 525). ' + CII}),
+    mk({when: 'محل بيع المشروبات (الحانة أو المحل)', act: 'على صاحب المحل أن يثبت في كل وقت دفع حق التداول على الخمور والمشروبات الروحية التي يحوزها، بسند تنقّل نظامي أو بفاتورة المورد التي تشير إلى سند التنقّل (المادة 205 من قانون الضرائب غير المباشرة). وانظر «رخصة محل بيع المشروبات»', type: 'none'})
+  ]};
+
+  // 7. Gold, silver, platinum
+  var GOLD = 'تُحجز المصوغات حجزاً فعلياً. الغرامة 4 أضعاف الحقوق المتهرب منها دون أن تقل عن 100.000 دج (المادة 524، أ، 3، ب)، ومصادرة الأشياء ووسيلة نقلها (المادة 525). ' + CII;
+  DOCS.gold_mark = {g: 'goods', name: 'دمغة الدولة على المصوغات الذهبية والفضية والبلاتينية (الضمان)', fr: 'Poinçon de garantie de l’État sur les ouvrages d’or, d’argent et de platine', cases: [
+    mk({when: 'مصوغات أجنبية الصنع أو مجهولة المصدر دون دمغة الدولة، أو بدمغة مزورة أو ملحومة أو منقولة', act: 'حيازة أو عرض للبيع مصوغات من المعادن الثمينة دون دمغة الدولة أو بدمغة مزورة', law: 'cii', nass: 'المادة 354 (1، أ وب) من قانون الضرائب غير المباشرة', iqab: 'المادتان 524 (أ، 3، ب) و525 من قانون الضرائب غير المباشرة', type: 'tax', amount: null, agent: agTob,
+      extra: 'يمنع حيازة أو عرض للبيع مصوغات بدمغات مزورة أو ملحومة أو منقولة، أو مصوغات من الذهب أو الفضة أو البلاتين أجنبية الصنع أو مجهولة المصدر دون دمغة الدولة (المادة 354). حجزها لا يُرفع، وتُحال القضية على القضاء للنظر في مصادرتها النهائية (المادة 358، 1). والدمغات المزورة: حبس من 6 أيام إلى 6 أشهر (المادة 530، البند 8). ' + GOLD}),
+    mk({when: 'مصوغات محلية الصنع أو منتهية دون دمغة الدولة', act: 'حيازة أو عرض للبيع مصوغات محلية الصنع دون دمغة الدولة (عدم الوسم)', law: 'cii', nass: 'المادة 354 (1، ج ود) من قانون الضرائب غير المباشرة', iqab: 'المادتان 524 (أ، 3، ب) و358 (2) من قانون الضرائب غير المباشرة', type: 'tax', amount: null, agent: agTob,
+      extra: 'يُرفع الحجز بقرار مدير الضرائب للولاية بعد دفع الحقوق والغرامات، وتُرد المصوغات مدموغة، أو مكسورة إن كان عيارها أقل من الحد القانوني (المادة 358، 2، أ). وفي العود خلال 5 سنوات تُحال على القضاء للنظر في المصادرة (المادة 358، 2، ب) مع حبس من 6 أيام إلى 6 أشهر (المادة 530، البند 14). تُعفى من الدمغة القطع التي يقل وزنها عن 0,5 غرام (المادة 357). ' + GOLD})
+  ]};
+
+  // 8. Fish
+  LAWS.l0111 = 'القانون 01-11 المؤرخ في 3 جويلية 2001 المتعلق بالصيد البحري وتربية المائيات';
+  DOCS.fish_size = {g: 'goods', name: 'الأسماك: الحجم التجاري الأدنى، ودرجة الحرارة أثناء النقل', fr: 'Taille marchande minimale et température de transport des produits de la pêche', cases: [
+    mk({when: 'سمك دون الحجم التجاري الأدنى (سردين صغير وغيره) يُنقل أو يُخزن أو يُباع', act: 'حيازة أو نقل أو بيع منتجات صيد لم تبلغ الحجم التجاري الأدنى', law: 'l0111', nass: 'المادة 53 من القانون 01-11', iqab: 'المادة 90 من القانون 01-11', type: 'court', amount: [200000, 500000], v: 'one',
+      agent: {who: 'حراس السواحل ومفتشو الصيد البحري وضباط الشرطة القضائية (حسب جواب وزير الصيد البحري، جريدة الشروق 25 ديسمبر 2022)', how: '', v: 'one'},
+      extra: 'يمنع صيد أو حيازة أو تخزين أو نقل أو تحويل أو بيع منتجات الصيد التي لم تبلغ الحجم التجاري الأدنى المحدد بالتنظيم، وتُعاد فوراً إلى وسطها، ويُتسامح مع نسبة لا تتجاوز 20% من المصطاد بالشباك غير الانتقائية (المادة 53). العقوبة: حبس من 3 إلى 6 أشهر و/أو غرامة من 200.000 إلى 500.000 دج، وتُضاعف الغرامة في العود خلال سنتين (المادة 92)، ويجوز للمحكمة مصادرة المحجوزات (المادة 102). المصدر: نسخة فرنسية مصوّرة من القانون 01-11؛ رقم مادة العقوبة غير واضح في الصورة، ولم أتحقق من تعديل 2015، والأحجام بالأرقام في نص تنظيمي لم أطلع عليه'}),
+    mk({when: 'درجة الحرارة أثناء النقل', act: 'المنتجات المبردة بين 0 و4 درجات، والسمك الطازج قريب من حرارة ذوبان الثلج، والمجمدة -18 درجة أو أقل في قلبها مع تسامح بارتفاع قصير حتى 3 درجات أثناء النقل، ووسائل النقل مصممة ومجهزة لحفظ هذه الدرجات ومزودة بجهاز تسجيل الحرارة (المواد 2 و29 و31 و40 و41 من المرسوم التنفيذي 99-158، الجريدة الرسمية 49 لسنة 1999). مخالفتها: انظر «شروط النظافة في نقل المواد الغذائية»', type: 'none', v: 'one'})
+  ]};
+
+  // 9. Fireworks
+  DOCS.pyro = {g: 'goods', name: 'المفرقعات والألعاب النارية (ممنوعة الاستيراد)', fr: 'Pétards et articles pyrotechniques', cases: [
+    mk({when: 'نقل أو حيازة مفرقعات بغرض البيع', act: 'تهريب: حيازة ونقل بضائع ممنوعة الاستيراد دون وثائق تثبت وضعيتها القانونية', law: 'smug', nass: 'المادتان 226 و324 من قانون الجمارك', iqab: 'المادة 10 من الأمر 05-06، والمادة 12 إن استُعملت وسيلة نقل', type: 'court', amount: null, v: 'one',
+      extra: 'المفرقعات ممنوعة الاستيراد. صرّح الوزير الأول (أفريل 2018) بأن المادة 10 من الأمر 05-06 تعاقب على تهريب المواد النارية بالحبس من سنة إلى 5 سنوات وغرامة 5 مرات قيمة البضاعة المصادرة. ومع استعمال وسيلة نقل: حبس من 10 إلى 20 سنة وغرامة 10 مرات القيمة المجمعة للبضاعة ووسيلة النقل (المادة 12)، وتُصادر البضاعة ووسيلة النقل (المادة 16). المادة 324 من قانون الجمارك تعدّ تهريباً مخالفة المادة 226 التي تُلزم حائز أو ناقل البضائع الحساسة للغش بتقديم وثائق تثبت وضعيتها. تكييف الحيازة والنقل داخل الإقليم تهريباً تكييف مني: لم أتحقق من أن المفرقعات مدرجة في قائمة المادة 226'})
+  ]};
+
+  // 10. Copper cables
+  var RECEL = 'المادة 387 من قانون العقوبات: «كل من أخفى عمداً أشياء مختلسة أو مبددة أو متحصلة من جناية أو جنحة»، حبس من سنة إلى 5 سنوات. الجريمة تشترط علم الحائز بمصدر الأشياء، فيُحال الأمر على الشرطة القضائية للتحقيق. مبلغ الغرامة في النسخة التي قرأتها (500 إلى 20.000 دج، ويمكن رفعه إلى نصف قيمة الأشياء) قد يكون عُدّل بعد 2006';
+  DOCS.cable_origin = {g: 'goods', name: 'مصدر الكوابل والأسلاك النحاسية المستعملة', fr: 'Origine des câbles et fils de cuivre usagés', cases: [
+    mk({when: 'ما يثبت المصدر', act: 'الفاتورة إن كان البيع بين أعوان اقتصاديين (القانون 04-02). تجارة الحديد القديم والخردة (509004) والمعادن القديمة غير الحديدية (509002) نشاطان مجمّدان في مدونة السجل التجاري. وداخل النطاق الجمركي تُشترط رخصة التنقل لنفايات النحاس', type: 'none'}),
+    mk({when: 'كوابل نحاسية مقشّرة أو مقطّعة لا يثبت حائزها مصدرها، مع شبهة أنها مسروقة من شبكة الكهرباء أو الهاتف', act: 'إخفاء أشياء مختلسة أو متحصلة من جناية أو جنحة', law: 'penal', nass: 'المادة 387 من قانون العقوبات', iqab: 'المادة 387 من قانون العقوبات', type: 'court', amount: null, extra: RECEL})
+  ]};
+  var vc = DOCS.veh_cargo && DOCS.veh_cargo.cases[2];
+  if (vc) { vc.law = 'penal'; vc.extra = RECEL + '. من يعاين ويحرر المحضر: ' + (vc._ag ? vc._ag.who : 'ضباط وأعوان الشرطة القضائية'); }
+
+  // Profiles
+  var prof = function(id){ return PROFILES.filter(function(p){ return p.id === id; })[0]; };
+  var addP = function(o){ if (!prof(o.id)) PROFILES.push(o); };
+  addP({id: 'alcohol', label: 'مشروبات كحولية (خمور، جعة)', keys: ['خمر', 'خمور', 'نبيذ', 'مشروبات كحولية', 'المشروبات الكحولية', 'بيرة', 'جعة', 'ويسكي', 'vins', 'bière', 'bieres', 'alcools', 'spiritueux', 'whisky'], docs: ['alcohol_move'],
+    note: 'يجب على ناقل المشروبات الكحولية: سند تنقّل (congé أو laissez-passer أو acquit-à-caution) يذكر الوجهة والمسار ورقم المركبة، وإلا تُصادر البضاعة والمركبة.'});
+  addP({id: 'gold_cargo', label: 'مصوغات الذهب والفضة', keys: ['ذهب', 'الذهب', 'مصوغات', 'المصوغات', 'مجوهرات', 'المجوهرات', 'فضة', 'الفضة', 'bijoux', 'bijouterie', 'orfèvrerie'], docs: ['gold_mark', 'invoice'],
+    note: 'يجب أن تحمل المصوغات دمغة الدولة، وإلا تُحجز.'});
+  addP({id: 'pyro', label: 'مفرقعات وألعاب نارية', keys: ['مفرقعات', 'المفرقعات', 'مفرقعة', 'ألعاب نارية', 'الألعاب النارية', 'محارق', 'المحارق', 'pétards', 'petards', 'feux d\'artifice', 'pyrotechnie'], docs: ['pyro'],
+    note: 'المفرقعات ممنوعة الاستيراد؛ نقلها بغرض البيع يُكيَّف تهريباً، مع حجز البضاعة ووسيلة النقل.'});
+  addP({id: 'cables', label: 'كوابل وأسلاك نحاسية مستعملة', keys: ['كوابل', 'الكوابل', 'كابلات', 'أسلاك نحاسية', 'اسلاك نحاسية', 'سلك نحاس', 'câbles', 'cables', 'fils de cuivre'], docs: ['cable_origin', 'customs_circ'],
+    note: 'يجب على ناقل الكوابل المستعملة: إثبات مصدرها (فاتورة)، وإلا يُحال الأمر على الشرطة القضائية.'});
+  var j = prof('jewel'); if (j && j.docs.indexOf('gold_mark') < 0) j.docs.push('gold_mark');
+  var f = prof('fish'); if (f && f.docs.indexOf('fish_size') < 0) f.docs.push('fish_size');
+
+  var _mpm = matchProfiles;
+  matchProfiles = function(q){ var r = _mpm(q); if (/كوابل|كابلات|كابل/.test(q || '')) r = r.filter(function(p){ return p.id !== 'livestock'; }); return r; };
+  var _blm = buildList;
+  buildList = function(ctx){
+    var ids = _blm(ctx), pids = ((ctx && ctx.profiles) || []).map(function(p){ return p.id; });
+    if (ctx && (ctx.role === 'business' || ctx.role === 'vendor') && (pids.indexOf('jewel') >= 0 || pids.indexOf('gold_cargo') >= 0) && ids.indexOf('gold_mark') < 0) { var at = ids.indexOf('jewel_reg'); ids.splice(at >= 0 ? at + 1 : ids.length, 0, 'gold_mark'); }
+    if (ctx && ctx.role === state.role) state.lastIds = ids.slice();
+    return ids;
+  };
+  // UI: licence chips and the out-of-line chip
+  var box = $('carryBox');
+  if (box && !$('offlineChip')) { var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.id = 'offlineChip'; b.textContent = 'تعمل خارج خطها المرخص'; box.appendChild(b); }
+  if (box && !$('licBox')) {
+    var w = document.createElement('div'); w.id = 'licBox';
+    w.innerHTML = '<span class="lbl">صنف رخصة السائق (اختياري: اختر الأصناف المكتوبة في رخصته)</span><div class="chips small" role="group" aria-label="صنف رخصة السائق">' + CATS.map(function(c){ return '<button type="button" class="chip" data-lic="' + c + '" aria-pressed="false" style="direction:ltr">' + c.replace(/E$/, '(E)').replace(/^\(E\)$/, 'E') + '</button>'; }).join('') + '</div>';
+    box.parentNode.insertBefore(w, box);
+  }
+  var _rm = render;
+  render = function(){
+    _rm();
+    var drv = state.mode !== 'biz', lb = $('licBox'), ob = $('offlineChip');
+    if (lb) { lb.hidden = !drv || !need(); lb.querySelectorAll('[data-lic]').forEach(function(x){ x.setAttribute('aria-pressed', String(state.lic.indexOf(x.getAttribute('data-lic')) >= 0)); }); }
+    var showOff = drv && (state.role === 'bus' || state.role === 'taxi');
+    if (ob) { ob.hidden = !showOff; ob.textContent = state.role === 'taxi' ? 'طاكسي جماعي يعمل خارج خطه' : 'تعمل خارج خطها المرخص'; ob.setAttribute('aria-pressed', String(!!state.offline && showOff)); }
+    if (box && showOff) box.hidden = false;
+    // the register check («السجل») shown as an incoherence too
+    var bad = $('rcOut') && $('rcOut').querySelector('.verd.bad');
+    ['cohWho', 'cohDocs'].forEach(function(id){ var el = $(id); if (!el) return; var old = el.querySelector('.coh.rcx'); if (old) old.remove();
+      if (bad && drv) { var d = document.createElement('div'); d.className = 'coh rcx'; d.innerHTML = '<b class="t">عدم انسجام: السلعة خارج نشاط السجل التجاري</b><p>المقارنة في «السجل» تبيّن أن السلعة المنقولة لا يغطيها نشاط السجل. أُضيفت إلى «الملخص» جنحة ممارسة نشاط خارج موضوع السجل التجاري (المادتان 4 و41 من القانون 04-08: 20.000 إلى 200.000 دج).</p>'; el.appendChild(d); el.hidden = false; } });
+  };
+  document.addEventListener('click', function(e){
+    var t = e.target.closest && e.target.closest('[data-lic]');
+    if (t) { var c = t.getAttribute('data-lic'), i = state.lic.indexOf(c); if (i >= 0) state.lic.splice(i, 1); else state.lic.push(c); keep(); render(); return; }
+    if (e.target.closest && e.target.closest('#offlineChip')) { state.offline = !state.offline; keep(); render(); }
+  });
+  Object.assign(SYN, {'المحارق': 'مفرقعات', 'محارق': 'مفرقعات', 'pétards': 'مفرقعات', 'لابيار': 'جعه', 'كوابل': 'كوابل نحاس', 'نحاس': 'كوابل نحاس', 'دمغة': 'دمغه الدوله', 'poinçon': 'دمغه الدوله', 'سردين صغير': 'سمك دون الحجم'});
+})();
+
+// ===== Coherence for «نشاطي» (shops and companies) (02/11/2026) =====
+// Uses cases already in the app: rc_shop (law 04-08 arts 4, 4 bis, 19, 38, 39, 41), food_premises (law 09-03 art 72, décret 17-140),
+// casnos (law 83-14), labour (law 90-11), pyro, gold_mark, alcohol_move, pharma, tobacco.
+(function(){
+  if (!window.COH) return;
+  var R = window.COH.RULES;
+  var P = (function(){ try { return JSON.parse(localStorage.getItem('rbcoh3') || '{}') || {}; } catch (e) { return {}; } })();
+  state.found = P.found || ''; state.bz = P.bz || {};
+  var keep = function(){ try { localStorage.setItem('rbcoh3', JSON.stringify({found: state.found, bz: state.bz})); } catch (e) {} };
+  var actLabel = function(){ return state.actCode && NOMEN[state.actCode] ? NOMEN[state.actCode][0] : ''; };
+  var foundProfs = function(){ return state.found.trim() ? matchProfiles(state.found).map(function(p){ return p.id; }) : []; };
+  var isFood = function(){ var t = actLabel() + ' ' + (state.q || '') + ' ' + state.found; return FOOD_RX.test(t) || ['food', 'veg', 'meat', 'fish'].some(function(x){ return foundProfs().indexOf(x) >= 0 || matchProfiles(state.q || '').some(function(p){ return p.id === x; }); }); };
+  var candidates = function(){ return state.found.trim() ? searchCodes(state.found) : []; };
+  var covered = function(){ var c = state.actCode, f = state.found.trim(); if (!c || !f || !NOMEN[c]) return true; if (codeCoversGoods(c, f) || textCoversGoods(NOMEN[c].join(' '), f)) return true; var cand = candidates(); if (!cand.length) return true; return cand.some(function(x){ return x === c || sameGoods(c, x) || sameGoods(x, c); }); };
+  var LAW0408 = 'المادتان 4 و41 من القانون 04-08: 20.000 إلى 200.000 دج، وغلق إداري مؤقت لمدة شهر، والشطب إن لم تُسوَّ الوضعية خلال شهرين';
+  var biz = function(o){ o.biz = true; return o; };
+  R.push(
+    biz({id: 'biz_outside', on: function(){ return !!(state.found.trim() && state.actCode && !covered()); }, auto: [['rc_shop', 3]], add: ['rc_shop'],
+      title: function(){ return '«' + state.found.trim() + '» خارج نشاط السجل'; },
+      get why(){ return 'النشاط المسجل «' + actLabel() + '» (' + state.actCode + ') لا يغطي «' + state.found.trim() + '». اختير تلقائياً «نشاط خارج موضوع السجل التجاري» (' + LAW0408 + '). إن كان لصاحب المحل سجل آخر يغطي هذه السلعة فغيّر الاختيار'; }}),
+    biz({id: 'biz_found_noact', on: function(){ return !!(state.found.trim() && !state.actCode); }, auto: [], add: [],
+      title: function(){ return 'اختر النشاط المسجل أولاً'; },
+      get why(){ return 'ليقارن التطبيق «' + state.found.trim() + '» بنشاط المحل، اكتب النشاط أعلاه واختره من قائمة أنشطة السجل التجاري'; }}),
+    biz({id: 'biz_found_unknown', on: function(){ return !!(state.found.trim() && state.actCode && !candidates().length && !foundProfs().length); }, auto: [], add: [],
+      title: function(){ return 'لم أتعرف على «' + state.found.trim() + '»'; },
+      get why(){ return 'لم أجد هذه السلعة في مدونة أنشطة السجل التجاري، فلم أقارنها بنشاط «' + actLabel() + '». جرّب كلمة أعم (مثال: ملابس بدل قمصان)، أو قارن يدوياً في «السجل»'; }}),
+    biz({id: 'biz_pyro', on: function(){ return foundProfs().indexOf('pyro') >= 0; }, auto: [['pyro', 0]], add: ['pyro'],
+      title: function(){ return 'مفرقعات معروضة للبيع'; },
+      why: 'المفرقعات ممنوعة الاستيراد، وحيازتها بغرض البيع تُكيَّف تهريباً مع حجز البضاعة (تكييف من مصدر واحد، انظر تفاصيله في العنصر)'}),
+    biz({id: 'biz_alcohol', on: function(){ return foundProfs().indexOf('alcohol') >= 0; }, auto: [], add: ['alcohol_move'],
+      title: function(){ return 'مشروبات كحولية في المحل'; },
+      why: 'بيع المشروبات الكحولية يحتاج رخصة الوالي حسب صنفها (الأمر 75-41 والمرسوم 75-59)، وعلى صاحب المحل أن يثبت في كل وقت دفع حق التداول بسند تنقّل أو بفاتورة المورد التي تشير إليه (المادة 205 من قانون الضرائب غير المباشرة)'}),
+    biz({id: 'biz_pharma', on: function(){ return foundProfs().indexOf('pharma') >= 0 && !/صيدل|pharmac/i.test(actLabel()); }, auto: [], add: ['pharma'],
+      title: function(){ return 'أدوية في محل غير صيدلية'; },
+      why: 'إنتاج المواد الصيدلانية واستيرادها وتوزيعها لا يمارسه إلا المعتمدون (القانون 18-11). إن ثبت التوزيع من مؤسسة غير معتمدة فاختر حالته في «اعتماد مؤسسة توزيع المواد الصيدلانية»'}),
+    biz({id: 'biz_cold', on: function(){ return !!state.bz.cold && isFood(); }, auto: [['food_premises', 2]], add: ['food_premises'],
+      title: function(){ return 'مواد سريعة التلف خارج التبريد'; },
+      why: 'يجب احترام درجات الحرارة وسلسلة التبريد، والثلاجات مزودة بجهاز تسجيل الحرارة (المواد 24 و45 إلى 48 من المرسوم التنفيذي 17-140). اختير تلقائياً «انقطاع سلسلة التبريد» (المادة 72 من القانون 09-03: 50.000 إلى 1.000.000 دج)'}),
+    biz({id: 'biz_outdoor', on: function(){ return !!state.bz.outdoor && isFood(); }, auto: [['food_premises', 3]], add: ['food_premises'],
+      title: function(){ return 'مواد غذائية معروضة خارج المحل'; },
+      why: 'يمنع عرض المواد الغذائية خارج المحل أو عرض المواد غير المغلفة دون حاجز (المادتان 49 و50 من المرسوم التنفيذي 17-140). اختير تلقائياً «عرض المواد الغذائية خارج المحل» (المادة 72 من القانون 09-03)'}),
+    biz({id: 'biz_undeclared', on: function(){ return !!state.bz.undeclared; }, auto: [['casnos', 1]], add: ['casnos'],
+      title: function(){ return 'عمال غير مصرّح بهم لدى الضمان الاجتماعي'; },
+      why: 'على صاحب العمل طلب انتساب كل عامل خلال 10 أيام من توظيفه. اختير تلقائياً «عدم انتساب العمال» (المادة 13 من القانون 83-14: 1.000 دج عن كل عامل)'}),
+    biz({id: 'biz_minor', on: function(){ return !!state.bz.minor; }, auto: [['labour', 0]], add: ['labour'],
+      title: function(){ return 'تشغيل قاصر دون 16 سنة'; },
+      why: 'السن الأدنى للتوظيف 16 سنة إلا في عقود التمهين (المادة 15 من القانون 90-11). اختير تلقائياً «تشغيل قاصر لم يبلغ 16 سنة» (المادة 140)'}),
+    biz({id: 'biz_proxy', on: function(){ return !!state.bz.proxy; }, auto: [['rc_shop', 6]], add: ['rc_shop'],
+      title: function(){ return 'شخص آخر يسيّر النشاط باسم صاحب السجل'; },
+      why: 'ممارسة النشاط بالوكالة ممنوعة إلا للزوج والأصول والفروع ضمن شروط (المادة 38 من القانون 04-08). اختير تلقائياً «تأجير السجل» (المادة 38: 1.000.000 إلى 5.000.000 دج على صاحب السجل والوكيل ومحرر العقد، والشطب التلقائي)'}),
+    biz({id: 'biz_address', on: function(){ return !!state.bz.address; }, auto: [['rc_shop', 5]], add: ['rc_shop'],
+      title: function(){ return 'المحل في عنوان غير المكتوب في السجل'; },
+      why: 'تغيير العنوان يُلزم بتعديل مستخرج السجل التجاري خلال شهر (المادة 4 مكرر من القانون 04-08 التي أضافها القانون 26-12). اختير تلقائياً «لم يشرع في تعديل المستخرج خلال شهر» (المادة 37، مصدر واحد)'}),
+    biz({id: 'biz_noshop', on: function(){ return !!state.bz.noshop && state.role === 'business'; }, auto: [['rc_shop', 4]], add: ['rc_shop'],
+      title: function(){ return 'تاجر مستقر دون محل'; },
+      why: 'التاجر المستقر يمارس في محل تجاري (المادة 19 من القانون 04-08). اختير تلقائياً «تاجر مستقر دون محل» (المادة 39: 10.000 إلى 100.000 دج، والشطب التلقائي إن لم تُسوَّ الوضعية خلال 3 أشهر)'})
+  );
+
+  // Found goods bring their own documents
+  var TRANSPORT = ['invoice', 'load_safe', 'long_load', 'veh_cargo', 'customs_circ', 'vet_cert', 'forest_permit', 'plants_permit', 'sand_bon', 'waste_dump', 'own_acc'];
+  var _blb = buildList;
+  buildList = function(ctx){
+    var ids = _blb(ctx);
+    if (ctx && (ctx.role === 'business' || ctx.role === 'vendor') && state.found.trim()) {
+      matchProfiles(state.found).forEach(function(p){ p.docs.forEach(function(id){ if (DOCS[id] && TRANSPORT.indexOf(id) < 0 && ids.indexOf(id) < 0) ids.push(id); }); });
+      if (ctx.role === state.role) state.lastIds = ids.slice();
+    }
+    return ids;
+  };
+
+  // UI in «نشاطي»
+  var CHIPS = [['cold', 'مواد سريعة التلف خارج الثلاجة', 'food'], ['outdoor', 'مواد غذائية معروضة خارج المحل', 'food'], ['undeclared', 'عمال غير مصرّح بهم لدى الضمان الاجتماعي'], ['minor', 'يشغّل قاصراً دون 16 سنة'], ['proxy', 'شخص آخر يسيّر المحل باسم صاحب السجل'], ['address', 'المحل في عنوان غير المكتوب في السجل'], ['noshop', 'تاجر مستقر يمارس دون محل', 'shop']];
+  var slot = $('bizSlot');
+  if (slot && !$('bizCoh')) {
+    var w = document.createElement('div'); w.id = 'bizCoh';
+    w.innerHTML = '<label class="lbl" for="foundIn">ما وجدته عند المراقبة (اختياري)</label>' +
+      '<input type="text" id="foundIn" placeholder="سلعة معروضة أو مخزنة لا تخص النشاط، مثال: مفرقعات، أدوية، سجائر، ذهب" autocomplete="off">' +
+      '<div class="chips small" role="group" aria-label="ما وجدته عند المراقبة">' + CHIPS.map(function(c){ return '<button type="button" class="chip" data-bz="' + c[0] + '" aria-pressed="false">' + c[1] + '</button>'; }).join('') + '</div>' +
+      '<div id="cohBiz" hidden></div>';
+    slot.parentNode.insertBefore(w, slot.nextSibling);
+  }
+  var _rb = render;
+  render = function(){
+    _rb();
+    var isB = state.mode === 'biz', w2 = $('bizCoh');
+    if (!w2) return;
+    w2.hidden = !isB;
+    if (!isB) return;
+    var fi = $('foundIn'); if (fi && document.activeElement !== fi) fi.value = state.found;
+    var food = isFood();
+    w2.querySelectorAll('[data-bz]').forEach(function(b){ var k = b.getAttribute('data-bz'), c = CHIPS.filter(function(x){ return x[0] === k; })[0]; b.hidden = (c[2] === 'food' && !food) || (c[2] === 'shop' && state.role !== 'business'); b.setAttribute('aria-pressed', String(!!state.bz[k] && !b.hidden)); });
+    var src = $('cohDocs'), dst = $('cohBiz');
+    if (src && dst) { dst.innerHTML = src.innerHTML; dst.hidden = !src.innerHTML.trim(); }
+  };
+  document.addEventListener('click', function(e){
+    var b = e.target.closest && e.target.closest('[data-bz]');
+    if (b) { var k = b.getAttribute('data-bz'); state.bz[k] = !state.bz[k]; keep(); render(); }
+  });
+  document.addEventListener('input', function(e){
+    if (e.target && e.target.id === 'foundIn') { state.found = e.target.value; keep(); render(); }
+  });
 })();
 
 render();
