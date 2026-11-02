@@ -3635,6 +3635,232 @@ function flexIsJewel(c){ if (!c || !NOMEN[c]) return false; var t = NOMEN[c][0].
   });
 })();
 
+// ===== Coherence check: vehicle vs. what it carries (02/11/2026) =====
+// When the vehicle chosen in «من أنت» does not match what it carries, the matching offences are selected automatically.
+// Law 01-13 arts 17, 61-5, 62-1, 64 (JO 44/2001 pp. 6, 11, 12, read). Law 26-09 arts 121 (c-1-15), 158 (JO 36/2026, read).
+// Décret 17-140 arts 34-38 (already used by food_hyg). CNRC code 604627 «خدمات الجر و الرأب المتنقل».
+(function(){
+  var P = (function(){ try { return JSON.parse(localStorage.getItem('rbcoh') || '{}') || {}; } catch (e) { return {}; } })();
+  state.pax = !!P.pax; state.cohApplied = P.applied || {};
+  var keep = function(){ try { localStorage.setItem('rbcoh', JSON.stringify({pax: !!state.pax, applied: state.cohApplied})); } catch (e) {} };
+
+  // 1. New item: carrying people for money without a licence
+  DOCS.illegal_pax = {g: 'act', name: 'نقل الأشخاص بمقابل دون رخصة (نقل غير شرعي، «كلونديستان»)', fr: 'Transport de personnes sans autorisation (clandestin)', cases: [
+    {when: 'ينقل أشخاصاً بمقابل أو لحساب الغير بمركبة غير مرخص لها بنقل المسافرين (سيارة خاصة، شاحنة، شاحنة قطر، جرار…)', nature: 'جنحة', act: 'مخالفة الأحكام المتعلقة بتنظيم النقل الخاضع للرخصة: ممارسة نشاط نقل الأشخاص دون الرخص المطلوبة', law: 'route', nass: 'المادتان 17 و61 (البند 5) من القانون 01-13', iqab: 'المادة 158 من القانون 26-09', type: 'court', amount: [200000, 500000], v: 'ok',
+     extra: 'المادة 17 من القانون 01-13: لا يمارس نشاط نقل الأشخاص أو البضائع عبر الطرقات إلا شخص طبيعي أو معنوي رخصت له مصالح الوزير المكلف بالنقل. والمادة 61 (البند 5) تعدّ مخالفة «ممارسة نشاط نقل الأشخاص والبضائع دون الرخص المطلوبة». العقوبة: غرامة من 200.000 إلى 500.000 دج زيادة على التوقيف الفوري للمركبة (المادة 158 من القانون 26-09). ويعاقب القانون 01-13 أيضاً بغرامة من 8.000 إلى 80.000 دج تُضاعف في العود (المادة 64)، والوضع الفوري في المحشر من 15 إلى 45 يوماً، ولا يقرره فوراً إلا ضابط الشرطة القضائية (المادة 62، البند 1). نقل الأقارب أو الأصدقاء دون مقابل ليس مخالفة'}
+  ]};
+  applyAgent(DOCS.illegal_pax.cases[0]);
+
+  // 2. The rules
+  var ROLE = function(r){ var b = document.querySelector('[data-role="' + r + '"]'); return b ? b.textContent : r; };
+  var goodsText = function(){ var t = state.q || ''; if (state.actCode && NOMEN[state.actCode]) t += ' ' + NOMEN[state.actCode].join(' '); return t; };
+  var PERISH = /(^|[\s،,(])(و|ب|ال|وال|بال)?(لحم|لحوم|دجاج|دواجن|سمك|أسماك|اسماك|سردين|حليب|ألبان|البان|ياغورت|ياوورت|يوغورت|زبادي|أجبان|اجبان|جبن|مثلجات|كاشير|مرقاز|نقانق|مجمدات|مجمّدات)|viande|poulet|volaill|poisson|sardine|lait|yaourt|yogourt|fromage|glace|surgel|congel|charcut/i;
+  var NOT_PERISH = /حي($|[\s،,])|حية|أحياء|احياء|vivant|بودرة|مجفف|poudre|معلب|مصبر|conserve/i;
+  var PAX_GOODS = ['driver', 'semi', 'carrier', 'owner', 'tow', 'tractor', 'engine'];
+  var PAX_PAID = ['private', 'rental', 'company', 'foreign', 'autoecole', 'staff', 'staff_ext'];
+  var UNFIT = {tipper: 'قلابة', tanker: 'صهريج محروقات أو غاز', livestock: 'ناقلة مواشي', carrier: 'ناقلة مركبات'};
+  var LEGAL_TR = 'نقل البضائع أو الأشخاص نشاط خاضع لرخصة من مصالح الوزير المكلف بالنقل (المادة 17 من القانون 01-13)';
+  var RULES = [
+    {id: 'tow_goods', on: function(){ return state.role === 'tow' && state.carry; }, auto: [['licence_tr', 0]], add: ['licence_tr', 'own_acc_auth'],
+     title: function(){ return 'شاحنة جر ورأب تنقل سلعة'; },
+     why: 'شاحنة الجر والرأب مخصصة لإسعاف المركبات المعطلة ورفعها (نشاط السجل التجاري 604627)، ونقل البضائع نشاط آخر خاضع لرخصة من مصالح النقل (المادة 17 من القانون 01-13). اختير «النقل دون رخصة» (المادة 158 من القانون 26-09: 200.000 إلى 500.000 دج وتوقيف فوري للمركبة). إن كانت السلعة ملكه ينقلها لحاجته فاختر بدلها «رخصة السير لنقل البضائع للحساب الخاص»، وإن نقلها بمقابل فهو أيضاً نشاط خارج موضوع سجله: قارن في «السجل»'},
+    {id: 'goods_pax', on: function(){ return PAX_GOODS.indexOf(state.role) >= 0 && state.pax; }, auto: [['passengers', 1], ['illegal_pax', 0]], add: ['passengers', 'illegal_pax'],
+     title: function(){ return ROLE(state.role) + ' تنقل أشخاصاً'; },
+     why: 'مركبة لنقل البضائع أو آلة ليست مهيأة لنقل الركاب. اختير تلقائياً: «نقل أشخاص في مركبة غير مهيأة لذلك» (المادة 121، ج، الفئة الأولى، البند 15: 6.000 دج)، و«نقل الأشخاص بمقابل دون رخصة» (المادة 158: 200.000 إلى 500.000 دج). ألغِ ما لا ينطبق: المرافق الجالس في مقعد المقصورة المرخص به ليس مخالفة، ونقل أشخاص دون مقابل ولا لحساب الغير ليس نقلاً دون رخصة'},
+    {id: 'car_paid', on: function(){ return ['private', 'rental', 'company', 'foreign', 'autoecole', 'staff_ext'].indexOf(state.role) >= 0 && state.pax; }, auto: [['illegal_pax', 0]], add: ['illegal_pax'],
+     title: function(){ return ROLE(state.role) + ' تنقل ركاباً بمقابل'; },
+     why: 'السيارة غير مرخص لها بنقل المسافرين بالأجرة. ' + LEGAL_TR + '. اختير تلقائياً «نقل الأشخاص بمقابل دون رخصة» (المادة 158: 200.000 إلى 500.000 دج وتوقيف فوري للمركبة)'},
+    {id: 'staff_paid', on: function(){ return state.role === 'staff' && state.pax; }, auto: [['own_acc', 0]], add: ['own_acc'],
+     title: function(){ return 'حافلة نقل العمال للحساب الخاص تنقل ركاباً بمقابل'; },
+     why: 'رخصة الخدمة الخاصة تغطي نقل عمال المؤسسة لحاجتها فقط. النقل بمقابل لحساب الغير نقل عمومي يحتاج رخصة (المادة 17 من القانون 01-13). اختير تلقائياً «ينقل بضائع أو أشخاصاً لغيره بمقابل بمركبة الحساب الخاص» (المادة 158)'},
+    {id: 'food_unfit', on: function(){ return GOODS_ROLES.indexOf(state.role) >= 0 && UNFIT[state.truck] && (FOOD_RX.test(goodsText()) || matchProfiles(goodsText()).some(function(p){ return ['food', 'veg', 'meat', 'fish'].indexOf(p.id) >= 0; })); }, auto: [['food_hyg', 0]], add: ['food_hyg'],
+     title: function(){ return 'مواد غذائية في شاحنة ' + UNFIT[state.truck]; },
+     why: 'وسيلة نقل المواد الغذائية تكون مخصصة لها وحدها، قابلة للتنظيف والتطهير (المواد 34 إلى 38 من المرسوم التنفيذي 17-140)، والشاحنة المختارة مخصصة لغيرها. اختير تلقائياً «مركبة غير مخصصة للمواد الغذائية» (المادة 72 من القانون 09-03: 50.000 إلى 1.000.000 دج)'},
+    {id: 'food_cold', on: function(){ var t = goodsText(); return GOODS_ROLES.indexOf(state.role) >= 0 && !UNFIT[state.truck] && (state.truck || 'plain') !== 'fridge' && PERISH.test(t) && !NOT_PERISH.test(t); }, auto: [['food_hyg', 0]], add: ['food_hyg'],
+     title: function(){ return 'مواد سريعة التلف في شاحنة غير مبردة'; },
+     why: 'اللحوم والدواجن والأسماك والحليب ومشتقاته والمثلجات تُنقل في مركبة تحافظ على درجة الحرارة دون انقطاع سلسلة التبريد أو التجميد (المرسوم التنفيذي 17-140). اختير تلقائياً «لا تحترم درجة الحرارة» (المادة 72 من القانون 09-03). إن كانت الشاحنة مبردة فاختر نوعها «مبردة» في «من أنت»'},
+    // Hints only: the offence depends on facts the officer must check
+    {id: 'pax_goods', on: function(){ return ROLE_CAT[state.role] === 'pax' && state.carry; }, auto: [], add: ['licence_tr'],
+     title: function(){ return ROLE(state.role) + ' تنقل سلعة'; },
+     why: 'أمتعة الركاب ليست مخالفة. أما نقل سلعة لحساب الغير بمقابل فنقل بضائع دون رخصة (المادة 158): إن ثبت ذلك فاختره في «رخصة ممارسة نشاط نقل البضائع لحساب الغير»'},
+    {id: 'tractor_goods', on: function(){ return state.role === 'tractor' && state.carry; }, auto: [], add: ['licence_tr'],
+     title: function(){ return 'جرار فلاحي ينقل سلعة'; },
+     why: 'نقل الفلاح لمنتوجه أو لوازمه ليس مخالفة. أما نقل سلع الغير بمقابل فنقل بضائع دون رخصة (المادة 158): إن ثبت ذلك فاختره في «رخصة ممارسة نشاط نقل البضائع لحساب الغير»'}
+  ];
+  window.COH = {RULES: RULES, goodsText: goodsText, PERISH: PERISH, NOT_PERISH: NOT_PERISH, UNFIT: UNFIT, ROLE: ROLE};
+  var active = function(){ if (state.mode === 'biz') return []; return RULES.filter(function(r){ try { return r.on(); } catch (e) { return false; } }); };
+
+  // 3. Apply once when a rule turns on; undo when it turns off (unless the user changed the choice)
+  var applyRules = function(){
+    var act = active(), on = {}, changed = false;
+    act.forEach(function(r){ on[r.id] = 1;
+      if (r.auto.length && !state.cohApplied[r.id]) {
+        r.auto.forEach(function(a){ if (DOCS[a[0]] && (state.sel[a[0]] == null || state.sel[a[0]] === '')) state.sel[a[0]] = String(a[1]); });
+        state.cohApplied[r.id] = 1; changed = true;
+      }
+    });
+    Object.keys(state.cohApplied).forEach(function(id){
+      if (on[id]) return;
+      var r = RULES.filter(function(x){ return x.id === id; })[0];
+      if (r) r.auto.forEach(function(a){ var stillOn = act.some(function(o){ return o.auto.some(function(b){ return b[0] === a[0] && b[1] === a[1]; }); }); if (!stillOn && String(state.sel[a[0]]) === String(a[1])) delete state.sel[a[0]]; });
+      delete state.cohApplied[id]; changed = true;
+    });
+    if (changed) { keep(); try { save(); } catch (e) {} }
+    return act;
+  };
+  var _blc = buildList;
+  buildList = function(ctx){
+    var ids = _blc(ctx);
+    if (ctx && ctx.role === state.role && state.mode !== 'biz') {
+      var add = [];
+      active().forEach(function(r){ r.add.forEach(function(id){ if (DOCS[id] && ids.indexOf(id) < 0 && add.indexOf(id) < 0) add.push(id); }); });
+      if (add.length) { var at = ids.indexOf('vignette'); if (at < 0) at = ids.indexOf('assurance'); at = at < 0 ? 0 : at + 1; ids.splice.apply(ids, [at, 0].concat(add)); }
+      state.lastIds = ids.slice();
+    }
+    return ids;
+  };
+
+  // 4. The chip and the notice
+  var box = $('carryBox');
+  if (box && !$('paxChip')) { var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.id = 'paxChip'; b.setAttribute('aria-pressed', 'false'); box.appendChild(b); }
+  var mkNote = function(id, before, tab){ if ($(id) || !before) return; var d = document.createElement('div'); d.id = id; if (tab) d.setAttribute('data-tab', tab); d.hidden = true; before.parentNode.insertBefore(d, before); };
+  mkNote('cohWho', document.querySelector('[data-tab="who"] .linkbtn[data-mode="biz"]'));
+  mkNote('cohDocs', $('groups'), 'docs');
+  var tb = document.querySelector('[data-role="tow"]'); if (tb) tb.textContent = 'شاحنة جر ورأب (قطر، إسعاف ميكانيكي)';
+  if (!document.getElementById('cohCss')) { var st = document.createElement('style'); st.id = 'cohCss'; st.textContent = '.coh{border:1.5px solid var(--bad);border-radius:12px;padding:10px 12px;margin:10px 0;background:color-mix(in srgb,var(--bad) 7%,transparent)}.coh b.t{color:var(--bad);display:block;margin-bottom:4px}.coh p{margin:4px 0;font-size:0.85rem;line-height:1.6}.coh .auto{font-weight:600}.coh.hint{border-color:var(--muted);background:transparent}.coh.hint b.t{color:inherit}#cohDocs .coh{margin:0}'; document.head.appendChild(st); }
+  var noteHtml = function(act){
+    return act.map(function(r){
+      var names = r.auto.filter(function(a){ return DOCS[a[0]] && String(state.sel[a[0]]) === String(a[1]); }).map(function(a){ return '«' + esc(DOCS[a[0]].cases[a[1]].when.replace(/\s*\(.*$/, '')) + '»'; });
+      return '<div class="coh' + (r.auto.length ? '' : ' hint') + '"><b class="t">' + (r.auto.length ? 'عدم انسجام: ' : 'تنبيه: ') + esc(r.title()) + '</b><p>' + esc(r.why) + '.</p>' +
+        (names.length ? '<p class="auto">مخالفات اختيرت تلقائياً في «وثائقي»: ' + names.join('، ') + '. يمكنك تغيير الاختيار من القائمة.</p>' : (r.auto.length ? '<p>غيّرتَ الاختيار التلقائي في «وثائقي».</p>' : '')) + '</div>';
+    }).join('');
+  };
+  var _rc = render;
+  render = function(){
+    var act = applyRules();
+    _rc();
+    var showCarry = !(state.mode === 'biz' || GOODS_ROLES.indexOf(state.role) >= 0);
+    var paxKind = state.mode === 'biz' ? '' : (PAX_GOODS.indexOf(state.role) >= 0 ? 'goods' : (PAX_PAID.indexOf(state.role) >= 0 ? 'paid' : ''));
+    var pc = $('paxChip'), cc = $('carryChip');
+    if (pc) { pc.hidden = !paxKind; pc.textContent = paxKind === 'paid' ? 'أنقل ركاباً بمقابل (أجرة)' : 'أنقل أشخاصاً (ركاباً) في هذه المركبة'; pc.setAttribute('aria-pressed', String(!!state.pax && !!paxKind)); }
+    if (cc) cc.hidden = !showCarry;
+    if (box) box.hidden = !(showCarry || paxKind);
+    var h = noteHtml(act);
+    ['cohWho', 'cohDocs'].forEach(function(id){ var el = $(id); if (el) { el.innerHTML = h; el.hidden = !h; } });
+  };
+  document.addEventListener('click', function(e){
+    if (e.target.closest && e.target.closest('#paxChip')) { state.pax = !state.pax; keep(); render(); }
+  });
+  Object.assign(SYN, {'فرود': 'نقل الاشخاص بمقابل دون رخصه', 'كلونديستان': 'نقل الاشخاص بمقابل دون رخصه', 'كلانديستان': 'نقل الاشخاص بمقابل دون رخصه', 'clandestin': 'نقل الاشخاص بمقابل دون رخصه', 'دبانوز': 'قطر جر', 'ديبانوز': 'قطر جر', 'depanneuse': 'قطر جر', 'جر ورأب': 'قطر جر', 'جر و رأب': 'قطر جر', 'الجر والرأب': 'قطر جر'});
+})();
+
+// ===== What each load needs, per goods type (02/11/2026) =====
+// Décret 04-381 arts 114-117 (JO 76/2004 p. 19, French official translation, read). Décret 03-452 art 12 and décret 04-82 arts 15-16 (already used in the app).
+// Penal code art 387 (local copy, read). CIDTA art 183 ter (2026 version, read).
+(function(){
+  var DEC = 'المرسوم التنفيذي 04-381';
+  var KEEP = 'والمرسوم 04-381 نص تطبيقي للقانون 01-14 يبقى سارياً إلى حين صدور النصوص التطبيقية للقانون 26-09 (المادة 188)';
+  var LOADACT = 'مخالفة شروط السلامة والأمن المروريين الخاصة بالحمولة وبنقل الحاويات';
+  var mk = function(o){ var c = Object.assign({nature: o.type === 'none' ? '' : (o.type === 'court' ? 'جنحة' : 'مخالفة'), law: 'route', v: 'ok'}, o); if (c.type !== 'none') applyAgent(c); return c; };
+
+  // 1. Long loads: iron bars, pipes, beams, logs
+  DOCS.long_load = {g: 'veh', name: 'الحمولة الطويلة (حديد البناء، أنابيب، أعمدة، عوارض، جذوع): لا تتجاوز مقدمة المركبة، ولا تزيد على 3 م خلفها، ومربوطة بإحكام', fr: 'Pièces de grande longueur : arrimage et dépassement arrière ≤ 3 m', cases: [
+    mk({when: 'الحمولة الطويلة تتجاوز مقدمة المركبة، أو تزيد على 3 م خلفها، أو تجر على الأرض', act: LOADACT, nass: 'المادتان 11 و12 من القانون 26-09، والمادة 116 من ' + DEC, iqab: 'المادة 158', type: 'court', amount: [200000, 500000],
+      extra: 'المادة 116 من المرسوم: إذا حُمّلت المركبة بخشب أو قطع طويلة، فلا تتجاوز الحمولة أبداً مقدمة المركبة، ولا تجر على الأرض، ولا تتجاوز مؤخرة المركبة أو مقطورتها بأكثر من 3 أمتار، إلا برخصة الوالي للحمولات التي تتجاوز الحدود (المادة 98). العقوبة: غرامة من 200.000 إلى 500.000 دج زيادة على التوقيف الفوري للمركبة (المادة 158 من القانون 26-09). ' + KEEP}),
+    mk({when: 'القطع الطويلة غير مربوطة ببعضها وبالمركبة، أو السلاسل والأغطية تتدلى خارج الحمولة', act: LOADACT, nass: 'المادتان 11 و12 من القانون 26-09، والمادتان 114 و117 من ' + DEC, iqab: 'المادة 158', type: 'court', amount: [200000, 500000],
+      extra: 'المادة 117: تُربط القطع الطويلة ببعضها وبالمركبة بحيث لا تتجاوز حدودها الجانبية عند الاهتزاز. والمادة 114: كل حمولة قد تتجاوز حدود المركبة بسبب الاهتزاز تُربط بإحكام، والسلاسل والأغطية تُثبّت فلا تخرج عن حدود الحمولة ولا تجر على الأرض، وإن لم تُحترم هذه الأحكام يوقف الأعوان المؤهلون المركبة فوراً. ' + KEEP}),
+    mk({when: 'عرض الحمولة', act: 'لا يتجاوز عرض الحمولة 2,50 م في أي نقطة (المادة 115 من المرسوم 04-381). ما زاد على ذلك نقل استثنائي يحتاج رخصة (انظر «رخصة النقل الاستثنائي»)', type: 'none'})
+  ]};
+
+  // 2. Vehicles carried as goods
+  DOCS.veh_cargo = {g: 'goods', name: 'مركبات منقولة كسلعة (على ناقلة أو شاحنة): وثائقها وتثبيتها', fr: 'Véhicules transportés comme marchandise', cases: [
+    mk({when: 'ما يرافق كل مركبة منقولة', act: 'بطاقتها الرمادية إن كانت مرقمة، أو فاتورة شرائها إن كانت جديدة، والفاتورة أو الوثيقة التي تقوم مقامها إن كان النقل بين أعوان اقتصاديين (انظر «فاتورة البضاعة»). لم أجد نصاً خاصاً آخر بنقل المركبات كسلعة', type: 'none'}),
+    mk({when: 'تثبيت المركبات على الناقلة', act: 'تُربط كل مركبة بإحكام حتى لا تتحرك ولا تتجاوز حدود الناقلة (المادة 114 من المرسوم 04-381). انظر «حمولة مغطاة ومثبّتة» و«الحمولة الطويلة»', type: 'none'}),
+    mk({when: 'مركبة منقولة لا وثيقة لها مع شبهة أنها مسروقة', act: 'إخفاء أشياء مختلسة أو متحصلة من جناية أو جنحة', nass: 'المادة 387 من قانون العقوبات', iqab: 'المادة 387 من قانون العقوبات', law: '', type: 'court', amount: null, v: 'ok',
+      extra: 'المادة 387: «كل من أخفى عمداً أشياء مختلسة أو مبددة أو متحصلة من جناية أو جنحة». الجريمة تشترط علم الناقل بمصدر المركبة، فيُحال الأمر على الشرطة القضائية للتحقيق. لم أذكر مبلغ العقوبة لأني لم أتحقق من صيغتها المحيّنة'})
+  ]};
+
+  // 3. The tax card next to the commercial register
+  if (DOCS.tax_exist) {
+    DOCS.tax_exist.name = 'البطاقة الجبائية: رقم التعريف الجبائي (NIF) وشهادة الوجود (C20)';
+    DOCS.tax_exist.fr = 'Attestation NIF et certificat d’existence (C20)';
+    if (!DOCS.tax_exist.cases.some(function(c){ return /غير محمولة/.test(c.when); }))
+      DOCS.tax_exist.cases.push(mk({when: 'البطاقة غير محمولة أو لا تُقدَّم على الطريق', act: 'لم أجد نصاً يفرض حمل بطاقة رقم التعريف الجبائي أو تقديمها على الطريق. رقم التعريف الجبائي يجب أن يظهر في الفاتورة (انظر «فاتورة البضاعة»)، وعلى تاجر الجملة أن يتحقق قبل البيع من رقم السجل التجاري ورقم التعريف الجبائي لزبونه (المادة 183 ثالثاً من قانون الضرائب المباشرة والرسوم المماثلة)', type: 'none'}));
+  }
+
+  // 4. Goods profiles: what the carrier must have
+  var prof = function(id){ return PROFILES.filter(function(p){ return p.id === id; })[0]; };
+  var note = function(id, t){ var p = prof(id); if (p && String(p.note || '').indexOf(t.slice(0, 20)) < 0) p.note = t + (p.note ? ' ' + p.note : ''); };
+  var addDocs = function(id, ds){ var p = prof(id); if (p) ds.forEach(function(d){ if (p.docs.indexOf(d) < 0) p.docs.push(d); }); };
+  if (!prof('fish')) PROFILES.push({id: 'fish', label: 'أسماك ومنتجات الصيد البحري', keys: ['سمك', 'أسماك', 'اسماك', 'سردين', 'جمبري', 'قمرون', 'كالامار', 'حبار', 'poisson', 'poissons', 'sardine', 'crevette', 'crevettes', 'fruits de mer', 'calamar'], docs: ['food_hyg', 'vet_doc'],
+    note: 'يجب على ناقل السمك: مركبة نظيفة مخصصة للأغذية تحافظ على البرودة دون انقطاع، ومعرّفة لدى السلطة البيطرية، والفاتورة أو وصل البيع.'});
+  if (!prof('poultry_live')) PROFILES.push({id: 'poultry_live', label: 'دواجن حية (دجاج، كتاكيت، ديك رومي)', keys: ['دجاج حي', 'الدجاج الحي', 'دواجن حية', 'الدواجن الحية', 'كتاكيت', 'صيصان', 'ديك رومي حي', 'poussins', 'volaille vivante', 'poulets vivants'], docs: ['vet_cert', 'vet_doc'],
+    note: 'يجب على ناقل الدواجن الحية: مركبة مهيأة تحافظ على حياة الطيور وراحتها (تهوية، أقفاص) ومعرّفة لدى السلطة البيطرية، وتطهيرها بعد النقل.'});
+  if (!prof('veh_cargo')) PROFILES.push({id: 'veh_cargo', label: 'مركبات منقولة كسلعة (سيارات جديدة أو مستعملة)', keys: ['سيارات جديدة', 'سيارات مستعملة', 'سيارة جديدة', 'سيارة مستعملة', 'مركبات جديدة', 'مركبات مستعملة', 'نقل السيارات', 'véhicules neufs', 'voitures neuves', 'véhicules d\'occasion'], docs: ['veh_cargo', 'load_safe'],
+    note: 'يجب على ناقل السيارات: وثيقة كل مركبة (البطاقة الرمادية أو فاتورة الشراء)، وتثبيتها بإحكام، واحترام الأبعاد.'});
+  if (!prof('long_load')) PROFILES.push({id: 'long_load', label: 'حمولة طويلة (حديد البناء، أنابيب، أعمدة، عوارض)', keys: ['حديد البناء', 'حديد التسليح', 'قضبان', 'قضبان حديد', 'أنابيب', 'انابيب', 'عوارض', 'جذوع', 'tubes', 'poutres', 'barres', 'rond à béton', 'fer à béton', 'grumes'], docs: ['long_load'],
+    note: 'يجب على ناقل الحديد والقطع الطويلة: ألا تتجاوز الحمولة مقدمة المركبة ولا تزيد على 3 م خلفها، وأن تُربط القطع ببعضها وبالمركبة.'});
+  if (!prof('inert')) PROFILES.push({id: 'inert', label: 'ردوم ونفايات البناء', keys: ['ردوم', 'الردوم', 'نفايات البناء', 'نفايات هامدة', 'أتربة الحفر', 'gravats', 'déblais'], docs: ['waste_dump', 'load_safe'],
+    note: 'يجب على ناقل الردوم: تغطية الحمولة، وتفريغها في مفرغة مرخصة فقط. رميها على حافة الطريق أو في مكان غير مخصص جنحة (المادة 57 من القانون 01-19).'});
+  note('meat', 'يجب على ناقل اللحوم والدواجن المذبوحة: ختم بيطري ومصدر معروف (مذبح)، ومركبة مبردة نظيفة مخصصة للأغذية ومعرّفة لدى السلطة البيطرية، والفاتورة.');
+  addDocs('meat', ['food_hyg', 'vet_doc']);
+  note('livestock', 'يجب على ناقل المواشي: مركبة مهيأة تحافظ على حياة الحيوانات وراحتها ومعرّفة لدى السلطة البيطرية (المادتان 15 و16 من المرسوم 04-82)، وتطهيرها بعد النقل.');
+  addDocs('livestock', ['vet_doc']);
+  note('sand', 'يجب على ناقل الرمل والحصى: وصل خروج أو فاتورة من مقلع مرخص، وتغطية الحمولة حتى لا تتطاير، واحترام الوزن المرخص.');
+  addDocs('sand', ['load_safe']);
+  addDocs('cement', ['long_load']);
+  addDocs('wood', ['long_load']);
+  addDocs('veg', ['food_hyg']);
+  addDocs('food', ['food_hyg']);
+
+  // Live birds are not meat
+  var LIVE = /(^|[\s،,])(ال)?(حي|حية|أحياء|احياء)($|[\s،,])|كتاكيت|صيصان|vivant/i;
+  var _mpg = matchProfiles;
+  matchProfiles = function(q){
+    var r = _mpg(q);
+    if (LIVE.test(q || '')) { r = r.filter(function(p){ return p.id !== 'meat'; }); var lp = prof('poultry_live'); if (lp && /دجاج|دواجن|ديك|poulet|volaille/i.test(q) && r.indexOf(lp) < 0) r.push(lp); }
+    return r;
+  };
+
+  // 5. More coherence rules
+  if (window.COH) {
+    var C = window.COH, R = C.RULES;
+    var profIds = function(){ return matchProfiles(C.goodsText()).map(function(p){ return p.id; }); };
+    var hasDanger = function(){ var ids = profIds(); return ['chem', 'gas', 'fuel'].some(function(x){ return ids.indexOf(x) >= 0; }); };
+    var goodsCtx = function(){ return GOODS_ROLES.indexOf(state.role) >= 0 || state.carry; };
+    var LIVE_UNFIT = {fridge: 'مبردة', tanker: 'صهريج', tipper: 'قلابة', carrier: 'ناقلة مركبات', container: 'ناقلة حاويات'};
+    R.push(
+      {id: 'danger_food', on: function(){ return goodsCtx() && hasDanger() && (FOOD_RX.test(C.goodsText()) || ['food', 'veg', 'meat', 'fish'].some(function(x){ return profIds().indexOf(x) >= 0; })); }, auto: [['dangerous', 1]], add: ['dangerous'],
+       title: function(){ return 'مواد خطرة مع مواد غذائية في الحمولة نفسها'; },
+       why: 'يمنع شحن المواد الخطرة مع المواد الغذائية في المركبة نفسها (المادة 12 من المرسوم التنفيذي 03-452). اختير تلقائياً «خرق ممنوعات شحن المواد الخطرة» (المادتان 61، البند 3، و63 من القانون 01-13: 4.000 إلى 8.000 دج)'},
+      {id: 'bus_danger', on: function(){ return state.role === 'bus' && state.carry && hasDanger(); }, auto: [['bus_onboard', 2]], add: ['bus_onboard'],
+       title: function(){ return 'حافلة تنقل مواد خطرة'; },
+       why: 'يمنع قبول المواد الخطرة على متن الحافلة أو في مخزن الأمتعة (المادة 25 من دفتر الشروط، قرار 11 أوت 2007). اختير تلقائياً «قبول مواد خطرة على متن الحافلة» (المادتان 61، البند 3، و63 من القانون 01-13: 4.000 إلى 8.000 دج)'},
+      {id: 'live_unfit', on: function(){ var ids = profIds(); return GOODS_ROLES.indexOf(state.role) >= 0 && LIVE_UNFIT[state.truck] && (ids.indexOf('livestock') >= 0 || ids.indexOf('poultry_live') >= 0); }, auto: [], add: ['vet_cert', 'vet_doc'],
+       title: function(){ return 'حيوانات حية في شاحنة ' + LIVE_UNFIT[state.truck]; },
+       why: 'تهيأ وسائل نقل الحيوانات وتجهز بشكل يحافظ على حياتها وراحتها، وتعيّنها السلطة البيطرية بوثيقة (المادتان 15 و16 من المرسوم التنفيذي 04-82). إن عوملت الحيوانات بقسوة أثناء النقل فاختر «سوء معاملة الحيوانات» في «الحالة الصحية للمواشي المنقولة»'},
+      {id: 'perish_car', on: function(){ var t = C.goodsText(); return ['car', 'pax'].indexOf(ROLE_CAT[state.role]) >= 0 && state.carry && C.PERISH.test(t) && !C.NOT_PERISH.test(t); }, auto: [], add: ['food_hyg'],
+       title: function(){ return C.ROLE(state.role) + ' تنقل مواد سريعة التلف'; },
+       why: 'إن كانت اللحوم أو الدواجن أو الأسماك أو الحليب سلعة تجارية، فتُنقل في مركبة مخصصة للأغذية تحافظ على البرودة دون انقطاع (المرسوم التنفيذي 17-140)، وإلا فاختر «مركبة غير مخصصة للمواد الغذائية» في «شروط النظافة في نقل المواد الغذائية». ما يشتريه الشخص لحاجته ليس مخالفة'}
+    );
+  }
+
+  // 6. Placement: the tax card right after the commercial register; transport-only items hidden for shops
+  var _blg = buildList;
+  buildList = function(ctx){
+    var ids = _blg(ctx), r = ctx && ctx.role;
+    if (r === 'business') ids = ids.filter(function(id){ return ['long_load', 'veh_cargo'].indexOf(id) < 0; });
+    var pids = ((ctx && ctx.profiles) || []).map(function(p){ return p.id; });
+    if (pids.length && pids.indexOf('sand') < 0) ids = ids.filter(function(id){ return id !== 'sand_bon'; });
+    if (r === 'carrier' && ids.indexOf('tax_exist') < 0) ids.push('tax_exist');
+    var anchor = ['rc_copy', 'rc_shop', 'licence_tr'].filter(function(id){ return ids.indexOf(id) >= 0; })[0];
+    if (anchor && ids.indexOf('tax_exist') >= 0) { ids.splice(ids.indexOf('tax_exist'), 1); ids.splice(ids.indexOf(anchor) + 1, 0, 'tax_exist'); }
+    if (ctx && ctx.role === state.role) state.lastIds = ids.slice();
+    return ids;
+  };
+  Object.assign(SYN, {'سيارات للبيع': 'سيارات مستعمله', 'بورت شار': 'نقل السيارات', 'porte-char': 'نقل السيارات', 'حديد الخرسانة': 'حديد البناء', 'تيبان': 'انابيب', 'tuyaux': 'انابيب', 'سردينة': 'سردين', 'حوت': 'سمك', 'الحوت': 'سمك', 'بطاقة جبائية': 'البطاقه الجبائيه', 'البطاقة الجبائية': 'البطاقه الجبائيه'});
+})();
+
 render();
 showTab(startTab);
 </script>
