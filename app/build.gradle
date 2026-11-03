@@ -6,8 +6,8 @@ android {
         applicationId 'dz.wathaiq.alhajiz'
         minSdk 26
         targetSdk 34
-        versionCode 45
-        versionName '4.2.0'
+        versionCode 46
+        versionName '4.2.1'
     }
     signingConfigs {
         fixed {

@@ -4117,6 +4117,112 @@ function flexIsJewel(c){ if (!c || !NOMEN[c]) return false; var t = NOMEN[c][0].
   });
 })();
 
+// ===== Each role its own documents (03/11/2026) =====
+// 1. Situational choices (goods, passengers, out of line) do not carry over to another vehicle.
+// 2. «النقل للحساب الخاص» only for private vehicles; tow trucks, machines and authorised passenger transport have their own rules.
+// 3. Tow truck, tractor and machines: people aboard = passengers in an unfit vehicle, not unlicensed transport.
+// 4. Shops: food, weighing and regulated-price items only when the activity is food, weighing or a subsidised staple.
+(function(){
+  // 1. Reset per-vehicle choices when the vehicle changes
+  var resetFor = function(newRole){
+    if (!newRole || newRole === state.role || ROLE_CAT[newRole] === 'biz' || state.mode === 'biz') return;
+    state.carry = false; state.pax = false; state.offline = false;
+    if (GOODS_ROLES.indexOf(newRole) < 0 || GOODS_ROLES.indexOf(state.role) < 0) { state.q = ''; state.actCode = ''; var qi = $('q'); if (qi) qi.value = ''; }
+    try { var a = JSON.parse(localStorage.getItem('rbcoh') || '{}') || {}; a.pax = false; localStorage.setItem('rbcoh', JSON.stringify(a)); } catch (e) {}
+    try { var b = JSON.parse(localStorage.getItem('rbcoh2') || '{}') || {}; b.offline = false; localStorage.setItem('rbcoh2', JSON.stringify(b)); } catch (e) {}
+  };
+  document.addEventListener('click', function(e){
+    if (!e.target.closest) return;
+    var r = e.target.closest('[data-role]');
+    if (r) { resetFor(r.getAttribute('data-role')); return; }
+    var c = e.target.closest('[data-cat]');
+    if (c && c.getAttribute('data-cat') !== ROLE_CAT[state.role]) { var first = document.querySelector('[data-catg="' + c.getAttribute('data-cat') + '"] [data-role]'); if (first) resetFor(first.getAttribute('data-role')); }
+  }, true);
+
+  // 2 and 4. Lists
+  var NO_OWNACC = ['taxi', 'bus', 'school', 'staff_ext', 'ambulance', 'tow', 'tractor', 'engine', 'vtc'];
+  var EQUIP_RX = /تجهيزات|معدات|آلات|أجهزة|عتاد|أدوات|أواني|[ée]quipement|mat[ée]riel|machines|appareils|ustensiles/i;
+  var REALFOOD_RX = /مواد غذائية|منتجات غذائية|alimentaire/i;
+  var FOODONLY = ['conso_food', 'food_premises', 'shop_permanence', 'food_hyg'];
+  var _blr = buildList;
+  buildList = function(ctx){
+    var ids = _blr(ctx), r = ctx && ctx.role;
+    var keep = function(id){ return state.sel[id] != null && state.sel[id] !== ''; };
+    if (NO_OWNACC.indexOf(r) >= 0) ids = ids.filter(function(id){ return id !== 'own_acc' || keep(id); });
+    if (r === 'business' || r === 'vendor') {
+      var code = ctx.act && ctx.act.code, lab = code && NOMEN[code] ? NOMEN[code].join(' ') : '';
+      var hide = {};
+      if (!code) {
+        var t = (state.q || '').trim();
+        var food = !!t && FOOD_RX.test(t);
+        if (!food) FOODONLY.forEach(function(x){ hide[x] = 1; });
+        if (!(food || (t && FLEX_PERM.test(t)))) hide.shop_permanence = 1;
+        if (!(food || (t && FLEX_MEASURE.test(t)))) hide.metrology = 1;
+        if (!(t && (SUBS_RX.test(t) || /مواد غذائية عامة|بقال|alimentation g[ée]n[ée]rale|وقود|محروقات|carburant/i.test(t)))) hide.shop_regprice = 1;
+      } else if (EQUIP_RX.test(lab) && !REALFOOD_RX.test(lab)) {
+        FOODONLY.forEach(function(x){ hide[x] = 1; });
+        if (FLEX_PERM.test(lab.replace(/مطاعم|المطاعم|مقاهي|المقاهي|مطعم|مقهى/g, ''))) delete hide.shop_permanence;
+        if (!FLEX_MEASURE.test(lab)) hide.metrology = 1;
+      }
+      hide.food_hyg = 1;
+      ids = ids.filter(function(id){ return !hide[id] || keep(id); });
+    }
+    if (ctx && ctx.role === state.role) state.lastIds = ids.slice();
+    return ids;
+  };
+
+  // 3. People aboard a tow truck, tractor or machine
+  if (window.COH) {
+    var R = window.COH.RULES;
+    var gp = R.filter(function(x){ return x.id === 'goods_pax'; })[0];
+    if (gp) gp.on = function(){ return ['driver', 'semi', 'carrier', 'owner'].indexOf(state.role) >= 0 && state.pax; };
+    var WHY = {
+      tow: 'نقل صاحب المركبة المعطلة في مقعد المقصورة المرخص به ليس مخالفة. أما إبقاء أشخاص داخل المركبة المقطورة أو المحمولة، أو على صندوق الشاحنة، فهو نقل أشخاص في مركبة غير مهيأة لذلك',
+      tractor: 'الجرار الفلاحي ومقطورته ليسا مهيأين لنقل الأشخاص',
+      engine: 'الآلة الخاصة لا تحمل غير السائق ومرافقاً عند الاقتضاء (المادة 2 من المرسوم 04-381)'
+    };
+    R.push({id: 'machine_pax', on: function(){ return ['tow', 'tractor', 'engine'].indexOf(state.role) >= 0 && state.pax; }, auto: [['passengers', 1]], add: ['passengers'],
+      title: function(){ return state.role === 'tow' ? 'أشخاص داخل المركبة المقطورة أو على الصندوق' : (state.role === 'tractor' ? 'أشخاص على الجرار أو مقطورته' : 'أشخاص على الآلة غير السائق ومرافقه'); },
+      get why(){ return (WHY[state.role] || '') + '. اختير تلقائياً «نقل أشخاص في مركبة غير مهيأة لذلك» (المادة 121، ج، الفئة الأولى، البند 15: 6.000 دج). وإن كان النقل بمقابل فاختر أيضاً «نقل الأشخاص بمقابل دون رخصة» من «بحث»'; }});
+  }
+
+  // Labels and what each role shows
+  var HINTS = {
+    private: 'رخصة السياقة، البطاقة الرمادية، التأمين، المراقبة التقنية، القسيمة، التجهيزات الإجبارية، ومخالفات السير.',
+    rental: 'وثائق السائق والسيارة، عقد كرائها، التجهيزات الإجبارية، ومخالفات السير.',
+    company: 'وثائق السائق والمركبة، الأمر بالمهمة، التجهيزات الإجبارية، ومخالفات السير.',
+    foreign: 'سند المرور الجمركي، الرخصة الأجنبية ومدة الاعتراف بها، التأمين، ومخالفات السير.',
+    autoecole: 'اعتماد مدرسة تعليم السياقة، جهاز القيادة المزدوج، وثائق السائق والمركبة، ومخالفات السير.',
+    vtc: 'وضعية نقل الركاب بالأجرة عبر التطبيقات، وثائق السائق والسيارة، ومخالفات السير.',
+    taxi: 'رخصة استغلال الطاكسي، شهادة الكفاءة، العداد والتعريفة، عدد المقاعد، خط الطاكسي الجماعي ومحطاته، ومخالفات السير.',
+    bus: 'رخصة الاستغلال، الطاقم وشاراته، وثائق الحافلة على متنها، التعريفة، الخط والمحطات، جهاز تسجيل السرعة، ومخالفات السير.',
+    school: 'رخصة النقل المدرسي، تجهيزات المركبة المدرسية، عدد الركاب، ومخالفات السير.',
+    staff: 'رخصة الخدمة الخاصة لنقل العمال، النقل للحساب الخاص فقط، عدد الركاب، ومخالفات السير.',
+    staff_ext: 'رخصة الخدمة الخاصة، الاتفاقية مع المؤسسة المستفيدة، عدد الركاب، ومخالفات السير.',
+    ambulance: 'اعتماد سيارة الإسعاف وتجهيزاتها، وثائق السائق والمركبة، ومخالفات السير.',
+    driver: 'وثائق السائق والشاحنة، الأمر بالمهمة، الحمولة وتثبيتها، وثائق السلعة حسب نوعها، ومخالفات السير.',
+    semi: 'وثائق السائق والجرار والمقطورة، جهاز تسجيل السرعة، الحمولة والأبعاد، وثائق السلعة، ومخالفات السير.',
+    carrier: 'رخصة نقل البضائع لحساب الغير، وثيقة النقل، البطاقة الجبائية، الحمولة، وثائق السلعة، ومخالفات السير.',
+    owner: 'رخصة السير للحساب الخاص، السجل التجاري والبطاقة الجبائية، الفاتورة، الحمولة، ومخالفات السير.',
+    tow: 'وثائق السائق وشاحنة الجر والرأب، قواعد القطر وطول المجموعة والإنارة، تثبيت المركبة المحمولة، ومخالفات السير. لا تظهر وثائق السلعة إلا إذا اخترت أنها تنقل سلعة غير المركبة المعطلة.',
+    moto: 'الخوذة، رخصة السياقة، البطاقة الرمادية والتأمين، ومخالفات السير.',
+    tricycle: 'الخوذة، رخصة السياقة، البطاقة الرمادية والتأمين، الحمولة، ومخالفات السير.',
+    moped: 'الخوذة، البطاقة الرمادية والتأمين، قواعد الدراجة المتحركة، ومخالفات السير.',
+    tractor: 'قواعد سير الجرار الفلاحي ووثائقه، ومخالفات السير.',
+    engine: 'قواعد سير الآلات الخاصة، النقل الاستثنائي، رمي الردوم، ومخالفات السير.'
+  };
+  var _rr = render;
+  render = function(){
+    _rr();
+    if (state.mode === 'biz') return;
+    var r = state.role, rn = $('roleNow'), rb = document.querySelector('[data-role="' + r + '"]');
+    if (rn && rb && HINTS[r]) rn.innerHTML = 'اخترت: <b>' + esc(rb.textContent) + '</b><br><span class="foot">سيعرض لك التطبيق: ' + HINTS[r] + '</span>';
+    var cc = $('carryChip'), pc = $('paxChip');
+    if (cc) cc.textContent = r === 'tow' ? 'تنقل سلعة (غير المركبة المعطلة التي تقطرها)' : (r === 'tractor' ? 'ينقل سلعة غير منتوجه الفلاحي' : 'أنقل سلعة أو بضاعة في هذه المركبة');
+    if (pc && !pc.hidden) pc.textContent = r === 'tow' ? 'أشخاص داخل المركبة المقطورة أو على الصندوق' : (r === 'tractor' ? 'أشخاص على الجرار أو مقطورته' : (r === 'engine' ? 'أشخاص على الآلة غير السائق ومرافقه' : pc.textContent));
+  };
+})();
+
 render();
 showTab(startTab);
 </script>
