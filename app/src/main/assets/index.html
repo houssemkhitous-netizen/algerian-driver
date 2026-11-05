@@ -1757,14 +1757,15 @@ var ICONS = {
 function iconFor(id){ var d = DOCS[id]; if (!d) return ''; if (ICONS[id]) return ICONS[id]; if (['road', 'tech', 'gen'].indexOf(d.g) >= 0) return ''; return docPaper('#5a6b62', '', STAMP('#5a6b62')); }
 
 
-function howOf(c){
+function howOf(c, id){
   var T = TYPES[c.type] || TYPES.court;
-  var conf = {ok: 'مؤكد: الواجب والعقوبة مقروءان في الجريدة الرسمية ومرتبطان صراحة.', one: 'مصدر واحد: صحيحة على الأرجح لكنها تكييف أو من مصدر غير رسمي واحد.', no: 'غير مؤكد: لم يثبت نص الواجب أو العقوبة أو ربطهما، فلا يُعتمد عليها وحدها.'}[c.v] || '';
-  if (c.type === 'none') return 'ليست مخالفة بذاتها: هي معلومة أو قاعدة لم أجد لها عقوبة خاصة، فلا يُحرَّر بها شيء. ' + conf;
+  if (c.type === 'none') return 'للعلم فقط: في هذه الحالة لا غرامة ولا محضر.';
   var amt = c.pct ? (c.pct === 2 ? 'ضعف قيمة البضاعة' : Math.round(c.pct * 100) + '% من قيمة البضاعة') : (c.amount ? (c.amount[0] === c.amount[1] ? fmt0(c.amount[0]) + ' دج' : 'من ' + fmt0(c.amount[0]) + ' إلى ' + fmt0(c.amount[1]) + ' دج') : '');
-  return 'تصبح مخالفة حين: ' + c.when + (c.nass ? '، لأن ' + c.nass + ' يفرض ذلك' : '') + '. وتُعاقَب ' + (c.iqab ? 'بموجب ' + c.iqab : 'دون مادة معاقبة محددة في المصدر') + ': ' + T.label + (amt ? ' (' + amt + ')' : '') + '. ' + conf;
+  var isDoc = !!(id && DOCS[id] && ['road', 'tech', 'gen', 'equip'].indexOf(DOCS[id].g) < 0 && /^(رخصة|رخص|بطاقة|شهادة|وثيقة|وثائق|عقد|سجل|اعتماد|فاتورة|فواتير|تأمين|ترخيص|تصريح|إجازة|وصل|أمر مهمة|سند|دفتر|كشف|محضر|بيان|نسخة|الرخصة|البطاقة|الشهادة|الفاتورة|ورقة)/.test(String(DOCS[id].name).trim()));
+  var out = {forfait: 'غرامة جزافية', court: 'محضر يُحال إلى وكيل الجمهورية', admin: 'محضر وإجراء إداري', settle: 'محضر إلى مديرية التجارة', tax: 'غرامة تفرضها الإدارة المختصة', customs: 'محضر جمركي'}[c.type] || T.label;
+  return (isDoc ? 'يطلب العون هذه الوثيقة عند المراقبة. ' : '') + 'في حالة «' + c.when + '» تكون النتيجة: ' + out + (amt ? ' (' + amt + ')' : '') + '.';
 }
-function howHtml(c){ return '<div class="how"><b>كيف تصبح مخالفة:</b> ' + esc(howOf(c)) + '</div>'; }
+function howHtml(c, id){ return '<div class="how"><b>الوصف العملي:</b> ' + esc(howOf(c, id)) + '</div>'; }
 function docHtml(id){
         var d = DOCS[id], k = state.sel[id] == null ? '' : String(state.sel[id]);
         var cur = k === '' ? null : d.cases[+k];
@@ -1779,7 +1780,7 @@ function docHtml(id){
           var vt = {ok: '<span class="v ok">مؤكد</span>', one: '<span class="v one">مصدر واحد</span>', no: '<span class="v no">غير مؤكد</span>'}[c.v];
           return '<div class="case' + (k === String(i) ? ' on' : '') + '"><div class="case-h"><span class="when">' + esc(c.when) + '</span>' + vt + '</div>' +
             '<div class="qual"><b>صيغة المخالفة:</b> ' + esc(qualOf(c)) + '</div>' +
-            howHtml(c) +
+            howHtml(c, id) +
             (c.type !== 'none' ? '<div class="arts"><div><b>المادة الناصة:</b> ' + esc(c.nass || '—') + '</div><div><b>المادة المعاقبة:</b> ' + esc(c.iqab || '—') + '</div>' + (LAWS[c.law] ? '<div class="lawname">' + esc(LAWS[c.law]) + '</div>' : '') + '</div>' : '') +
             '<div class="meta"><span class="type ' + T.cls + '">' + T.label + '</span><span class="amt">' + amt + '</span></div>' +
             (c.extra ? '<div class="extra">' + esc(c.extra) + '</div>' : '') +
@@ -1913,7 +1914,7 @@ function render(){
     var vt = {ok: '<span class="v ok">مؤكد</span>', one: '<span class="v one">مصدر واحد</span>', no: '<span class="v no">غير مؤكد</span>'}[c.v];
     return '<div class="case' + (added ? ' on' : '') + '"><div class="case-h"><span class="when">' + esc(r.d.name) + ' — ' + esc(c.when) + '</span>' + vt + '</div>' +
       '<div class="qual"><b>صيغة المخالفة:</b> ' + esc(qualOf(c)) + '</div>' +
-            howHtml(c) +
+            howHtml(c, r.id) +
       '<div class="arts"><div><b>المادة الناصة:</b> ' + esc(c.nass || '—') + '</div><div><b>المادة المعاقبة:</b> ' + esc(c.iqab || '—') + '</div>' + (LAWS[c.law] ? '<div class="lawname">' + esc(LAWS[c.law]) + '</div>' : '') + '</div>' +
       '<div class="meta"><span class="type ' + T.cls + '">' + T.label + '</span><span class="amt">' + amt + '</span></div>' +
       (c.extra ? '<div class="extra">' + esc(c.extra) + '</div>' : '') +
@@ -2767,7 +2768,7 @@ function gCaseRow(x, withDoc){
     '<span class="g-sit">' + (withDoc ? 'الحالة: ' : '') + esc(c.when) + '</span>' +
     '<span class="meta"><span class="type ' + T.cls + '">' + T.label + '</span><span class="amt">' + gAmt(c) + '</span>' + vt + '</span>' +
     '<span class="g-ref">' + (c.nass ? 'الواجب: ' + esc(c.nass) + ' · ' : '') + 'العقوبة: ' + esc(c.iqab || '—') + ' · ' + esc(gLaw(c)) + '</span>' +
-    howHtml(c) + (c.extra ? '<details><summary class="foot" style="margin:0">الإجراءات والتفاصيل</summary><div class="extra">' + esc(c.extra) + '</div></details>' : '') + '</div>';
+    howHtml(c, x.id) + (c.extra ? '<details><summary class="foot" style="margin:0">الإجراءات والتفاصيل</summary><div class="extra">' + esc(c.extra) + '</div></details>' : '') + '</div>';
 }
 function gDocRow(id){
   var d = DOCS[id], cs = (d.cases || []).map(function(c, i){ return {id: id, i: i, d: d, c: c}; }).filter(function(x){ return x.c.type !== 'none'; });
