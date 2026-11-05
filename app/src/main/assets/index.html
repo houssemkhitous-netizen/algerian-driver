@@ -2000,7 +2000,7 @@ function showTab(t){
   if (state.mode === 'biz' && (t === 'who' || t === 'rc' || t === 'list')) t = 'biz';
   if (state.mode !== 'biz' && t === 'biz') t = 'who';
   placeShared();
-  var NAV = state.mode === 'biz' ? ['biz', 'docs', 'search', 'sum', 'guide'] : ['who', 'docs', 'list', 'search', 'rc', 'sum', 'guide'];
+  var NAV = state.mode === 'biz' ? ['biz', 'docs', 'search', 'sum', 'guide'] : ['who', 'docs', 'forf', 'list', 'search', 'rc', 'sum', 'guide'];
   document.querySelectorAll('.tabs [data-go]').forEach(function(b){ b.hidden = NAV.indexOf(b.getAttribute('data-go')) < 0; });
   document.querySelector('.tabs').style.gridTemplateColumns = 'repeat(' + NAV.length + ', 1fr)';
   document.querySelectorAll('[data-mode]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === (state.mode || 'drv'))); });
@@ -5009,6 +5009,51 @@ function flexIsJewel(c){ if (!c || !NOMEN[c]) return false; var t = NOMEN[c][0].
   var c = d.cases.filter(function(x){ return /مثقوبة/.test(x.when); })[0]; if (!c) return;
   if (/قدم الحاوية/.test(c.extra)) return;
   c.extra = 'إن كانت الثقوب من قدم الحاوية وتآكلها (صدأ) ولم يُعبث بالأختام: لا أجد نصاً يجعل ذلك مخالفة بحد ذاته. الفحص يكون في ثلاثة أمور. الأول: الأختام سليمة وأرقامها تطابق الوثائق (المادة 127 من قانون الجمارك)، فإن كانت سليمة فلا مخالفة جمركية، وإن كُسرت فهي المادة 319 (البند هـ). الثاني: هل تسقط البضاعة أو تتطاير من الثقوب، فتدخل في بطاقة «سلامة الحمولة» (المادة 158 من القانون 26-09، غرامة 200.000 إلى 500.000 دج)؛ والحاوية مثبتة بأقفالها وليس بأسلاك (المادة 12). الثالث: إن كانت البضاعة مواد غذائية أو خطرة، فشروط الحاوية لها لم أتحقق منها. ' + c.extra;
+})();
+
+// ===== Tab «الجزافية»: same layout as the «المخالفات» tab (card, count, search, doc blocks), only fixed-fine cases =====
+(function(){
+  var cont = document.createElement('div');
+  cont.id = 'groupsForf'; cont.setAttribute('data-tab', 'forf'); cont.style.cssText = 'display:flex;flex-direction:column;gap:16px';
+  var road = document.getElementById('groupsRoad');
+  road.parentNode.insertBefore(cont, road);
+  var listBtn = document.querySelector('.tabs [data-go="list"]');
+  var b = document.createElement('button'); b.type = 'button'; b.setAttribute('data-go', 'forf');
+  b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5h5M10.5 8v5"/></svg><span>جزافية</span>';
+  listBtn.parentNode.insertBefore(b, listBtn);
+  b.addEventListener('click', function(){ showTab('forf'); });
+
+  var _cis = caseInScope;
+  caseInScope = function(c){ return state.forfOnly ? c.type === 'forfait' : _cis(c); };
+
+  var build = function(){
+    var ids = Object.keys(DOCS).filter(function(id){ return DOCS[id].cases.some(function(c){ return c.type === 'forfait'; }); });
+    var total = 0;
+    ids.forEach(function(id){ DOCS[id].cases.forEach(function(c){ if (c.type === 'forfait') total++; }); });
+    var f = normAr(state.forfQ || '');
+    var hit = ids.filter(function(id){
+      var d = DOCS[id];
+      var txt = d.name + ' ' + (d.fr || '') + ' ' + d.cases.filter(function(c){ return c.type === 'forfait'; }).map(function(c){ return c.when + ' ' + (c.act || ''); }).join(' ');
+      return !f || f.split(/\s+/).every(function(p){ return normAr(txt).indexOf(p) >= 0; }) || (state.sel[id] != null && state.sel[id] !== '');
+    });
+    state.forfOnly = true;
+    var html;
+    try {
+      html = hit.map(function(id){
+        var n = DOCS[id].cases.filter(function(c){ return c.type === 'forfait'; }).length;
+        return docHtml(id).replace(/المخالفات والإجراءات \(\d+\)/, 'المخالفات والإجراءات (' + n + ')');
+      }).join('');
+    } finally { state.forfOnly = false; }
+    cont.innerHTML = '<section class="card hc-road"><div class="group-h"><h2>الغرامات الجزافية</h2><span class="count">' + total + ' مخالفة</span></div>' +
+      '<p class="foot" style="margin:0">كل مخالفة عقوبتها غرامة جزافية وحدها، بلا محضر يُحال إلى وكيل الجمهورية.</p>' +
+      '<input type="text" id="forfQ" placeholder="ابحث: رخصة، سرعة، هاتف، حزام، تأمين…" value="' + esc(state.forfQ || '') + '" autocomplete="off">' +
+      html + (hit.length ? '' : '<p class="foot">لا نتيجة. جرّب كلمة أخرى.</p>') + '</section>';
+  };
+  document.addEventListener('input', function(e){
+    if (e.target.id === 'forfQ') { state.forfQ = e.target.value; render(); var r = document.getElementById('forfQ'); if (r) { r.focus(); r.setSelectionRange(r.value.length, r.value.length); } }
+  });
+  var _r = render;
+  render = function(){ _r.apply(this, arguments); if (state.tab === 'forf') build(); };
 })();
 
 render();
